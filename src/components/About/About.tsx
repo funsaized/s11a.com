@@ -28,7 +28,7 @@ class About extends Component {
           <div className="currently">
             <h3>What I'm up to: </h3>
             <button className="muted-button"
-              onClick={() => this.navigateToSomething("https://github.com/snimmagadda1/coding-challenges")}>
+              onClick={() => this.navigateToSomething("https://github.com/funsaized/coding-challenges")}>
               Tryna remember DS & algos
               <StaticImage
                 src={leetCode}

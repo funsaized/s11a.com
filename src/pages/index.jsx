@@ -24,10 +24,10 @@ class Index extends React.Component {
               <div className="social-buttons">
                 <div>
                   <GitHubButton
-                    href="https://github.com/snimmagadda1"
+                    href="https://github.com/funsaized"
                     data-size="large"
                     data-show-count="true"
-                    aria-label="Follow @snimmagadda1 on GitHub"
+                    aria-label="Follow @funsaized on GitHub"
                   >
                     Follow
                   </GitHubButton>

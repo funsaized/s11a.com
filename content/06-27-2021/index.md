@@ -39,7 +39,7 @@ We will cover:
 - How to create a bot to respond to Github webhooks
 - How to package & deploy (on a kubernetes cluster)
 
-The bot's full source can be [found here](https://github.com/snimmagadda1/github-PR-automation). The scope of this post will go over some background and construction of the core functionality.
+The bot's full source can be [found here](https://github.com/funsaized/github-PR-automation). The scope of this post will go over some background and construction of the core functionality.
 
 &nbsp;
 
@@ -51,7 +51,7 @@ It's worth mentioning Github Actions also has some capabilities to create pull r
 
 In order to automate, we'll need to build an application that can perform actions in response to something happening. Github publishes some handy [events](https://docs.github.com/en/developers/webhooks-and-events/events/github-event-types) that apps can subscribe to. At it's core, the bot we're going to build is a web server that will interpret and respond to these events to do something useful. The process of creating a Github app is relatively straightforward and outlined in depth [here](https://docs.github.com/en/developers/apps/building-github-apps/creating-a-github-app).
 
-Set the homepage & callback URL to anything (don't need them for our bot's purposes). However, make sure webhooks are set to active. For the webhook URL, I recommend heading over to [smee.io](https://smee.io) to generate a development webhook URL to start. Smee provides a handy node package we can run to receive forwarded events. During development, smee will act as the middleman to allow our localhost to receive Github event payloads. When the bot is ready to be deployed, we will change the webhook URL to our deployment's domain name. When it comes time to develop, a more detailed description to run your bot locally can be found [here](https://github.com/snimmagadda1/github-PR-automation#usage).
+Set the homepage & callback URL to anything (don't need them for our bot's purposes). However, make sure webhooks are set to active. For the webhook URL, I recommend heading over to [smee.io](https://smee.io) to generate a development webhook URL to start. Smee provides a handy node package we can run to receive forwarded events. During development, smee will act as the middleman to allow our localhost to receive Github event payloads. When the bot is ready to be deployed, we will change the webhook URL to our deployment's domain name. When it comes time to develop, a more detailed description to run your bot locally can be found [here](https://github.com/funsaized/github-PR-automation#usage).
 
 On the permissions page request read/write access to Repository level _Contents_ and _Pull requests_. Continue scrolling and subscribe to the Pull request and Push events:
 
@@ -219,7 +219,7 @@ For each action, here are the corresponding endpoint(s) needed:
 - **Assign reviewers:** I' chose to do this by getting authors who contributed to the branch with **[list commits](https://docs.github.com/en/rest/reference/repos#list-commits)** and followed by **[request reviewers](https://docs.github.com/en/rest/reference/pulls#review-requests)**
 - **Checkout a branch: [Create a reference](https://docs.github.com/en/rest/reference/git#create-a-reference)**
 
-Using libraries the actions above translate to writing minimal code. The `processEvent` method to run whenever a commit is made to the release is below with [full source here](https://github.com/snimmagadda1/github-PR-automation/tree/master/pkg/client):
+Using libraries the actions above translate to writing minimal code. The `processEvent` method to run whenever a commit is made to the release is below with [full source here](https://github.com/funsaized/github-PR-automation/tree/master/pkg/client):
 
 ```go
 func processEvent(p *ghwebhooks.PushPayload) {
@@ -297,7 +297,7 @@ RUN go build -o main cmd/main.go
 CMD ["/app/main"]
 ```
 
-For the deployment manifest, I've included an example. The bot will need some environment variables set specific to where it is being run (Organization name, repos, keys, etc). If you want to view the full definition, you can do so [here](https://github.com/snimmagadda1/github-PR-automation/blob/master/deploy/k8s.yaml). Notably we chose to mount the app's private key as a secret named `github-rsa-keypair` and the mountPath `/app/keys`.
+For the deployment manifest, I've included an example. The bot will need some environment variables set specific to where it is being run (Organization name, repos, keys, etc). If you want to view the full definition, you can do so [here](https://github.com/funsaized/github-PR-automation/blob/master/deploy/k8s.yaml). Notably we chose to mount the app's private key as a secret named `github-rsa-keypair` and the mountPath `/app/keys`.
 
 ```k8s
 .
@@ -319,4 +319,4 @@ Executing the yaml will create a deployment and a service. Don't forget to creat
 
 ## Summary
 
-To keep this post digestible I've left out a decent bit of implementation. Hopefully it gives folks some direction on building similar apps. If you're looking for more detail around the implementation I encourage you to check out the [full source](https://github.com/snimmagadda1/github-PR-automation) or reach out of you have any questions.
+To keep this post digestible I've left out a decent bit of implementation. Hopefully it gives folks some direction on building similar apps. If you're looking for more detail around the implementation I encourage you to check out the [full source](https://github.com/funsaized/github-PR-automation) or reach out of you have any questions.

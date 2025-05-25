@@ -9,7 +9,7 @@ class Footer extends Component {
     return (
       <footer className="footer">
         <div className="container footer">
-            <a href="https://github.com/snimmagadda1" title="Contribute on GitHub">
+            <a href="https://github.com/funsaized" title="Contribute on GitHub">
               <img
                 src={github}
                 rel="noopener noreferrer"

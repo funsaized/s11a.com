@@ -72,7 +72,7 @@ To add some language-specific font accents, I leveraged `VSCode's Inspect Editor
 }
 ```
 
-Full VSCode settings can be found [here](https://github.com/snimmagadda1/dotfiles/blob/main/settings.json).
+Full VSCode settings can be found [here](https://github.com/funsaized/dotfiles/blob/main/settings.json).
 
 ## `style.css`
 

@@ -4,7 +4,7 @@ const config = {
   siteTitleAlt: "s11a website", // Alternative site title for SEO.
   siteLogo: "logos/logo-512.png", // Logo used for SEO and manifest.
   siteUrl: "https://s11a.com", // Domain of your website without pathPrefix.
-  repo: "https://github.com/snimmagadda1/s11a.com",
+  repo: "https://github.com/funsaized/s11a.com",
   pathPrefix: "", // Prefixes all links. For cases when deployed to example.github.io/gatsby-advanced-starter/.
   siteDescription: "A personal development blog", // Website description used for RSS feeds/meta description tag.
   siteRss: "/rss.xml", // Path to the RSS file.
@@ -22,7 +22,7 @@ const config = {
   userLinks: [
     {
       label: "GitHub",
-      url: "https://github.com/snimmagadda1",
+      url: "https://github.com/funsaized",
       iconClassName: "fa fa-github",
     },
     {

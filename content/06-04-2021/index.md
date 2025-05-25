@@ -32,7 +32,7 @@ Here we'll do a practical overview of some of the primary components that you'll
   
 In this set of posts we will build a modest, multi-threaded batch pipeline. It will read a directory of files (XML data dumps from Stack Exchange), perform some processing, and write to a relational DB (MySQL). Here is the link to the full source:
 
-- [**Source**](https://github.com/snimmagadda1/stack-exchange-dump-to-mysql)
+- [**Source**](https://github.com/funsaized/stack-exchange-dump-to-mysql)
 
 ## Intro to batch processing
 

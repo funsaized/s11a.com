@@ -40,7 +40,7 @@ Within the Kubernetes architecture, we’ll be working with a number of objects 
 
 ## Creating the server image
 
-All of the “heavy lifting” for how our files are served is handled by NGINX. We simply have to provide the container some configuration context and instructions for how to serve our files we’d like deployed. Full code for the following tutorials can be found [here](https://github.com/snimmagadda1/nginx-openshift-pvc). First we’ll construct a `Dockerfile` as follows:
+All of the “heavy lifting” for how our files are served is handled by NGINX. We simply have to provide the container some configuration context and instructions for how to serve our files we’d like deployed. Full code for the following tutorials can be found [here](https://github.com/funsaized/nginx-openshift-pvc). First we’ll construct a `Dockerfile` as follows:
 
 ```dockerfile
 FROM nginx:mainline
@@ -119,7 +119,7 @@ Persistent volumes are made available to you as a developer and applications by 
 
 >A PersistentVolume is a specific resource. A PersistentVolumeClaim is a request for a resource with specific attributes, such as storage size. In between the two is a process that matches a claim to an available volume and binds them together. This allows the claim to be used as a volume in a pod. OpenShift Enterprise finds the volume backing the claim and mounts it into the pod.
 
-There are also a number of ways a volume can be added to a project within Openshift. Perhaps the simplest is the oc volume command; however, in the spirit of defining everything as code, we’re going the .yml route and we’ll define our objects via a [deployment](https://github.com/snimmagadda1/nginx-openshift-pvc/blob/master/deployment.yml). The first block of the deployment defines the persistent volume claim that will be used by our deployed NGINX image. Here we make a request for a PVC named nginx-pvc with the given access mode and a storage size of 512 Megabytes:
+There are also a number of ways a volume can be added to a project within Openshift. Perhaps the simplest is the oc volume command; however, in the spirit of defining everything as code, we’re going the .yml route and we’ll define our objects via a [deployment](https://github.com/funsaized/nginx-openshift-pvc/blob/master/deployment.yml). The first block of the deployment defines the persistent volume claim that will be used by our deployed NGINX image. Here we make a request for a PVC named nginx-pvc with the given access mode and a storage size of 512 Megabytes:
 
 ```yaml
 apiVersion: v1
@@ -173,7 +173,7 @@ At this point we have a running NGINX web server attached to a persistent volume
 tar cf - . | oc rsh nginx-static-5c89688f44-nkrxj tar xofC - /var/www/static --no-overwrite-dir
 ```
 
-With files now copied into the volume, we can test it by exposing our service (creating a route) and making a `GET` request to `<base-url>/my_file.pdf`. If you’ve been using the code [here](https://github.com/snimmagadda1/nginx-openshift-pvc) making a request to:
+With files now copied into the volume, we can test it by exposing our service (creating a route) and making a `GET` request to `<base-url>/my_file.pdf`. If you’ve been using the code [here](https://github.com/funsaized/nginx-openshift-pvc) making a request to:
 
 
 ```http

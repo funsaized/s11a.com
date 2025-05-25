@@ -62,7 +62,7 @@ app.post(
 ## Recapping the Oauth2 setup
 
 I'll skip the majority of the Express setup & configuration to focus on the testing approach.
-For reference, the full application and quick start can be found [here](https://github.com/snimmagadda1/express-passport-github-oauth2-functional-testing).
+For reference, the full application and quick start can be found [here](https://github.com/funsaized/express-passport-github-oauth2-functional-testing).
 The project delegates sign in via Github OAuth 2.0, specifically using session-based authentication with cookies. Notably, the app's strategy, `passport-github2`, is defined straight from the docs with `passport.use()`:
 
 ```typescript
@@ -156,7 +156,7 @@ const githubUser = {
   id: "19558427",
   nodeId: "11111",
   displayName: "Sai Nimmagadda",
-  username: "snimmagadda1",
+  username: "funsaized",
 ... // rest of the profile
 
 ```
@@ -164,7 +164,7 @@ const githubUser = {
 ## Configuring passport's strategy conditionally
 
 The trick is to detect the environment (simply using an environment variable here) and provide the strategy to passport accordingly
- (full implementation [here](https://github.com/snimmagadda1/express-passport-github-oauth2-functional-testing/blob/main/loaders/passport-strategy.ts)):
+ (full implementation [here](https://github.com/funsaized/express-passport-github-oauth2-functional-testing/blob/main/loaders/passport-strategy.ts)):
 
 ```typescript
 export default async function () {
@@ -200,7 +200,7 @@ const environmentStrategy = (store: any): passport.Strategy => {
 ```
 
 That's really all there is to it. You can now write tests for your protected routes. Endpoints will be still be protected by the passport middleware, but the strategy will be mocked, making authenticating before each test case a simple procedure.
-[For example, using the `supertest` library](https://github.com/snimmagadda1/express-passport-github-oauth2-functional-testing/blob/main/test/users.test.ts):
+[For example, using the `supertest` library](https://github.com/funsaized/express-passport-github-oauth2-functional-testing/blob/main/test/users.test.ts):
 
 ```typescript
 const createAuthenticatedAgent = async (
@@ -233,7 +233,7 @@ beforeEach(async () => {
 
 ## Resources and further reading
 
-- [Full GitHub repository](https://github.com/snimmagadda1/express-passport-github-oauth2-functional-testing)
+- [Full GitHub repository](https://github.com/funsaized/express-passport-github-oauth2-functional-testing)
 - [Passport.js](https://www.passportjs.org)
 - [supertest](https://github.com/ladjs/supertest)
 

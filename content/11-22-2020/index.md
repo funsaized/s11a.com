@@ -22,7 +22,7 @@ I've been eyeing [styled-components](https://styled-components.com/) for a while
 
 ![](../images/discordClone.png)
 <p style="text-align: center; font-weight: 800; font-style:italic">
-<a href="https://bit.dev/snimmagadda1/discord-login-form/discord-form">Live component here on bit.dev!</a>
+<a href="https://bit.dev/funsaized/discord-login-form/discord-form">Live component here on bit.dev!</a>
 </p>
 
 

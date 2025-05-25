@@ -26,7 +26,7 @@ The [first post in this series](https://s11a.com/building-a-batch-pipeline-01-cr
 - Spring Batch fundamentals. I recommend using the last post in this series as a crash-course in tandem with [Spring's docs](https://docs.spring.io/spring-batch/docs/current/reference/html/)
 - Databases i.e basic relational database concepts
 
-The full, completed source code can be [found here](https://github.com/snimmagadda1/stack-exchange-dump-to-mysql). Below we'll construct the job piece by piece.
+The full, completed source code can be [found here](https://github.com/funsaized/stack-exchange-dump-to-mysql). Below we'll construct the job piece by piece.
 
 ## The scenario
 
@@ -40,14 +40,14 @@ The job will ingest everything in a site on StackExchange (posts, comments, user
 
 Stack Exchange publishes each site in individual archives. They all follow [the same relational schema](https://meta.stackexchange.com/questions/2677/database-schema-documentation-for-the-public-data-dump-and-sede/2678#2678) that can be translated to MySQL. The datamodel for an individual site on the Stack Exchange network can be reduced to a few models: Posts, Comments, Users, Badges, Votes, and Post History.
 
-The schema we'll be using to define a stack exchange site [can be found here](https://github.com/snimmagadda1/stack-exchange-dump-to-mysql/blob/master/src/main/resources/schema-base.sql).
+The schema we'll be using to define a stack exchange site [can be found here](https://github.com/funsaized/stack-exchange-dump-to-mysql/blob/master/src/main/resources/schema-base.sql).
 
 
 ## Setting up the project & reading data
 
 A starting point for many batch jobs is the delivery of a file. In this exercise, the job will read XML files in a target directory. To set that up, we can download our input data from [here](https://archive.org/details/stackexchange).
 
-I started with a fresh clone of the [spring-batch-rapid-starter](https://github.com/snimmagadda1/spring-batch-rapid-starter.git) project. It comes with some basic datasource configurations and an opinionated organization of a Spring Batch project. I downloaded and extracted the dataset to the resources folder to get a clean template for the batch job. I chose to download the dump from [health.stackexchange.com](https://medicalsciences.stackexchange.com):
+I started with a fresh clone of the [spring-batch-rapid-starter](https://github.com/funsaized/spring-batch-rapid-starter.git) project. It comes with some basic datasource configurations and an opinionated organization of a Spring Batch project. I downloaded and extracted the dataset to the resources folder to get a clean template for the batch job. I chose to download the dump from [health.stackexchange.com](https://medicalsciences.stackexchange.com):
 
 ```bash
 src/main/resources
@@ -109,7 +109,7 @@ public class Comment {
 }
 ```
 
-Each of the other objects follows a similar pattern, and all the models [can be found here](https://github.com/snimmagadda1/stack-exchange-dump-to-mysql/tree/master/src/main/java/com/snimma1/model). With entity definitions in hand, we can work on mapping inputs and outputs to them.
+Each of the other objects follows a similar pattern, and all the models [can be found here](https://github.com/funsaized/stack-exchange-dump-to-mysql/tree/master/src/main/java/com/snimma1/model). With entity definitions in hand, we can work on mapping inputs and outputs to them.
 
 ### Reading and parsing XML records in batch
 
@@ -364,7 +364,7 @@ Compiling and running the job results in Posts being printed to the console in r
 ```
 
 Having validated that the `StaxEventItemReader` we created works for post data, the definitions for reading the other Stack Exchange domain objects can be written with the same set of steps.
-Simply define a Bean of type `StaxEventItemReader` that is bound to the POJO representing the data, and use it as the delegate in another `MultiResourceItemReader` pointing to the data on the local filesystem. The final reader definitions for posts, comments, badges, post history, users, and votes are [defined here](https://github.com/snimmagadda1/stack-exchange-dump-to-mysql).
+Simply define a Bean of type `StaxEventItemReader` that is bound to the POJO representing the data, and use it as the delegate in another `MultiResourceItemReader` pointing to the data on the local filesystem. The final reader definitions for posts, comments, badges, post history, users, and votes are [defined here](https://github.com/funsaized/stack-exchange-dump-to-mysql).
 
 ## Connecting & writing to MySQL
 
@@ -378,7 +378,7 @@ docker run --name test-mysql -e MYSQL_ROOT_PASSWORD=password -e MYSQL_ROOT_USER=
 
 >I happen to be running apple silicon and the typical mysql image doesn't work. As a workaround I ended up using this [mysql-server image](https://hub.docker.com/r/mysql/mysql-server) without issue.
 
-Once your instance of MySQL is running, the last setup step is to create the target database and execute the schema. I created a database `stacke` and executed [the full schema here](https://github.com/snimmagadda1/stack-exchange-dump-to-mysql/blob/master/src/main/resources/schema-base.sql) to get a set of empty tables to populate via the batch job.
+Once your instance of MySQL is running, the last setup step is to create the target database and execute the schema. I created a database `stacke` and executed [the full schema here](https://github.com/funsaized/stack-exchange-dump-to-mysql/blob/master/src/main/resources/schema-base.sql) to get a set of empty tables to populate via the batch job.
 
 With a running database and empty schema let's make the working batch application aware of it by adding an additional data source. The rapid-starter template already has taken care of most of the boilerplate to do so. Configuring the `app.datasource` properties with our MySQL details in `application.yaml` will do the job:
 
@@ -635,7 +635,7 @@ public Step step1(
 
 ## Executing parallel writes
 
-Each of the other `Step`s in job follows the same pattern outlined above (save for the processing step). You can find the full set of `Step` [definitions here](https://github.com/snimmagadda1/stack-exchange-dump-to-mysql/blob/master/src/main/java/com/snimma1/config/batch/BatchConfig.java#L107). What I want to focus on before recapping is the concept of parallel processing within Spring Batch.
+Each of the other `Step`s in job follows the same pattern outlined above (save for the processing step). You can find the full set of `Step` [definitions here](https://github.com/funsaized/stack-exchange-dump-to-mysql/blob/master/src/main/java/com/snimma1/config/batch/BatchConfig.java#L107). What I want to focus on before recapping is the concept of parallel processing within Spring Batch.
 
 The framework offers two modes of parallel processing:
 

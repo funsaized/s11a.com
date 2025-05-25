@@ -38,7 +38,7 @@ export ACCOUNT_KEY="test=="
 export ACCOUNT_HOST="https://test.documents.azure.com:443/"
 ```
 
-You can then run the example code. [It can be found here](https://github.com/snimmagadda1/azure-cosmos-stored-procedure-pagination-continuation) in its entirety. Below we will go through the code. It will:
+You can then run the example code. [It can be found here](https://github.com/funsaized/azure-cosmos-stored-procedure-pagination-continuation) in its entirety. Below we will go through the code. It will:
 
 1. Create the `ToDoList` database
 2. Create the `Items` collection
@@ -137,7 +137,7 @@ private GetItemsProcedureResponse runStoredProcedure(String continuation) throws
 
 ```
 
-I've put together example code that demonstrates the process [here](https://github.com/snimmagadda1/azure-cosmos-stored-procedure-pagination-continuation). Simply clone, set the env vars for your cosmos instance, package, and then run it to inspect the output of the procedure calls:
+I've put together example code that demonstrates the process [here](https://github.com/funsaized/azure-cosmos-stored-procedure-pagination-continuation). Simply clone, set the env vars for your cosmos instance, package, and then run it to inspect the output of the procedure calls:
 
 ```log
 INFO: Getting database account endpoint from https://XXXX.documents.azure.com:443/
