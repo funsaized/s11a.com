@@ -1,6 +1,6 @@
 import React, { Component } from "react";
-import _ from "lodash";
 import { Link } from "gatsby";
+import kebabCase from "lodash.kebabcase";
 
 type Props = {
   tags: string[];
@@ -17,7 +17,7 @@ class PostTags extends Component<Props, {}> {
             <Link
               key={tag}
               style={{ textDecoration: "none" }}
-              to={`/tags/${_.kebabCase(tag)}`}
+              to={`/tags/${kebabCase(tag)}`}
             >
               <button type="button">{tag}</button>
             </Link>

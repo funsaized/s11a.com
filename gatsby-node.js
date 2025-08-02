@@ -1,10 +1,25 @@
 /* eslint-disable no-console */
 const path = require("path");
-const _ = require("lodash");
-const moment = require("moment");
 // eslint-disable-next-line import/no-extraneous-dependencies
 const webpack = require("webpack");
+const kebabCase = require("lodash.kebabcase");
 const siteConfig = require("./data/SiteConfig");
+
+// Native Date parsing function to replace moment
+const parseDate = (dateString, format) => {
+  // Handle MM-DD-YYYY format
+  if (format === "MM-DD-YYYY" && dateString.includes("-")) {
+    const [month, day, year] = dateString.split("-");
+    return new Date(Date.UTC(year, month - 1, day));
+  }
+  // Handle MM/DD/YYYY format (common in frontmatter)
+  if (dateString.includes("/")) {
+    const [month, day, year] = dateString.split("/");
+    return new Date(Date.UTC(year, month - 1, day));
+  }
+  // Default to native Date parsing
+  return new Date(dateString);
+};
 
 exports.onCreateWebpackConfig = ({ actions }) => {
   actions.setWebpackConfig({
@@ -37,7 +52,7 @@ exports.onCreateNode = ({ node, actions, getNode }) => {
       Object.prototype.hasOwnProperty.call(node, "frontmatter") &&
       Object.prototype.hasOwnProperty.call(node.frontmatter, "title")
     ) {
-      slug = `/${_.kebabCase(node.frontmatter.title)}`;
+      slug = `/${kebabCase(node.frontmatter.title)}`;
     } else if (parsedFilePath.name !== "index" && parsedFilePath.dir !== "") {
       slug = `/${parsedFilePath.dir}/${parsedFilePath.name}/`;
     } else if (parsedFilePath.dir === "") {
@@ -48,11 +63,15 @@ exports.onCreateNode = ({ node, actions, getNode }) => {
 
     if (Object.prototype.hasOwnProperty.call(node, "frontmatter")) {
       if (Object.prototype.hasOwnProperty.call(node.frontmatter, "slug"))
-        slug = `/${_.kebabCase(node.frontmatter.slug)}`;
+        slug = `/${kebabCase(node.frontmatter.slug)}`;
       if (Object.prototype.hasOwnProperty.call(node.frontmatter, "date")) {
-        const date = moment(node.frontmatter.date, siteConfig.dateFromFormat);
-        if (!date.isValid)
+        const date = parseDate(
+          node.frontmatter.date,
+          siteConfig.dateFromFormat,
+        );
+        if (Number.isNaN(date.getTime())) {
           console.warn(`WARNING: Invalid date.`, node.frontmatter);
+        }
 
         createNodeField({
           node,
@@ -103,20 +122,18 @@ exports.createPages = async ({ graphql, actions }) => {
   const postsEdges = markdownQueryResult.data.allMarkdownRemark.edges;
 
   postsEdges.sort((postA, postB) => {
-    const dateA = moment(
+    const dateA = parseDate(
       postA.node.frontmatter.date,
       siteConfig.dateFromFormat,
     );
 
-    const dateB = moment(
+    const dateB = parseDate(
       postB.node.frontmatter.date,
       siteConfig.dateFromFormat,
     );
 
-    if (dateA.isBefore(dateB)) return 1;
-    if (dateB.isBefore(dateA)) return -1;
-
-    return 0;
+    // Sort in descending order (newer dates first)
+    return dateB.getTime() - dateA.getTime();
   });
 
   postsEdges.forEach((edge, index) => {
@@ -150,54 +167,20 @@ exports.createPages = async ({ graphql, actions }) => {
 
   tagSet.forEach((tag) => {
     createPage({
-      path: `/tags/${_.kebabCase(tag)}/`,
+      path: `/tags/${kebabCase(tag)}/`,
       component: tagPage,
       context: {
         tag,
       },
     });
   });
+
   categorySet.forEach((category) => {
     createPage({
-      path: `/categories/${_.kebabCase(category)}/`,
+      path: `/categories/${kebabCase(category)}/`,
       component: categoryPage,
       context: {
         category,
-      },
-    });
-  });
-
-  // Notes
-  const notesRes = await graphql(`
-    {
-      allFile(
-        filter: {
-          sourceInstanceName: { eq: "notes" }
-          extension: { eq: "pdf" }
-        }
-      ) {
-        nodes {
-          name
-          publicURL
-        }
-      }
-    }
-  `);
-
-  if (notesRes.errors) {
-    console.error(notesRes.errors);
-    throw notesRes.errors;
-  }
-
-  // Create pages for notes
-  notesRes.data.allFile.nodes.forEach((node) => {
-    const slug = `/notes/${node.name}`;
-    createPage({
-      path: slug,
-      component: path.resolve("src/templates/note.jsx"),
-      context: {
-        slug,
-        noteFile: node.publicURL,
       },
     });
   });
