@@ -7,11 +7,15 @@ import PostListing from "../components/PostListing/PostListing";
 import ProjectListing from "../components/ProjectListing/ProjectListing";
 import SEO from "../components/SEO/SEO";
 import config from "../../data/SiteConfig";
-import projects from '../../data/projects'
+import projects from "../../data/projects";
 
 class Index extends React.Component {
   render() {
-    const postEdges = this.props.data.allMarkdownRemark.edges;
+    const {
+      data: {
+        allMarkdownRemark: { edges: postEdges },
+      },
+    } = this.props;
     return (
       <Layout>
         <div className="index-container">
@@ -19,8 +23,13 @@ class Index extends React.Component {
           <SEO />
           <div className="container">
             <div className="lead">
-              <h1>Hi, I'm Sai</h1>
-              <p>I'm a full stack software engineer focused on using tech to find novel solutions to today's problems. My day to day focus is largely in the healthcare sphere. I build things, contribute to open source, and love a good challenge.</p>
+              <h1>Hi, I&apos;m Sai</h1>
+              <p>
+                I&apos;m a full stack software engineer focused on using tech to
+                find novel solutions to today&apos;s problems. My day to day
+                focus is largely in the healthcare sphere. I build things,
+                contribute to open source, and love a good challenge.
+              </p>
               <div className="social-buttons">
                 <div>
                   <GitHubButton
@@ -44,7 +53,7 @@ class Index extends React.Component {
             <section className="section">
               <h2>OSS & Projects</h2>
               <ProjectListing projects={projects} />
-          </section>
+            </section>
           </div>
         </div>
       </Layout>
@@ -55,32 +64,34 @@ class Index extends React.Component {
 export default Index;
 
 /* eslint no-undef: "off" */
-export const pageQuery = graphql`query IndexQuery {
-  allMarkdownRemark(
-      limit: 2000, 
-      sort: {fields: {date: DESC}},
-      filter: {frontmatter: {type: {eq: "post"}}}
+export const pageQuery = graphql`
+  query IndexQuery {
+    allMarkdownRemark(
+      limit: 2000
+      sort: { fields: { date: DESC } }
+      filter: { frontmatter: { type: { eq: "post" } } }
     ) {
-    edges {
-      node {
-        fields {
-          slug
-          date
-        }
-        excerpt
-        timeToRead
-        frontmatter {
-          title
-          tags
-          cover
-          date
-          thumbnail {
-            childImageSharp {
-              gatsbyImageData(layout: FIXED, width: 50, height: 50)
+      edges {
+        node {
+          fields {
+            slug
+            date
+          }
+          excerpt
+          timeToRead
+          frontmatter {
+            title
+            tags
+            cover
+            date
+            thumbnail {
+              childImageSharp {
+                gatsbyImageData(layout: FIXED, width: 50, height: 50)
+              }
             }
           }
         }
       }
     }
   }
-}`;
+`;

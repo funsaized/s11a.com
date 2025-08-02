@@ -1,8 +1,10 @@
+/* eslint-disable no-console */
 const path = require("path");
 const _ = require("lodash");
 const moment = require("moment");
-const siteConfig = require("./data/SiteConfig");
+// eslint-disable-next-line import/no-extraneous-dependencies
 const webpack = require("webpack");
+const siteConfig = require("./data/SiteConfig");
 
 exports.onCreateWebpackConfig = ({ actions }) => {
   actions.setWebpackConfig({
@@ -70,27 +72,25 @@ exports.createPages = async ({ graphql, actions }) => {
   const tagPage = path.resolve("src/templates/tag.jsx");
   const categoryPage = path.resolve("src/templates/category.jsx");
 
-  const markdownQueryResult = await graphql(
-    `
-      {
-        allMarkdownRemark {
-          edges {
-            node {
-              fields {
-                slug
-              }
-              frontmatter {
-                title
-                tags
-                category
-                date
-              }
+  const markdownQueryResult = await graphql(`
+    {
+      allMarkdownRemark {
+        edges {
+          node {
+            fields {
+              slug
+            }
+            frontmatter {
+              title
+              tags
+              category
+              date
             }
           }
         }
       }
-    `
-  );
+    }
+  `);
 
   if (markdownQueryResult.errors) {
     console.error(markdownQueryResult.errors);
@@ -105,12 +105,12 @@ exports.createPages = async ({ graphql, actions }) => {
   postsEdges.sort((postA, postB) => {
     const dateA = moment(
       postA.node.frontmatter.date,
-      siteConfig.dateFromFormat
+      siteConfig.dateFromFormat,
     );
 
     const dateB = moment(
       postB.node.frontmatter.date,
-      siteConfig.dateFromFormat
+      siteConfig.dateFromFormat,
     );
 
     if (dateA.isBefore(dateB)) return 1;

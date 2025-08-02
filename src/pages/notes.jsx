@@ -1,41 +1,47 @@
-import React, { Component } from 'react'
-import Helmet from 'react-helmet'
-import { Link, graphql } from 'gatsby'
-import Layout from '../layout'
-import SEO from '../components/SEO/SEO'
-import config from '../../data/SiteConfig'
+import React, { Component } from "react";
+import Helmet from "react-helmet";
+import { Link, graphql } from "gatsby";
+import Layout from "../layout";
+import SEO from "../components/SEO/SEO";
+import config from "../../data/SiteConfig";
 import { slugToTitle } from "../services/appConstants";
 
 export default class NotesPage extends Component {
-  state = {
-    searchTerm: '',
-    notes: this.props.data.notes.nodes,
-    filteredNotes: this.props.data.notes.nodes,
+  constructor(props) {
+    super(props);
+    const {
+      data: {
+        notes: { nodes },
+      },
+    } = props;
+    this.state = {
+      searchTerm: "",
+      notes: nodes,
+      filteredNotes: nodes,
+    };
   }
 
-  handleChange = async event => {
-    const { name, value } = event.target
-    console.warn('Handling change in notes listing with name:', name, 'and value:', value);
+  handleChange = async (event) => {
+    const { name, value } = event.target;
+    this.setState({ [name]: value });
 
-    await this.setState({ [name]: value })
-
-    this.filterPosts()
-  }
+    this.filterPosts();
+  };
 
   filterPosts = () => {
-    const { notes, searchTerm } = this.state
+    const { notes, searchTerm } = this.state;
 
-    let filteredNotes = notes.filter(notes =>
-      notes.name.toLowerCase().includes(searchTerm.toLowerCase())
-    )
+    const filteredNotes = notes.filter((n) =>
+      n.name.toLowerCase().includes(searchTerm.toLowerCase()),
+    );
 
-    this.setState({ filteredNotes })
-  }
+    this.setState({ filteredNotes });
+  };
 
   render() {
-    const { filteredNotes, searchTerm } = this.state
+    const { filteredNotes, searchTerm } = this.state;
     // todo
-    const filterCount = filteredNotes.length
+    const filterCount = filteredNotes.length;
 
     return (
       <Layout>
@@ -43,7 +49,10 @@ export default class NotesPage extends Component {
         <SEO />
         <div className="container">
           <h1>Notes</h1>
-          <p>Writing things helps with understanding. Below is a repo of my scribbles...</p>
+          <p>
+            Writing things helps with understanding. Below is a repo of my
+            scribbles...
+          </p>
           <div className="search-container">
             <input
               className="search"
@@ -56,26 +65,26 @@ export default class NotesPage extends Component {
             <div className="filter-count">{filterCount}</div>
           </div>
           <div className="notes">
-            {
-              filteredNotes.map(note => {
-                return (
-                  <Link to={`/notes/${note.name}`}>
-                    <h2>{slugToTitle(note.name.replace('/notes/', ''))}</h2>
-                  </Link>
-                )
-              })
-            }
+            {filteredNotes.map((note) => (
+              <Link to={`/notes/${note.name}`}>
+                <h2>{slugToTitle(note.name.replace("/notes/", ""))}</h2>
+              </Link>
+            ))}
           </div>
         </div>
       </Layout>
-    )
+    );
   }
 }
 
-export const pageQuery = graphql`query NotesQuery {
-  notes: allFile(filter: {sourceInstanceName: {eq: "notes"}, extension: {eq: "pdf"}}) {
-    nodes {
-      name
+export const pageQuery = graphql`
+  query NotesQuery {
+    notes: allFile(
+      filter: { sourceInstanceName: { eq: "notes" }, extension: { eq: "pdf" } }
+    ) {
+      nodes {
+        name
+      }
     }
   }
-}`
+`;

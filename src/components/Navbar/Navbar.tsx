@@ -1,20 +1,23 @@
 import React, { Component } from "react";
 import { Link } from "gatsby";
-import { StaticImage } from "gatsby-plugin-image"
+import { StaticImage } from "gatsby-plugin-image";
 import { MenuLink } from "../../models";
 
 type Props = {
-  menuLinks: MenuLink[]
-}
+  menuLinks: MenuLink[];
+};
 
 type State = {
   scrolled: boolean;
 };
 
 export default class Navbar extends Component<Props, State> {
-  state = {
-    scrolled: false
-  };
+  constructor(props: Props) {
+    super(props);
+    this.state = {
+      scrolled: false,
+    };
+  }
 
   componentDidMount() {
     window.addEventListener("scroll", this.navOnScroll);
@@ -41,12 +44,16 @@ export default class Navbar extends Component<Props, State> {
         <div className="nav-container">
           <div className="me">
             <Link key="sai" to="/" activeClassName="active">
-              <StaticImage src="../../images/face.png" className="favicon" alt="Face" />
+              <StaticImage
+                src="../../images/face.png"
+                className="favicon"
+                alt="Face"
+              />
               <span className="text">Sai Nimmagadda</span>
             </Link>
           </div>
           <div className="links">
-            {menuLinks.map(link => (
+            {menuLinks.map((link) => (
               <Link key={link.name} to={link.link} activeClassName="active">
                 {link.name}
               </Link>

@@ -7,8 +7,12 @@ import config from "../../data/SiteConfig";
 
 export default class CategoryTemplate extends React.Component {
   render() {
-    const { category } = this.props.pageContext;
-    const postEdges = this.props.data.allMarkdownRemark.edges;
+    const {
+      pageContext: { category },
+      data: {
+        allMarkdownRemark: { edges: postEdges },
+      },
+    } = this.props;
     return (
       <Layout>
         <div className="category-container">
@@ -23,28 +27,30 @@ export default class CategoryTemplate extends React.Component {
 }
 
 /* eslint no-undef: "off" */
-export const pageQuery = graphql`query CategoryPage($category: String) {
-  allMarkdownRemark(
-    limit: 1000
-    sort: {fields: {date: DESC}}
-    filter: {frontmatter: {category: {eq: $category}}}
-  ) {
-    totalCount
-    edges {
-      node {
-        fields {
-          slug
-          date
-        }
-        excerpt
-        timeToRead
-        frontmatter {
-          title
-          tags
-          cover
-          date
+export const pageQuery = graphql`
+  query CategoryPage($category: String) {
+    allMarkdownRemark(
+      limit: 1000
+      sort: { fields: { date: DESC } }
+      filter: { frontmatter: { category: { eq: $category } } }
+    ) {
+      totalCount
+      edges {
+        node {
+          fields {
+            slug
+            date
+          }
+          excerpt
+          timeToRead
+          frontmatter {
+            title
+            tags
+            cover
+            date
+          }
         }
       }
     }
   }
-}`;
+`;

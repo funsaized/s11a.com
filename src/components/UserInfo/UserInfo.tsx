@@ -2,16 +2,19 @@ import React, { Component } from "react";
 import { Follow } from "react-twitter-widgets";
 import { Config } from "../../models";
 
-type Props = {
-    config: Config,
-    expanded: boolean
-}
+type UserInfoProps = {
+  config: Config;
+  expanded: boolean;
+};
 
-class UserInfo extends Component<Props, {}> {
+// eslint-disable-next-line react/prefer-stateless-function
+class UserInfo extends Component<UserInfoProps, {}> {
   render() {
-    const { userTwitter } = this.props.config;
-    const { expanded } = this.props;
+    const { config, expanded } = this.props;
+    const { userTwitter } = config;
     return (
+      // TODO: remove the react-twitter-widgets dependency
+      // eslint-disable-next-line react/jsx-filename-extension
       <Follow
         username={userTwitter}
         options={{ count: expanded ? true : "none" }}

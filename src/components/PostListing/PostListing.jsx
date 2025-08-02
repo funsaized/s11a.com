@@ -1,11 +1,12 @@
 import React from "react";
-import { GatsbyImage, getImage } from 'gatsby-plugin-image'
+import { GatsbyImage, getImage } from "gatsby-plugin-image";
 import { Link } from "gatsby";
 
 class PostListing extends React.Component {
   getPostList() {
     const postList = [];
-    this.props.postEdges.forEach(postEdge => {
+    const { postEdges } = this.props;
+    postEdges.forEach((postEdge) => {
       postList.push({
         path: postEdge.node.fields.slug,
         tags: postEdge.node.frontmatter.tags,
@@ -15,28 +16,35 @@ class PostListing extends React.Component {
         date: postEdge.node.fields.date,
         excerpt: postEdge.node.excerpt,
         timeToRead: postEdge.node.timeToRead,
-        isdev: postEdge.node.frontmatter.isdev
+        isdev: postEdge.node.frontmatter.isdev,
       });
     });
     return postList;
   }
+
   render() {
     const postList = this.getPostList();
-    const { expanded } = this.props
+    const { expanded } = this.props;
 
     return (
-      <div className={`posts ${expanded ? 'expanded' : ''}`}>
-        {postList.map(post => {
+      <div className={`posts ${expanded ? "expanded" : ""}`}>
+        {postList.map((post) => {
           let thumbnail;
-          if (post.thumbnail) {
-            thumbnail = getImage(post.thumbnail);
+          if (post.thumbnail && post.thumbnail.childImageSharp) {
+            thumbnail = getImage(
+              post.thumbnail.childImageSharp.gatsbyImageData,
+            );
           }
 
           return (
             <Link to={post.path} key={post.title}>
-               <div className="post-info">
+              <div className="post-info">
                 <div className="icon">
-                  {thumbnail ? <GatsbyImage image={thumbnail} alt=""/> : <div />}
+                  {thumbnail ? (
+                    <GatsbyImage image={thumbnail} alt="" />
+                  ) : (
+                    <div />
+                  )}
                 </div>
                 <div className="post-line">
                   <h2>{post.title}</h2>

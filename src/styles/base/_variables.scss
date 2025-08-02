@@ -50,22 +50,22 @@ $font-style               : normal                                     !default;
 $font-variant             : normal                                     !default;
 $font-weight              : normal                                     !default;
 $font-color               : #404040                                  !default;
-$font-family              : -apple-system, 
-                            BlinkMacSystemFont, 
-                            Helvetica Neue, 
-                            Helvetica, 
-                            Arial, 
+$font-family              : -apple-system,
+                            BlinkMacSystemFont,
+                            Helvetica Neue,
+                            Helvetica,
+                            Arial,
                             sans-serif                                 !default;
 $line-height              : 1.6                                        !default;
 
 // Headings
 $heading-font-color       : #404040 !default;
 $heading-font-weight      : 600 !default;
-$heading-font-family      : -apple-system, 
-                            BlinkMacSystemFont, 
-                            Helvetica Neue, 
-                            Helvetica, 
-                            Arial, 
+$heading-font-family      : -apple-system,
+                            BlinkMacSystemFont,
+                            Helvetica Neue,
+                            Helvetica,
+                            Arial,
                             sans-serif                                 !default;
 $heading-line-height      : 1.2 !default;
 
@@ -110,11 +110,11 @@ $button-background        : $primary-color                             !default;
 $button-background-hover  : darken($button-background, 10%)            !default;
 $button-color             : #ffffff                                  !default;
 $button-font-weight       : 600                                        !default;
-$button-font-family       : -apple-system, 
-                            BlinkMacSystemFont, 
-                            Helvetica Neue, 
-                            Helvetica, 
-                            Arial, 
+$button-font-family       : -apple-system,
+                            BlinkMacSystemFont,
+                            Helvetica Neue,
+                            Helvetica,
+                            Arial,
                             sans-serif                                 !default;
 $button-font-size         : 1rem                                       !default;
 $button-border-width      : 1px                                        !default;
