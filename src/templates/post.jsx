@@ -1,7 +1,7 @@
 import React from "react";
 import Helmet from "react-helmet";
 import { graphql } from "gatsby";
-import { GatsbyImage, getImage } from 'gatsby-plugin-image'
+import { GatsbyImage, getImage } from "gatsby-plugin-image";
 import Layout from "../layout";
 import UserInfo from "../components/UserInfo/UserInfo";
 import PostTags from "../components/PostTags/PostTags";
@@ -19,9 +19,6 @@ export default class PostTemplate extends React.Component {
     const post = postNode.frontmatter;
     let thumbnail;
     const date = formatDate(post.date);
-    const twitterShare = `http://twitter.com/share?text=${encodeURIComponent(
-      post.title
-    )}&url=${config.siteUrl}/${post.slug}/&via=funsaized`;
 
     const githubLink = editOnGithub(post);
 
@@ -45,15 +42,20 @@ export default class PostTemplate extends React.Component {
             <header
               className={`single-header ${!thumbnail ? "no-thumbnail" : ""}`}
             >
-              {thumbnail ? (
-                <GatsbyImage image={thumbnail} alt=""/>
-              ) : null}
+              {thumbnail ? <GatsbyImage image={thumbnail} alt="" /> : null}
               <div>
                 <h1>{post.title}</h1>
                 <div className="post-meta">
-                  <time className="date">By <strong>Sai Nimmagadda</strong> on {date}</time>
+                  <time className="date">
+                    By <strong>Sai Nimmagadda</strong> on {date}
+                  </time>
                   <span>| {post.time} |</span>
-                  <a className="github-link" href={githubLink} target="_blank">
+                  <a
+                    className="github-link"
+                    href={githubLink}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
                     Edit on Github ✍️
                   </a>
                 </div>
@@ -61,7 +63,10 @@ export default class PostTemplate extends React.Component {
                 <PostTags tags={post.tags} />
               </div>
             </header>
-            <div className="post-content" dangerouslySetInnerHTML={{ __html: postNode.html }} />
+            <div
+              className="post-content"
+              dangerouslySetInnerHTML={{ __html: postNode.html }}
+            />
             <div className="post-meta">
               <PostTags tags={post.tags} />
               <SocialLinks postPath={slug} postNode={postNode} />
@@ -84,9 +89,9 @@ export const pageQuery = graphql`
       frontmatter {
         title
         thumbnail {
-            childImageSharp {
-              gatsbyImageData(layout: FIXED, width: 150, height: 140)
-            }
+          childImageSharp {
+            gatsbyImageData(layout: FIXED, width: 150, height: 140)
+          }
         }
         slug
         cover

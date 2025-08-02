@@ -12,7 +12,7 @@ module.exports = {
       description: config.siteDescription,
       image_url: `${urljoin(
         config.siteUrl,
-        config.pathPrefix
+        config.pathPrefix,
       )}/logos/logo-512.png`,
       copyright: config.copyright,
     },
@@ -34,6 +34,7 @@ module.exports = {
     {
       resolve: "gatsby-plugin-sass",
       options: {
+        // eslint-disable-next-line import/no-extraneous-dependencies, global-require
         implementation: require("sass"),
       },
     },
@@ -79,7 +80,6 @@ module.exports = {
             resolve: `gatsby-remark-prismjs`,
             options: {
               classPrefix: "language-",
-              inlineCodeMarker: null,
               aliases: {},
               showLineNumbers: false,
               noInlineHighlight: false,

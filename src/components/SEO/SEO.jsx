@@ -18,13 +18,15 @@ class SEO extends Component {
         : postNode.excerpt;
       image = postMeta.cover;
       if (postMeta.thumbnail) {
-        image = postMeta.thumbnail.childImageSharp.gatsbyImageData.images.fallback.src
+        image =
+          postMeta.thumbnail.childImageSharp.gatsbyImageData.images.fallback
+            .src;
       }
       postURL = urljoin(config.siteUrl, config.pathPrefix, postPath);
     } else {
       title = config.siteTitle;
       description = config.siteDescription;
-      image = config.siteLogo + '/';
+      image = `${config.siteLogo}/`;
     }
 
     image = config.siteUrl + image;
@@ -35,8 +37,8 @@ class SEO extends Component {
         "@type": "WebSite",
         url: blogURL,
         name: title,
-        alternateName: config.siteTitleAlt ? config.siteTitleAlt : ""
-      }
+        alternateName: config.siteTitleAlt ? config.siteTitleAlt : "",
+      },
     ];
     if (postSEO) {
       schemaOrgJSONLD.push(
@@ -50,10 +52,10 @@ class SEO extends Component {
               item: {
                 "@id": postURL,
                 name: title,
-                image
-              }
-            }
-          ]
+                image,
+              },
+            },
+          ],
         },
         {
           "@context": "http://schema.org",
@@ -64,10 +66,10 @@ class SEO extends Component {
           headline: title,
           image: {
             "@type": "ImageObject",
-            url: image
+            url: image,
           },
-          description
-        }
+          description,
+        },
       );
     }
     return (
