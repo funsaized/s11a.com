@@ -2,6 +2,9 @@
  * Grid
  */
 
+@use "../base/variables" as *;
+@use "../base/mixins" as *;
+
 $column-padding: 1rem;
 $margin-bottom: 1rem;
 

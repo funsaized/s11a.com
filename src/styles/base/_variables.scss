@@ -4,6 +4,8 @@
  * The majority of the configuration for the toolkit.
  */
 
+@use "sass:color";
+
 //==============================================================================
 // Containers
 //==============================================================================
@@ -34,7 +36,7 @@ $accent-color             : #cdcdcd                                  !default;
 $alternate-background     : #fafafa                                  !default;
 $alternate-color          : #404040                                  !default;
 $link-color               : $primary-color                             !default;
-$link-hover-color         : darken($link-color, 15%)                   !default;
+$link-hover-color         : color.adjust($link-color, $lightness: -15%) !default;
 $highlight                : #ffeea8                                  !default;
 $error                    : #D33C40                                  !default;
 $bq-border                : 16px solid #f0f0f0                       !default;
@@ -107,7 +109,7 @@ $borders                  : $border-width $border-style $border-color  !default;
 //==============================================================================
 
 $button-background        : $primary-color                             !default;
-$button-background-hover  : darken($button-background, 10%)            !default;
+$button-background-hover  : color.adjust($button-background, $lightness: -10%) !default;
 $button-color             : #ffffff                                  !default;
 $button-font-weight       : 600                                        !default;
 $button-font-family       : -apple-system,
@@ -130,11 +132,11 @@ $accent-button-color-hover: #ffffff                                  !default;
 
 // Muted Buttons
 $muted-border             : 1px solid $accent-color                    !default;
-$muted-border-hover       : 1px solid darken($accent-color, 30%)       !default;
+$muted-border-hover       : 1px solid color.adjust($accent-color, $lightness: -30%) !default;
 $muted-background         : transparent                                !default;
 $muted-background-hover   : transparent                                !default;
-$muted-color              : darken($accent-color, 50%)                 !default;
-$muted-color-hover        : darken($accent-color, 50%)                 !default;
+$muted-color              : color.adjust($accent-color, $lightness: -50%) !default;
+$muted-color-hover        : color.adjust($accent-color, $lightness: -50%) !default;
 
 // Round Buttons
 $round-buttons            : 40px !default;
@@ -146,9 +148,9 @@ $round-buttons            : 40px !default;
 $forms                    : ('[type=color], [type=date], [type=datetime], [type=datetime-local], [type=email], [type=month], [type=number], [type=password], [type=search], [type=tel], [type=text], [type=url], [type=week], [type=time], select, textarea');
 $buttons                  : ('.button, a.button, button, [type=submit], [type=reset], [type=button]');
 $input-background         : transparent                                !default;
-$placeholder              : darken($accent-color, 20%)                 !default;
+$placeholder              : color.adjust($accent-color, $lightness: -20%) !default;
 $form-border              : 1px solid $border-color                    !default;
-$form-border-hover        : 1px solid darken($border-color, 10%)       !default;
+$form-border-hover        : 1px solid color.adjust($border-color, $lightness: -10%) !default;
 $form-border-focus        : 1px solid $link-color                      !default;
 
 //==============================================================================
