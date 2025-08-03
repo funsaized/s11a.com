@@ -1,12 +1,12 @@
 /* eslint-disable no-console */
-const path = require("path");
-// eslint-disable-next-line import/no-extraneous-dependencies
-const webpack = require("webpack");
-const kebabCase = require("lodash.kebabcase");
-const siteConfig = require("./data/SiteConfig");
+import path from "path";
+import webpack from "webpack";
+import kebabCase from "lodash.kebabcase";
+import type { GatsbyNode } from "gatsby";
+import siteConfig from "./data/SiteConfig";
 
 // Native Date parsing function to replace moment
-const parseDate = (dateString, format) => {
+const parseDate = (dateString: string, format: string): Date => {
   // Handle MM-DD-YYYY format
   if (format === "MM-DD-YYYY" && dateString.includes("-")) {
     const [month, day, year] = dateString.split("-");
@@ -21,11 +21,13 @@ const parseDate = (dateString, format) => {
   return new Date(dateString);
 };
 
-exports.onCreateWebpackConfig = ({ actions }) => {
+export const onCreateWebpackConfig: GatsbyNode["onCreateWebpackConfig"] = ({
+  actions,
+}) => {
   actions.setWebpackConfig({
     plugins: [
       new webpack.ProvidePlugin({
-        Buffer: [require.resolve("buffer/"), "Buffer"],
+        Buffer: ["buffer/", "Buffer"],
       }),
     ],
     resolve: {
@@ -42,7 +44,11 @@ exports.onCreateWebpackConfig = ({ actions }) => {
 };
 
 // Modifies markdownRemark nodes to include a date & slug field
-exports.onCreateNode = ({ node, actions, getNode }) => {
+export const onCreateNode: GatsbyNode["onCreateNode"] = ({
+  node,
+  actions,
+  getNode,
+}) => {
   const { createNodeField } = actions;
   let slug;
   if (node.internal.type === "MarkdownRemark") {
@@ -85,7 +91,10 @@ exports.onCreateNode = ({ node, actions, getNode }) => {
 };
 
 // Programmatic page creation via node APIs
-exports.createPages = async ({ graphql, actions }) => {
+export const createPages: GatsbyNode["createPages"] = async ({
+  graphql,
+  actions,
+}) => {
   const { createPage } = actions;
   const postPage = path.resolve("src/templates/post.tsx");
   const tagPage = path.resolve("src/templates/tag.tsx");

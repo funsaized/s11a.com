@@ -1,7 +1,8 @@
-const urljoin = require("url-join");
-const config = require("./data/SiteConfig");
+import type { GatsbyConfig } from "gatsby";
+import urljoin from "url-join";
+import config from "./data/SiteConfig";
 
-module.exports = {
+const gatsbyConfig: GatsbyConfig = {
   pathPrefix: config.pathPrefix === "" ? "/" : config.pathPrefix,
   siteMetadata: {
     siteUrl: urljoin(config.siteUrl, config.pathPrefix),
@@ -233,3 +234,5 @@ module.exports = {
     },
   ],
 };
+
+export default gatsbyConfig;
