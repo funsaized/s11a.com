@@ -1,66 +1,51 @@
-import React, { Component } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Link } from "gatsby";
 import { StaticImage } from "gatsby-plugin-image";
 import { MenuLink } from "../../models";
 
-type Props = {
+interface NavbarProps {
   menuLinks: MenuLink[];
-};
+}
 
-type State = {
-  scrolled: boolean;
-};
+function Navbar({ menuLinks }: NavbarProps): React.ReactElement {
+  const [scrolled, setScrolled] = useState(false);
 
-export default class Navbar extends Component<Props, State> {
-  constructor(props: Props) {
-    super(props);
-    this.state = {
-      scrolled: false,
-    };
-  }
-
-  componentDidMount() {
-    window.addEventListener("scroll", this.navOnScroll);
-  }
-
-  componentWillUnmount() {
-    window.removeEventListener("scroll", this.navOnScroll);
-  }
-
-  navOnScroll = () => {
+  const navOnScroll = useCallback(() => {
     if (window.scrollY > 20) {
-      this.setState({ scrolled: true });
+      setScrolled(true);
     } else {
-      this.setState({ scrolled: false });
+      setScrolled(false);
     }
-  };
+  }, []);
 
-  render() {
-    const { scrolled } = this.state;
-    const { menuLinks } = this.props;
+  useEffect(() => {
+    window.addEventListener("scroll", navOnScroll);
+    return () => window.removeEventListener("scroll", navOnScroll);
+  }, [navOnScroll]);
 
-    return (
-      <div className={scrolled ? "nav scroll" : "nav"}>
-        <div className="nav-container">
-          <div className="me">
-            <Link key="sai" to="/" activeClassName="active">
-              <StaticImage
-                src="../../images/face.png"
-                className="favicon"
-                alt="Face"
-              />
-              <span className="text">Sai Nimmagadda</span>
+  return (
+    <div className={scrolled ? "nav scroll" : "nav"}>
+      <div className="nav-container">
+        <div className="me">
+          <Link key="sai" to="/" activeClassName="active">
+            <StaticImage
+              src="../../images/face.png"
+              className="favicon"
+              alt="Face"
+            />
+            <span className="text">Sai Nimmagadda</span>
+          </Link>
+        </div>
+        <div className="links">
+          {menuLinks.map((link) => (
+            <Link key={link.name} to={link.link} activeClassName="active">
+              {link.name}
             </Link>
-          </div>
-          <div className="links">
-            {menuLinks.map((link) => (
-              <Link key={link.name} to={link.link} activeClassName="active">
-                {link.name}
-              </Link>
-            ))}
-          </div>
+          ))}
         </div>
       </div>
-    );
-  }
+    </div>
+  );
 }
+
+export default Navbar;
