@@ -2,6 +2,14 @@ import { Project } from "../src/models";
 
 const projects: Project[] = [
   {
+    icon: "🐶",
+    title: "Project SafeStream",
+    path: "https://safekids.s11a.com",
+    source: "https://safekids.s11a.com",
+    description:
+      "Shipping soon..  Community curation meets intelligent moderation in an app that works everywhere.",
+  },
+  {
     icon: "☕",
     title: "Fickle Cal",
     path: "https://todo.s11a.com/home",
