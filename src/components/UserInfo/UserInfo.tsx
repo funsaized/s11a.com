@@ -1,26 +1,17 @@
-import React, { Component } from "react";
-import { Follow } from "react-twitter-widgets";
+import React from "react";
 import { Config } from "../../models";
 
-type UserInfoProps = {
+interface UserInfoProps {
   config: Config;
-  expanded: boolean;
-};
+  expanded?: boolean;
+}
 
-// eslint-disable-next-line react/prefer-stateless-function
-class UserInfo extends Component<UserInfoProps, {}> {
-  render() {
-    const { config, expanded } = this.props;
-    const { userTwitter } = config;
-    return (
-      // TODO: remove the react-twitter-widgets dependency
-      // eslint-disable-next-line react/jsx-filename-extension
-      <Follow
-        username={userTwitter}
-        options={{ count: expanded ? true : "none" }}
-      />
-    );
-  }
+function UserInfo({ config, expanded }: UserInfoProps): React.ReactElement {
+  return (
+    <div className="user-info">
+      <p>{config.userDescription}</p>
+    </div>
+  );
 }
 
 export default UserInfo;

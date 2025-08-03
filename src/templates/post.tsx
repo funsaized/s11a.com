@@ -31,7 +31,10 @@ interface PostTemplateProps {
   };
 }
 
-function PostTemplate({ data, pageContext }: PostTemplateProps): React.ReactElement {
+function PostTemplate({
+  data,
+  pageContext,
+}: PostTemplateProps): React.ReactElement {
   const { slug } = pageContext;
   const postNode = data.markdownRemark;
   const post = postNode.frontmatter;
@@ -49,7 +52,7 @@ function PostTemplate({ data, pageContext }: PostTemplateProps): React.ReactElem
   if (post.thumbnail) {
     thumbnail = getImage(post.thumbnail);
   }
-  
+
   return (
     <Layout>
       <div>

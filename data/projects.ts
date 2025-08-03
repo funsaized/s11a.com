@@ -1,4 +1,6 @@
-export default [
+import { Project } from "../src/models";
+
+const projects: Project[] = [
   {
     icon: "☕",
     title: "Fickle Cal",
@@ -38,3 +40,5 @@ export default [
       "CLI tool to query resources and generate terraform definitions for existing objects",
   },
 ];
+
+export default projects;

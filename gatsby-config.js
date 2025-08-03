@@ -25,6 +25,14 @@ module.exports = {
           key: `X-Frame-Options`,
           value: `SAMEORIGIN`,
         },
+        {
+          key: `X-Content-Type-Options`,
+          value: `nosniff`,
+        },
+        {
+          key: `X-XSS-Protection`,
+          value: `1; mode=block`,
+        },
       ],
     },
   ],
@@ -68,6 +76,12 @@ module.exports = {
             resolve: "gatsby-remark-images",
             options: {
               maxWidth: 690,
+              quality: 90,
+              withWebp: true,
+              loading: "lazy",
+              linkImagesToOriginal: false,
+              showCaptions: false,
+              backgroundColor: "transparent",
             },
           },
           {
@@ -129,9 +143,24 @@ module.exports = {
         theme_color: config.themeColor,
         display: "minimal-ui",
         icon: "src/favicon.png",
+        icon_options: {
+          purpose: "any maskable",
+        },
+        cache_busting_mode: "none",
       },
     },
-    "gatsby-plugin-offline",
+    {
+      resolve: "gatsby-plugin-offline",
+      options: {
+        precachePages: ["/", "/blog/*", "/about/"],
+        workboxConfig: {
+          globPatterns: [
+            "**/*.{js,jpg,png,gif,html,css,webp,woff,woff2,ttf,svg,ico}",
+          ],
+          maximumFileSizeToCacheInBytes: 5 * 1024 * 1024, // 5MB
+        },
+      },
+    },
     {
       resolve: "gatsby-plugin-feed",
       options: {

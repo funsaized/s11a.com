@@ -1,7 +1,6 @@
-// This file exports the TypeScript config for use by gatsby-config.js
-// The actual config is maintained in SiteConfig.ts
+import { Config } from "../src/models";
 
-const config = {
+const config: Config = {
   siteTitle: "s11a Programming Blog", // Site title.
   siteTitleShort: "s11a", // Short site title for homescreen (PWA). Preferably should be under 12 characters to prevent truncation.
   siteTitleAlt: "s11a website", // Alternative site title for SEO.
@@ -76,4 +75,4 @@ if (config.siteUrl.substr(-1) === "/")
 if (config.siteRss && config.siteRss[0] !== "/")
   config.siteRss = `/${config.siteRss}`;
 
-module.exports = config;
+export default config;
