@@ -47,10 +47,6 @@ const config: Config = {
       name: "Articles",
       link: "/blog/",
     },
-    {
-      name: "Notes",
-      link: "/notes/",
-    },
   ],
   copyright: "Copyright © 2024. Sai Nimmagadda", // Copyright string for the footer of the website and RSS feed.
   themeColor: "#9dd4cf", // Used for setting manifest and progress theme colors.

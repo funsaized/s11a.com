@@ -63,13 +63,6 @@ const gatsbyConfig: GatsbyConfig = {
       },
     },
     {
-      resolve: "gatsby-source-filesystem",
-      options: {
-        name: "notes",
-        path: `${__dirname}/notes/`,
-      },
-    },
-    {
       resolve: "gatsby-transformer-remark",
       options: {
         plugins: [
