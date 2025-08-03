@@ -1,3 +1,5 @@
+@use "variables" as *;
+
 // Media query for mobile first layout 
 @mixin small-breakpoint {
   @media (min-width: #{$mobile}) {

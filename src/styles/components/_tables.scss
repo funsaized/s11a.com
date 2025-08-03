@@ -2,6 +2,9 @@
  * Tables
  */
 
+@use "../base/variables" as *;
+@use "../base/mixins" as *;
+
 // Table expands to full width of containing element
 table {
   border-collapse: collapse;

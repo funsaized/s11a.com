@@ -2,6 +2,8 @@
  * Helpers
  */
 
+@use "../base/variables" as *;
+
 // Classic clearfix 
 .clearfix::before,
 .clearfix::after {

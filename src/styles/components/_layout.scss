@@ -2,6 +2,10 @@
  * Layout
  */
 
+@use "sass:color";
+@use "../base/variables" as *;
+@use "../base/mixins" as *;
+
 // Move down to make space for nav
 #main-content {
     margin-top: 55px;
@@ -182,7 +186,7 @@
         align-items: center;
         font-size: 0.85rem;
         padding: 0.5rem 0.75rem;
-        background: lighten($primary-color, 42%);
+        background: color.adjust($primary-color, $lightness: 42%);
         border-radius: $border-radius;
         margin-right: 0.5rem;
         margin-bottom: 0.5rem;
@@ -215,7 +219,7 @@
             &:active,
             &:focus {
                 color: white;
-                background: darken($primary-color, 10%);
+                background: color.adjust($primary-color, $lightness: -10%);
             }
         }
 
@@ -224,8 +228,8 @@
         }
 
         &:hover {
-            background: lighten($primary-color, 28%);
-            color: darken($primary-color, 5%);
+            background: color.adjust($primary-color, $lightness: 28%);
+            color: color.adjust($primary-color, $lightness: -5%);
         }
     }
 }
