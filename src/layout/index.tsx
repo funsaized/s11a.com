@@ -15,6 +15,14 @@ function MainLayout({ children }: MainLayoutProps): React.ReactElement {
     <div>
       <Helmet>
         <meta name="description" content={config.siteDescription} />
+        <html lang="en" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" />
+        <link rel="dns-prefetch" href="https://fonts.gstatic.com" />
+        <meta
+          name="viewport"
+          content="width=device-width, initial-scale=1, shrink-to-fit=no"
+        />
+        <meta httpEquiv="x-ua-compatible" content="ie=edge" />
       </Helmet>
       <Navbar menuLinks={config.menuLinks} />
       <main id="main-content">{children}</main>

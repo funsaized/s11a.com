@@ -41,9 +41,11 @@ function SEO({ postNode, postPath, postSEO }: SEOProps): React.ReactElement {
       title = postMeta.title;
       description = postMeta.description || postNode.excerpt;
       image = postMeta.cover || "";
-      
+
       if (postMeta.thumbnail) {
-        image = postMeta.thumbnail.childImageSharp.gatsbyImageData.images.fallback.src;
+        image =
+          postMeta.thumbnail.childImageSharp.gatsbyImageData.images.fallback
+            .src;
       }
       postURL = urljoin(config.siteUrl, config.pathPrefix, postPath || "");
     } else {
@@ -54,7 +56,7 @@ function SEO({ postNode, postPath, postSEO }: SEOProps): React.ReactElement {
 
     image = config.siteUrl + image;
     const blogURL = urljoin(config.siteUrl, config.pathPrefix);
-    
+
     const schemaOrgJSONLD = [
       {
         "@context": "http://schema.org",
@@ -120,22 +122,19 @@ function SEO({ postNode, postPath, postSEO }: SEOProps): React.ReactElement {
       </script>
 
       {/* OpenGraph tags */}
-      <meta property="og:url" content={postSEO ? seoData.postURL : seoData.blogURL} />
+      <meta
+        property="og:url"
+        content={postSEO ? seoData.postURL : seoData.blogURL}
+      />
       {postSEO ? <meta property="og:type" content="article" /> : null}
       <meta property="og:title" content={seoData.title} />
       <meta property="og:description" content={seoData.description} />
       <meta property="og:image" content={seoData.image} />
-      <meta
-        property="fb:app_id"
-        content={config.siteFBAppID || ""}
-      />
+      <meta property="fb:app_id" content={config.siteFBAppID || ""} />
 
       {/* Twitter Card tags */}
       <meta name="twitter:card" content="summary_large_image" />
-      <meta
-        name="twitter:creator"
-        content={config.userTwitter || ""}
-      />
+      <meta name="twitter:creator" content={config.userTwitter || ""} />
       <meta name="twitter:title" content={seoData.title} />
       <meta name="twitter:description" content={seoData.description} />
       <meta name="twitter:image" content={seoData.image} />
