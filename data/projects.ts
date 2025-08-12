@@ -25,6 +25,13 @@ const projects: Project[] = [
     description: "A serverless bot that RTs garlic when it feels like it",
   },
   {
+    icon: "📆",
+    title: "OctoAgenda",
+    path: "https://github.com/funsaized/OctoAgenda",
+    source: "https://github.com/funsaized/OctoAgenda",
+    description: "AI powered scraping of events from a source to export to ics format",
+  },
+  {
     icon: "🐙",
     title: "Stack Exchange GraphQL Server",
     path: "https://github.com/funsaized/stack-exchange-graphql-server",
