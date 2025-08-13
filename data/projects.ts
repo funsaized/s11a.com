@@ -27,9 +27,9 @@ const projects: Project[] = [
   {
     icon: "📆",
     title: "OctoAgenda",
-    path: "https://github.com/funsaized/OctoAgenda",
+    path: "https://octoagenda.s11a.com",
     source: "https://github.com/funsaized/OctoAgenda",
-    description: "AI powered scraping of events from a source to export to ics format",
+    description: "Scrape events from any source on the web and export to iCal (.ics)",
   },
   {
     icon: "🐙",
