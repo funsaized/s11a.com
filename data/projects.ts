@@ -47,6 +47,13 @@ const projects: Project[] = [
       "Old school project. Run custom build flappy bird on custom build processor (verilog)",
   },
   {
+    icon: "🐍",
+    title: "NgReactiveSnakes",
+    path: "https://ng-reactive-snakes.s11a.com",
+    source: "https://github.com/funsaized/ng-reactive-snake",
+    description: "The classic game of snake! Built as a reference implementation of thinking reactively with RxJS",
+  },
+  {
     icon: "🚧",
     title: "azure-terraform-generator",
     path: "https://github.com/funsaized/azure-terraform-generator",
