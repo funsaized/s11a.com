@@ -1,4 +1,5 @@
 import React from "react";
+import "./GitHubButton.scss";
 
 interface GitHubButtonProps {
   href: string;

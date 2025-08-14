@@ -131,12 +131,17 @@
     .buttons {
         display: flex;
         align-items: center;
+        gap: 0.5rem;
     }
 
     .button {
-        margin-left: 0.5rem;
-        padding: 0.5rem;
+        padding: 0.5rem 1rem;
         font-size: 1rem;
+        white-space: nowrap;
+        display: inline-flex;
+        align-items: center;
+        height: 32px;
+        line-height: 1;
     }
 }
 
@@ -154,11 +159,11 @@
         }
 
         h2 {
-            width: 200px;
             min-width: 200px;
-            max-width: 150px;
+            max-width: 200px;
             font-size: 1.3rem;
             margin-right: 1rem;
+            flex-shrink: 0;
         }
 
         p {
@@ -171,6 +176,36 @@
         .button {
             padding: 0.45rem 1.25rem;
             font-size: 0.9rem;
+            white-space: nowrap;
+            height: auto;
+        }
+    }
+}
+
+// Extra responsive fixes for very small screens
+@media screen and (max-width: 480px) {
+    .projects {
+        .each {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.75rem;
+        }
+
+        h2 {
+            min-width: auto;
+            max-width: 100%;
+            margin-right: 0;
+            margin-bottom: 0.5rem;
+        }
+
+        p {
+            margin: 0 0 0.75rem 0;
+            font-size: 1rem;
+        }
+
+        .buttons {
+            width: 100%;
+            justify-content: flex-start;
         }
     }
 }

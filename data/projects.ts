@@ -10,6 +10,13 @@ const projects: Project[] = [
       "Shipping soon..  Community curation meets intelligent moderation in an app that works everywhere.",
   },
   {
+    icon: "📆",
+    title: "OctoAgenda",
+    path: "https://octoagenda.s11a.com",
+    source: "https://github.com/funsaized/OctoAgenda",
+    description: "Scrape events from any source on the web and export to iCal (.ics)",
+  },
+  {
     icon: "☕",
     title: "Fickle Cal",
     path: "https://todo.s11a.com/home",
@@ -23,13 +30,6 @@ const projects: Project[] = [
     path: "https://twitter.com/garlichub",
     source: "https://github.com/funsaized/garlic-bot",
     description: "A serverless bot that RTs garlic when it feels like it",
-  },
-  {
-    icon: "📆",
-    title: "OctoAgenda",
-    path: "https://octoagenda.s11a.com",
-    source: "https://github.com/funsaized/OctoAgenda",
-    description: "Scrape events from any source on the web and export to iCal (.ics)",
   },
   {
     icon: "🐙",
