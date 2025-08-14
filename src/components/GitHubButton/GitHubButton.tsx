@@ -24,22 +24,13 @@ function GitHubButton({
       className="github-button"
       aria-label={ariaLabel}
       style={{
-        display: "inline-block",
-        padding: "6px 12px",
-        fontSize: size === "large" ? "14px" : "12px",
         fontWeight: 600,
-        lineHeight: "20px",
         color: "#24292e",
         backgroundColor: "#fafbfc",
         border: "1px solid #d1d5da",
         borderRadius: "6px",
         textDecoration: "none",
-        verticalAlign: "middle",
         cursor: "pointer",
-        userSelect: "none",
-        backgroundPosition: "-1px -1px",
-        backgroundRepeat: "repeat-x",
-        backgroundSize: "110% 110%",
         transition: "background-color 0.2s cubic-bezier(0.3, 0, 0.5, 1)",
       }}
       onMouseEnter={(e) => {
@@ -58,7 +49,6 @@ function GitHubButton({
         style={{
           display: "inline-block",
           marginRight: "4px",
-          verticalAlign: "text-bottom",
           fill: "currentColor",
         }}
       >

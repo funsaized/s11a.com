@@ -1,32 +1,16 @@
-.github-button {
+.projects .github-button {
+  // Match view button exactly
   display: inline-flex !important;
-  align-items: center;
-  white-space: nowrap;
-  height: 32px;
-  padding: 6px 12px !important;
+  align-items: center !important;
+  white-space: nowrap !important;
+  padding: 0.4rem 0.8rem !important;
+  font-size: 0.9rem !important;
+  line-height: 1.2 !important;
+  height: auto !important;
   
   svg {
-    flex-shrink: 0;
-  }
-}
-
-// Match the view button styling on small screens
-@media screen and (min-width: 600px) {
-  .projects .github-button {
-    height: auto;
-    padding: 0.45rem 1.25rem !important;
-    font-size: 0.9rem !important;
-  }
-}
-
-// Prevent text wrapping on mobile
-@media screen and (max-width: 599px) {
-  .projects .github-button {
-    padding: 0.5rem 1rem !important;
-    font-size: 1rem !important;
-    
-    svg {
-      margin-right: 4px !important;
-    }
+    width: 14px !important;
+    height: 14px !important;
+    margin-right: 4px !important;
   }
 }

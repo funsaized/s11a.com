@@ -48,7 +48,7 @@ const projects: Project[] = [
   },
   {
     icon: "🐍",
-    title: "NgReactiveSnakes",
+    title: "Reactive Snakes",
     path: "https://ng-reactive-snakes.s11a.com",
     source: "https://github.com/funsaized/ng-reactive-snake",
     description: "The classic game of snake! Built as a reference implementation of thinking reactively with RxJS",

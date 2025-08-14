@@ -135,13 +135,13 @@
     }
 
     .button {
-        padding: 0.5rem 1rem;
-        font-size: 1rem;
+        padding: 0.4rem 0.8rem;
+        font-size: 0.9rem;
         white-space: nowrap;
         display: inline-flex;
         align-items: center;
-        height: 32px;
-        line-height: 1;
+        line-height: 1.2;
+        margin-bottom: 0;
     }
 }
 
@@ -174,10 +174,10 @@
         }
 
         .button {
-            padding: 0.45rem 1.25rem;
+            padding: 0.4rem 0.8rem;
             font-size: 0.9rem;
             white-space: nowrap;
-            height: auto;
+            margin-bottom: 0;
         }
     }
 }
