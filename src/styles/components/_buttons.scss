@@ -28,7 +28,7 @@
 
 // Buttons on hover
 %buttons-hover {
-  border: $button-border-width $button-border-style color.adjust($button-border-color, $lightness: -10%);
+  border: $button-border-width $button-border-style var(--color-accent-primary-hover);
   background: $button-background-hover;
   color: $button-color;
   text-decoration: none;
@@ -36,8 +36,8 @@
 
 // Buttons on focus
 %buttons-focus {
-  border: $button-border-width $button-border-style color.adjust($button-border-color, $lightness: -10%);
-  background: color.adjust($button-background, $lightness: -10%);
+  border: $button-border-width $button-border-style var(--color-accent-primary-hover);
+  background: var(--color-accent-primary-hover);
   color: $button-color;
   text-decoration: none;
 }
@@ -72,8 +72,8 @@ a.accent-button {
   &:focus,
   &:active {
     color: $accent-button-color-hover;
-    border: 1px solid color.adjust($accent-button-background, $lightness: -10%);
-    background: color.adjust($accent-button-background, $lightness: -10%);
+    border: 1px solid var(--color-accent-secondary-hover);
+    background: var(--color-accent-secondary-hover);
   }
 }
 

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import { Link } from "gatsby";
 import { StaticImage } from "gatsby-plugin-image";
 import { MenuLink } from "../../models";
+import ThemeToggle from "../ThemeToggle/ThemeToggle";
 
 interface NavbarProps {
   menuLinks: MenuLink[];
@@ -42,6 +43,7 @@ function Navbar({ menuLinks }: NavbarProps): React.ReactElement {
               {link.name}
             </Link>
           ))}
+          <ThemeToggle className="theme-toggle--compact theme-toggle--subtle" />
         </div>
       </div>
     </div>

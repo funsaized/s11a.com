@@ -74,13 +74,13 @@
 .post-line {
     h2 {
         font-size: 1.3rem;
-        color: rgba(0, 0, 0, 0.6);
+        color: var(--color-text-secondary);
     }
 }
 
 .post-content {
     h2 {
-        border-bottom: 2px solid rgba(205, 205, 205, 0.5);
+        border-bottom: 2px solid var(--color-border-primary);
         padding-bottom: 0.5rem;
     }
 }
@@ -90,15 +90,15 @@
     .each {
         display: flex;
         flex-direction: column;
-        background: #ffffff;
-        border: 1px solid #e5e5e5;
+        background: var(--color-bg-primary);
+        border: 1px solid var(--color-border-primary);
         border-radius: 8px;
         padding: 1.25rem;
         margin-bottom: 1rem;
         transition: box-shadow 0.2s ease, transform 0.2s ease;
 
         &:hover {
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            box-shadow: 0 4px 12px var(--color-shadow-medium);
             transform: translateY(-2px);
         }
 
@@ -112,13 +112,13 @@
         border-bottom: none;
         margin: 0 0 0.75rem 0;
         font-weight: 600;
-        color: #111;
+        color: var(--color-text-primary);
         padding: 0;
         width: 100%;
 
         a {
             display: flex;
-            color: #111;
+            color: var(--color-text-primary);
             align-items: center;
             text-decoration: none;
 
@@ -143,7 +143,7 @@
     // Show description on mobile for better context
     p {
         display: block;
-        color: rgba(0, 0, 0, 0.7);
+        color: var(--color-text-secondary);
         font-weight: normal;
         margin: 0 0 1rem 0;
         font-size: 0.95rem;
@@ -225,7 +225,7 @@
             &:hover {
                 box-shadow: none;
                 transform: none;
-                background: rgba(3, 102, 238, 0.02);
+                background: var(--color-bg-secondary);
             }
 
             &:last-of-type {
@@ -251,7 +251,7 @@
             flex: 1;
             margin: 0 1.5rem 0 0;
             font-size: 1.05rem;
-            color: rgba(0, 0, 0, 0.65);
+            color: var(--color-text-secondary);
         }
 
         .buttons {
@@ -314,7 +314,7 @@
         align-items: center;
         font-size: 0.85rem;
         padding: 0.5rem 0.75rem;
-        background: color.adjust($primary-color, $lightness: 42%);
+        background: var(--color-bg-secondary);
         border-radius: $border-radius;
         margin-right: 0.5rem;
         margin-bottom: 0.5rem;
@@ -337,17 +337,17 @@
 
         &.active {
             background: $primary-color;
-            color: white;
+            color: var(--color-text-inverse);
 
             .count {
-                background: white;
+                background: var(--color-bg-primary);
             }
 
             &:hover,
             &:active,
             &:focus {
-                color: white;
-                background: color.adjust($primary-color, $lightness: -10%);
+                color: var(--color-text-inverse);
+                background: var(--color-accent-primary-hover);
             }
         }
 
@@ -356,8 +356,8 @@
         }
 
         &:hover {
-            background: color.adjust($primary-color, $lightness: 28%);
-            color: color.adjust($primary-color, $lightness: -5%);
+            background: var(--color-bg-tertiary);
+            color: var(--color-accent-primary-hover);
         }
     }
 }
@@ -382,7 +382,7 @@
 
 .post-tag-container {
     button {
-        background: #f2f2f2;
+        background: var(--color-bg-secondary);
         font-size: 0.9rem;
         color: $alternate-color;
         padding: 0.3rem 0.8rem;
@@ -482,18 +482,18 @@
     grid-template-columns: 2fr 1fr;
     gap: 3rem;
     align-items: start;
-    background: $alternate-background;
+    background: var(--color-bg-secondary);
     padding: 2rem;
     border-radius: 12px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-    border: 1px solid $border-color;
+    box-shadow: 0 2px 8px var(--color-shadow-light);
+    border: 1px solid var(--color-border-primary);
 }
 
 .about-intro {
     .intro-text {
         font-size: 1.1rem;
         font-weight: 500;
-        color: $font-color;
+        color: var(--color-text-primary);
         margin-bottom: 1.5rem;
     }
 
@@ -518,7 +518,7 @@
         max-width: 350px;
         height: auto;
         border-radius: 16px;
-        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 8px 24px var(--color-shadow-medium);
         transition: transform 0.3s ease;
 
         &:hover {
@@ -561,7 +561,7 @@
 
             &:hover {
                 transform: translateY(-2px);
-                box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+                box-shadow: 0 4px 16px var(--color-shadow-heavy);
             }
 
             img {

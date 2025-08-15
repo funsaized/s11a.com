@@ -15,8 +15,8 @@ html {
 
 // Body base
 body {
-  color: $font-color;
-  background: $background;
+  color: var(--color-text-primary);
+  background: var(--color-bg-primary);
   font-size: $body-font-size;
 }
 
@@ -47,7 +47,7 @@ h5 {
   font-weight: $heading-font-weight;
   font-family: $heading-font-family;
   line-height: $heading-line-height;
-  color: $heading-font-color;
+  color: var(--color-text-primary);
 
   &:not(:first-child) {
     margin: 1.5rem 0;
@@ -115,20 +115,20 @@ h5 {
 
 // Link styling
 a {
-  color: $link-color;
+  color: var(--color-accent-primary);
   text-decoration: none;
 
   &:hover,
   &:active,
   &:focus {
-    color: $link-hover-color;
+    color: var(--color-accent-primary-hover);
     text-decoration: underline;
   }
 }
 
 // Highlight
 mark {
-  background: $highlight;
+  background: var(--color-bg-tertiary);
   padding: 0 0.2rem;
 }
 
@@ -151,10 +151,10 @@ blockquote {
 pre {
   border: 0;
   border-radius: $border-radius;
-  background: $code-background;
+  background: var(--color-bg-tertiary);
   padding: 1rem;
   tab-size: 2;
-  color: $code-color;
+  color: var(--color-text-primary);
   font-family: $code-family;
   font-size: $code-size;
   margin: 0 0 $margins 0;
@@ -183,12 +183,12 @@ kbd {
 
 // Inline code styling
 :not(pre)>code {
-  color: $code-color;
-  background: $code-background;
+  color: var(--color-text-primary);
+  background: var(--color-bg-tertiary);
   font-family: $code-family;
   font-size: $code-size;
   padding: 0 0.2rem;
-  border: $borders;
+  border: 1px solid var(--color-border-primary);
   border-radius: $border-radius;
 }
 

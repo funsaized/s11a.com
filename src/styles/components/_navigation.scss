@@ -12,7 +12,8 @@
   left: 0;
   z-index: 3;
   width: 100%;
-  background: white;
+  background: var(--color-bg-primary);
+  border-bottom: 1px solid var(--color-border-primary);
 
   .nav-container {
     padding: 0 2rem;
@@ -32,14 +33,14 @@
     a {
       display: flex;
       align-items: center;
-      color: #333;
+      color: var(--color-text-primary);
       margin-right: 0;
       font-weight: 600;
       font-size: 1.1rem;
 
       &:hover,
       &:focus {
-        color: black;
+        color: var(--color-accent-primary);
       }
     }
 
@@ -67,13 +68,13 @@
       font-weight: 500;
       padding: 1rem 0.75rem;
       margin: 0;
-      color: rgba(0, 0, 0, 0.45);
+      color: var(--color-text-secondary);
       line-height: 1.2;
       text-align: center;
 
       &:hover,
       &:active {
-        color: #111;
+        color: var(--color-text-primary);
         text-decoration: none;
       }
     }
@@ -83,7 +84,7 @@
 @include small-breakpoint {
   .nav {
     &.scroll {
-      box-shadow: 1px 2px 18px rgba(0, 0, 0, 0.1);
+      box-shadow: 1px 2px 18px var(--color-shadow-light);
 
       .nav-container {
         height: 60px;
@@ -92,12 +93,12 @@
       .links a {
         &:hover,
         &.active {
-          color: #111;
+          color: var(--color-text-primary);
           border-bottom: 2px solid $primary-color;
         }
 
         &:active {
-          color: #111;
+          color: var(--color-text-primary);
           border-bottom: 2px dashed $primary-color;
         }
       }

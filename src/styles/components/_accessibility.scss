@@ -10,8 +10,8 @@
   position: absolute;
   top: -40px;
   left: 0;
-  background: color.adjust($primary-color, $lightness: 5%);
-  color: #fff;
+  background: var(--color-accent-primary);
+  color: var(--color-text-inverse);
   padding: 10px 20px;
   z-index: 100;
   text-decoration: none;
@@ -19,19 +19,19 @@
   font-size: 14px;
   font-weight: 500;
   transition: top 0.2s ease;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 8px var(--color-shadow-medium);
 
   &:focus {
     top: 0;
-    outline: 2px solid color.adjust($primary-color, $lightness: 20%);
+    outline: 2px solid var(--color-border-focus);
     outline-offset: 3px;
-    background: color.adjust($primary-color, $lightness: -5%);
-    color: #ffffff !important; // Force white text on focus
+    background: var(--color-accent-primary-hover);
+    color: var(--color-text-inverse) !important;
   }
 
   &:hover {
-    background: color.adjust($primary-color, $lightness: -10%);
-    color: #ffffff !important; // Force white text on hover
+    background: var(--color-accent-primary-hover);
+    color: var(--color-text-inverse) !important;
   }
 }
 
@@ -42,7 +42,7 @@ input:focus,
 select:focus,
 textarea:focus,
 [tabindex]:focus {
-  outline: 2px solid color.adjust($primary-color, $lightness: 30%);
+  outline: 2px solid var(--color-border-focus);
   outline-offset: 2px;
   border-radius: 2px;
 }
@@ -50,9 +50,9 @@ textarea:focus,
 // Alternative subtle focus style for links in content
 .post-content a:focus,
 .posts a:focus {
-  outline: 2px dotted color.adjust($primary-color, $lightness: 20%);
+  outline: 2px dotted var(--color-border-focus);
   outline-offset: 3px;
-  background: color.adjust($primary-color, $lightness: 47%);
+  background: var(--color-bg-secondary);
   border-radius: 2px;
 }
 

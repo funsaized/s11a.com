@@ -13,6 +13,7 @@
 // Configuration
 //==============================================================================
 
+@use "base/themes"; // CSS custom properties for dark/light themes
 @use "base/variables";
 @use "base/mixins";
 @use "base/fonts"; // Font optimization with font-display: swap

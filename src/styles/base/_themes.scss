@@ -1,0 +1,162 @@
+/**
+ * Theme System - CSS Custom Properties
+ * 
+ * Modern dark/light mode implementation using semantic color tokens
+ * and CSS custom properties for runtime theme switching.
+ */
+
+// Default theme (light mode)
+:root {
+  // Background colors
+  --color-bg-primary: #ffffff;
+  --color-bg-secondary: #fafafa;
+  --color-bg-tertiary: #f5f5f5;
+  --color-bg-elevated: #ffffff;
+  
+  // Text colors
+  --color-text-primary: #404040;
+  --color-text-secondary: #6a6a6a;
+  --color-text-tertiary: #9a9a9a;
+  --color-text-inverse: #ffffff;
+  --color-text-muted: #999999;
+  
+  // Accent colors
+  --color-accent-primary: #0366EE;
+  --color-accent-primary-hover: #0251cc;
+  --color-accent-secondary: #29de7d;
+  --color-accent-secondary-hover: #22c76a;
+  
+  // Border and divider colors
+  --color-border-primary: #dedede;
+  --color-border-secondary: #e8e8e8;
+  --color-border-focus: #0366EE;
+  
+  // Status colors
+  --color-success: #29de7d;
+  --color-warning: #ffa500;
+  --color-error: #D33C40;
+  --color-info: #0366EE;
+  
+  // Shadow colors
+  --color-shadow-light: rgba(0, 0, 0, 0.05);
+  --color-shadow-medium: rgba(0, 0, 0, 0.1);
+  --color-shadow-heavy: rgba(0, 0, 0, 0.15);
+  
+  // Code syntax highlighting
+  --color-code-bg: #f8f8f8;
+  --color-code-text: #404040;
+  --color-code-comment: #6a737d;
+  --color-code-keyword: #d73a49;
+  --color-code-string: #032f62;
+  --color-code-function: #6f42c1;
+}
+
+// Dark theme
+[data-theme="dark"] {
+  // Background colors
+  --color-bg-primary: #1a1a1a;
+  --color-bg-secondary: #2d2d2d;
+  --color-bg-tertiary: #3a3a3a;
+  --color-bg-elevated: #2d2d2d;
+  
+  // Text colors
+  --color-text-primary: #e1e1e1;
+  --color-text-secondary: #b1b1b1;
+  --color-text-tertiary: #8a8a8a;
+  --color-text-inverse: #1a1a1a;
+  --color-text-muted: #7a7a7a;
+  
+  // Accent colors (adjusted for dark backgrounds)
+  --color-accent-primary: #4c9aff;
+  --color-accent-primary-hover: #6bb3ff;
+  --color-accent-secondary: #4fd1a7;
+  --color-accent-secondary-hover: #6dd9b8;
+  
+  // Border and divider colors
+  --color-border-primary: #404040;
+  --color-border-secondary: #353535;
+  --color-border-focus: #4c9aff;
+  
+  // Status colors (adjusted for dark mode)
+  --color-success: #4fd1a7;
+  --color-warning: #ffb84d;
+  --color-error: #ff6b6b;
+  --color-info: #4c9aff;
+  
+  // Shadow colors
+  --color-shadow-light: rgba(0, 0, 0, 0.2);
+  --color-shadow-medium: rgba(0, 0, 0, 0.3);
+  --color-shadow-heavy: rgba(0, 0, 0, 0.4);
+  
+  // Code syntax highlighting (dark theme)
+  --color-code-bg: #2d2d2d;
+  --color-code-text: #e1e1e1;
+  --color-code-comment: #8a8a8a;
+  --color-code-keyword: #ff79c6;
+  --color-code-string: #f1fa8c;
+  --color-code-function: #bd93f9;
+}
+
+// System preference fallback (when no explicit theme is set)
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    // Background colors
+    --color-bg-primary: #1a1a1a;
+    --color-bg-secondary: #2d2d2d;
+    --color-bg-tertiary: #3a3a3a;
+    --color-bg-elevated: #2d2d2d;
+    
+    // Text colors
+    --color-text-primary: #e1e1e1;
+    --color-text-secondary: #b1b1b1;
+    --color-text-tertiary: #8a8a8a;
+    --color-text-inverse: #1a1a1a;
+    --color-text-muted: #7a7a7a;
+    
+    // Accent colors
+    --color-accent-primary: #4c9aff;
+    --color-accent-primary-hover: #6bb3ff;
+    --color-accent-secondary: #4fd1a7;
+    --color-accent-secondary-hover: #6dd9b8;
+    
+    // Border and divider colors
+    --color-border-primary: #404040;
+    --color-border-secondary: #353535;
+    --color-border-focus: #4c9aff;
+    
+    // Status colors
+    --color-success: #4fd1a7;
+    --color-warning: #ffb84d;
+    --color-error: #ff6b6b;
+    --color-info: #4c9aff;
+    
+    // Shadow colors
+    --color-shadow-light: rgba(0, 0, 0, 0.2);
+    --color-shadow-medium: rgba(0, 0, 0, 0.3);
+    --color-shadow-heavy: rgba(0, 0, 0, 0.4);
+    
+    // Code syntax highlighting
+    --color-code-bg: #2d2d2d;
+    --color-code-text: #e1e1e1;
+    --color-code-comment: #8a8a8a;
+    --color-code-keyword: #ff79c6;
+    --color-code-string: #f1fa8c;
+    --color-code-function: #bd93f9;
+  }
+}
+
+// Smooth transitions for theme changes
+* {
+  transition: 
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+// Respect user motion preferences
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition-duration: 0.01ms !important;
+  }
+}

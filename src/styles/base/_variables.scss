@@ -26,20 +26,32 @@ $desktop                  : $medium                                    !default;
 $width: 800px;
 
 //==============================================================================
-// Global Colors
+// Global Colors - CSS Custom Properties Bridge
 //==============================================================================
 
-$background               : white !default;
-$primary-color            : #0366EE                                  !default;
-$secondary-color          : #29de7d                                  !default;
-$accent-color             : #cdcdcd                                  !default;
-$alternate-background     : #fafafa                                  !default;
-$alternate-color          : #404040                                  !default;
-$link-color               : $primary-color                             !default;
-$link-hover-color         : color.adjust($link-color, $lightness: -15%) !default;
-$highlight                : #ffeea8                                  !default;
-$error                    : #D33C40                                  !default;
-$bq-border                : 16px solid #f0f0f0                       !default;
+// Static color values for SCSS functions (can't use CSS variables in color.adjust)
+$static-primary-color     : #0366EE                                           !default;
+$static-secondary-color   : #29de7d                                           !default;
+$static-accent-color      : #cdcdcd                                           !default;
+
+// Bridge CSS custom properties to SCSS variables for backwards compatibility
+$background               : var(--color-bg-primary, white)                    !default;
+$primary-color            : var(--color-accent-primary, #{$static-primary-color}) !default;
+$secondary-color          : var(--color-accent-secondary, #{$static-secondary-color}) !default;
+$accent-color             : var(--color-border-primary, #{$static-accent-color}) !default;
+$alternate-background     : var(--color-bg-secondary, #fafafa)                !default;
+$alternate-color          : var(--color-text-secondary, #404040)              !default;
+$link-color               : var(--color-accent-primary, #{$static-primary-color}) !default;
+$link-hover-color         : var(--color-accent-primary-hover, #{color.adjust($static-primary-color, $lightness: -15%)}) !default;
+$highlight                : #ffeea8                                           !default;
+$error                    : var(--color-error, #D33C40)                       !default;
+$bq-border                : 16px solid var(--color-border-secondary, #f0f0f0) !default;
+
+// Legacy color variables (will be migrated gradually)
+$font-color               : var(--color-text-primary, #404040)                !default;
+$heading-font-color       : var(--color-text-primary, #404040)                !default;
+$border-color             : var(--color-border-primary, #dedede)              !default;
+$muted-color              : var(--color-text-muted, #999999)                  !default;
 
 //==============================================================================
 // Typography
@@ -108,8 +120,8 @@ $borders                  : $border-width $border-style $border-color  !default;
 // Buttons
 //==============================================================================
 
-$button-background        : $primary-color                             !default;
-$button-background-hover  : color.adjust($button-background, $lightness: -10%) !default;
+$button-background        : var(--color-accent-primary, #{$static-primary-color}) !default;
+$button-background-hover  : var(--color-accent-primary-hover, #{color.adjust($static-primary-color, $lightness: -10%)}) !default;
 $button-color             : #ffffff                                  !default;
 $button-font-weight       : 600                                        !default;
 $button-font-family       : -apple-system,
@@ -131,12 +143,12 @@ $accent-button-color      : #ffffff                                  !default;
 $accent-button-color-hover: #ffffff                                  !default;
 
 // Muted Buttons
-$muted-border             : 1px solid $accent-color                    !default;
-$muted-border-hover       : 1px solid color.adjust($accent-color, $lightness: -30%) !default;
+$muted-border             : 1px solid var(--color-border-primary, #{$static-accent-color}) !default;
+$muted-border-hover       : 1px solid var(--color-border-secondary, #{color.adjust($static-accent-color, $lightness: -30%)}) !default;
 $muted-background         : transparent                                !default;
 $muted-background-hover   : transparent                                !default;
-$muted-color              : color.adjust($accent-color, $lightness: -50%) !default;
-$muted-color-hover        : color.adjust($accent-color, $lightness: -50%) !default;
+$muted-color              : var(--color-text-secondary, #{color.adjust($static-accent-color, $lightness: -50%)}) !default;
+$muted-color-hover        : var(--color-text-secondary, #{color.adjust($static-accent-color, $lightness: -50%)}) !default;
 
 // Round Buttons
 $round-buttons            : 40px !default;
@@ -148,9 +160,9 @@ $round-buttons            : 40px !default;
 $forms                    : ('[type=color], [type=date], [type=datetime], [type=datetime-local], [type=email], [type=month], [type=number], [type=password], [type=search], [type=tel], [type=text], [type=url], [type=week], [type=time], select, textarea');
 $buttons                  : ('.button, a.button, button, [type=submit], [type=reset], [type=button]');
 $input-background         : transparent                                !default;
-$placeholder              : color.adjust($accent-color, $lightness: -20%) !default;
-$form-border              : 1px solid $border-color                    !default;
-$form-border-hover        : 1px solid color.adjust($border-color, $lightness: -10%) !default;
+$placeholder              : var(--color-text-tertiary, #{color.adjust($static-accent-color, $lightness: -20%)}) !default;
+$form-border              : 1px solid var(--color-border-primary, #{$static-accent-color}) !default;
+$form-border-hover        : 1px solid var(--color-border-secondary, #{color.adjust($static-accent-color, $lightness: -10%)}) !default;
 $form-border-focus        : 1px solid $link-color                      !default;
 
 //==============================================================================

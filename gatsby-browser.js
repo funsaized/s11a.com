@@ -1,4 +1,6 @@
 import { onCLS, onINP, onLCP, onFCP, onTTFB } from 'web-vitals';
+import React from 'react';
+import { ThemeProvider } from './src/context/ThemeContext';
 
 // Lazy load images that are not in viewport & Initialize Web Vitals
 export const onClientEntry = () => {
@@ -56,4 +58,13 @@ export const onServiceWorkerUpdateReady = () => {
   if (answer === true) {
     window.location.reload();
   }
+};
+
+// Wrap root element with theme provider
+export const wrapRootElement = ({ element }) => {
+  return (
+    <ThemeProvider defaultTheme="system">
+      {element}
+    </ThemeProvider>
+  );
 };
