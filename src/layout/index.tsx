@@ -2,7 +2,11 @@ import React from "react";
 import Helmet from "react-helmet";
 import config from "../../data/SiteConfig";
 import "./index.css";
-import "../styles/main.scss";
+import "../styles/globals.css";
+
+// Modern self-hosted fonts via Fontsource
+import "@fontsource-variable/inter";
+import "@fontsource-variable/jetbrains-mono";
 import Navbar from "../components/Navbar/Navbar";
 import Footer from "../components/Footer/Footer";
 
@@ -12,7 +16,7 @@ interface MainLayoutProps {
 
 function MainLayout({ children }: MainLayoutProps): React.ReactElement {
   return (
-    <div>
+    <div className="min-h-screen bg-background">
       <Helmet>
         <meta name="description" content={config.siteDescription} />
         <html lang="en" />
@@ -34,7 +38,9 @@ function MainLayout({ children }: MainLayoutProps): React.ReactElement {
         Skip to main content
       </a>
       <Navbar menuLinks={config.menuLinks} />
-      <main id="main-content">{children}</main>
+      <main id="main-content" className="min-h-screen pt-20 pb-16">
+        {children}
+      </main>
       <Footer />
     </div>
   );

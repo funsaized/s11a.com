@@ -63,7 +63,7 @@ function PostListing({
   );
 
   return (
-    <div className={`posts ${expanded ? "expanded" : ""}`}>
+    <div className="space-y-6">
       {postList.map((post) => {
         let thumbnail;
         if (post.thumbnail && post.thumbnail.childImageSharp) {
@@ -71,13 +71,29 @@ function PostListing({
         }
 
         return (
-          <Link to={post.path} key={post.title}>
-            <div className="post-info">
-              <div className="icon">
-                {thumbnail ? <GatsbyImage image={thumbnail} alt="" /> : <div />}
+          <Link 
+            to={post.path} 
+            key={post.title}
+            className="block hover:opacity-80 transition-opacity"
+          >
+            <div className="flex items-center gap-4 md:gap-6">
+              <div className="flex-shrink-0 w-12 h-12 md:w-16 md:h-16 flex items-center justify-center">
+                {thumbnail ? (
+                  <GatsbyImage 
+                    image={thumbnail} 
+                    alt="" 
+                    className="w-12 h-12 md:w-16 md:h-16 object-cover rounded-md"
+                  />
+                ) : (
+                  <div className="w-12 h-12 md:w-16 md:h-16 bg-muted rounded-md flex items-center justify-center">
+                    <span className="text-muted-foreground text-base md:text-lg">📄</span>
+                  </div>
+                )}
               </div>
-              <div className="post-line">
-                <h2>{post.title}</h2>
+              <div className="flex-1 min-w-0">
+                <h2 className="text-sm md:text-base font-medium text-foreground hover:text-primary hover:underline transition-all leading-snug line-clamp-2">
+                  {post.title}
+                </h2>
               </div>
             </div>
           </Link>

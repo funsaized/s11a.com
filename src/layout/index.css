@@ -8,11 +8,5 @@ html {
 
 body {
   margin: 0;
-  padding: 20px;
-}
-
-@media (max-width: 600px) {
-  body {
-    padding: 5px;
-  }
+  padding: 0;
 }

@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import { Link } from "gatsby";
 import { StaticImage } from "gatsby-plugin-image";
 import { MenuLink } from "../../models";
-import ThemeToggle from "../ThemeToggle/ThemeToggle";
+import { ThemeToggle } from "../ThemeToggle/ThemeToggle";
 
 interface NavbarProps {
   menuLinks: MenuLink[];
@@ -25,28 +25,66 @@ function Navbar({ menuLinks }: NavbarProps): React.ReactElement {
   }, [navOnScroll]);
 
   return (
-    <div className={scrolled ? "nav scroll" : "nav"}>
-      <div className="nav-container">
-        <div className="me">
-          <Link key="sai" to="/" activeClassName="active">
+    <nav
+      className={`fixed w-full top-0 left-0 z-30 bg-background border-b border-border transition-all duration-300 ${
+        scrolled ? "shadow-md" : ""
+      }`}
+    >
+      <div
+        className={`px-8 max-w-7xl mx-auto flex items-center justify-between transition-all duration-300 ${
+          scrolled ? "h-[60px]" : "h-[55px]"
+        }`}
+      >
+        <div className="text-xl font-semibold">
+          <Link
+            to="/"
+            className="flex items-center text-foreground hover:text-primary font-semibold text-lg transition-colors"
+          >
             <StaticImage
               src="../../images/face.png"
-              className="favicon"
+              className="w-[30px] mr-4"
               alt="Face"
             />
-            <span className="text">Sai Nimmagadda</span>
+            <span className="hidden md:block">Sai Nimmagadda</span>
           </Link>
         </div>
-        <div className="links">
-          {menuLinks.map((link) => (
-            <Link key={link.name} to={link.link} activeClassName="active">
-              {link.name}
-            </Link>
-          ))}
-          <ThemeToggle className="theme-toggle--compact theme-toggle--subtle" />
+        <div className="flex flex-row justify-end flex-1 items-center">
+          <div className="hidden md:flex items-center">
+            {menuLinks.map((link) => (
+              <Link
+                key={link.name}
+                to={link.link}
+                className={`flex items-center text-base font-medium py-4 px-3 text-muted-foreground hover:text-foreground transition-colors ${
+                  scrolled
+                    ? "hover:border-b-2 hover:border-primary active:border-b-2 active:border-dashed active:border-primary"
+                    : ""
+                }`}
+                activeClassName={
+                  scrolled
+                    ? "text-foreground border-b-2 border-primary"
+                    : "text-foreground"
+                }
+              >
+                {link.name}
+              </Link>
+            ))}
+          </div>
+          <div className="md:hidden flex items-center space-x-2">
+            {menuLinks.slice(0, 2).map((link) => (
+              <Link
+                key={link.name}
+                to={link.link}
+                className="flex items-center text-sm font-medium py-2 px-2 text-muted-foreground hover:text-foreground transition-colors"
+                activeClassName="text-foreground"
+              >
+                {link.name}
+              </Link>
+            ))}
+          </div>
+          <ThemeToggle />
         </div>
       </div>
-    </div>
+    </nav>
   );
 }
 

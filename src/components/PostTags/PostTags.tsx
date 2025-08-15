@@ -1,6 +1,7 @@
 import React from "react";
 import { Link } from "gatsby";
 import kebabCase from "lodash.kebabcase";
+import { Badge } from "@/components/ui/badge";
 
 interface PostTagsProps {
   tags: string[];
@@ -8,15 +9,20 @@ interface PostTagsProps {
 
 function PostTags({ tags }: PostTagsProps): React.ReactElement {
   return (
-    <div className="post-tag-container">
+    <div className="flex flex-wrap gap-1.5 sm:gap-2">
       {tags &&
         tags.map((tag) => (
           <Link
             key={tag}
-            style={{ textDecoration: "none" }}
             to={`/tags/${kebabCase(tag)}`}
+            className="no-underline"
           >
-            <button type="button">{tag}</button>
+            <Badge 
+              variant="secondary" 
+              className="hover:bg-primary hover:text-primary-foreground transition-colors cursor-pointer"
+            >
+              {tag}
+            </Badge>
           </Link>
         ))}
     </div>

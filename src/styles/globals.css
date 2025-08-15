@@ -1,0 +1,165 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Import Prism.js theme for syntax highlighting */
+@import "prismjs/themes/prism.css";
+
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 20 14.3% 4.1%;
+    --card: 0 0% 100%;
+    --card-foreground: 20 14.3% 4.1%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 20 14.3% 4.1%;
+    --primary: 24.6 95% 53.1%;
+    --primary-foreground: 60 9.1% 97.8%;
+    --secondary: 60 4.8% 95.9%;
+    --secondary-foreground: 24 9.8% 10%;
+    --muted: 60 4.8% 95.9%;
+    --muted-foreground: 25 5.3% 44.7%;
+    --accent: 60 4.8% 95.9%;
+    --accent-foreground: 24 9.8% 10%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 60 9.1% 97.8%;
+    --border: 20 5.9% 90%;
+    --input: 20 5.9% 90%;
+    --ring: 24.6 95% 53.1%;
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --background: 20 14.3% 4.1%;
+    --foreground: 60 9.1% 97.8%;
+    --card: 20 14.3% 4.1%;
+    --card-foreground: 60 9.1% 97.8%;
+    --popover: 20 14.3% 4.1%;
+    --popover-foreground: 60 9.1% 97.8%;
+    --primary: 20.5 90.2% 48.2%;
+    --primary-foreground: 60 9.1% 97.8%;
+    --secondary: 12 6.5% 15.1%;
+    --secondary-foreground: 60 9.1% 97.8%;
+    --muted: 12 6.5% 15.1%;
+    --muted-foreground: 24 5.4% 63.9%;
+    --accent: 12 6.5% 15.1%;
+    --accent-foreground: 60 9.1% 97.8%;
+    --destructive: 0 72.2% 50.6%;
+    --destructive-foreground: 60 9.1% 97.8%;
+    --border: 12 6.5% 15.1%;
+    --input: 12 6.5% 15.1%;
+    --ring: 20.5 90.2% 48.2%;
+  }
+
+  /* System theme support - apply dark mode when system preference is dark and no explicit theme is set */
+  @media (prefers-color-scheme: dark) {
+    [data-theme="system"] {
+      --background: 20 14.3% 4.1%;
+      --foreground: 60 9.1% 97.8%;
+      --card: 20 14.3% 4.1%;
+      --card-foreground: 60 9.1% 97.8%;
+      --popover: 20 14.3% 4.1%;
+      --popover-foreground: 60 9.1% 97.8%;
+      --primary: 20.5 90.2% 48.2%;
+      --primary-foreground: 60 9.1% 97.8%;
+      --secondary: 12 6.5% 15.1%;
+      --secondary-foreground: 60 9.1% 97.8%;
+      --muted: 12 6.5% 15.1%;
+      --muted-foreground: 24 5.4% 63.9%;
+      --accent: 12 6.5% 15.1%;
+      --accent-foreground: 60 9.1% 97.8%;
+      --destructive: 0 72.2% 50.6%;
+      --destructive-foreground: 60 9.1% 97.8%;
+      --border: 12 6.5% 15.1%;
+      --input: 12 6.5% 15.1%;
+      --ring: 20.5 90.2% 48.2%;
+    }
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/* Custom utility classes for compatibility during migration */
+@layer utilities {
+  .container-custom {
+    @apply mx-auto max-w-4xl px-6 lg:px-8;
+  }
+  
+  /* Preserve some existing utility classes */
+  .lead {
+    @apply text-xl font-medium leading-relaxed text-muted-foreground;
+  }
+  
+  /* Navigation styles */
+  .nav-scroll {
+    @apply shadow-md transition-shadow duration-300;
+  }
+
+  /* Skip navigation link for accessibility */
+  .skip-nav {
+    @apply sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:bg-primary focus:text-primary-foreground focus:px-4 focus:py-2 focus:rounded;
+  }
+
+  /* Line clamp utilities for text truncation */
+  .line-clamp-1 {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 1;
+  }
+  
+  .line-clamp-2 {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+  
+  .line-clamp-3 {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+  }
+}
+
+/* Custom styling for inline code and prose compatibility */
+@layer components {
+  /* Inline code styling is now handled by typography plugin */
+  .prose code:not(pre code) {
+    background: hsl(var(--muted)) !important;
+    color: hsl(var(--foreground)) !important;
+    font-weight: 500 !important;
+  }
+  
+  /* Enhanced code block styling with light theme */
+  .prose pre[class*="language-"] {
+    @apply rounded-lg overflow-x-auto shadow-lg;
+    background: #f8f9fa !important; /* Light background */
+    border: 1px solid hsl(var(--border));
+    margin-top: 2rem !important;
+    margin-bottom: 2rem !important;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
+  }
+  
+  .prose pre[class*="language-"] code {
+    background: transparent !important;
+    padding: 0 !important;
+    font-family: 'JetBrains Mono Variable', 'JetBrains Mono', 'Menlo', 'Monaco', 'Consolas', 'Liberation Mono', 'Courier New', monospace !important;
+  }
+  
+  /* Ensure proper heading underlines */
+  .prose h2, .prose h3 {
+    padding-bottom: 0.5rem !important;
+    border-bottom: 1px solid hsl(var(--border)) !important;
+    margin-bottom: 1.5rem !important;
+  }
+}

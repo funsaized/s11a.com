@@ -40,16 +40,7 @@ const gatsbyConfig: GatsbyConfig = {
   plugins: [
     "gatsby-plugin-sitemap",
     "gatsby-disable-404",
-    {
-      resolve: "gatsby-plugin-sass",
-      options: {
-        // eslint-disable-next-line import/no-extraneous-dependencies, global-require
-        implementation: require("sass"),
-        sassOptions: {
-          silenceDeprecations: ['legacy-js-api'], // Temporarily silence the deprecation warning
-        },
-      },
-    },
+    "gatsby-plugin-postcss", // Add PostCSS plugin for Tailwind
     "gatsby-plugin-react-helmet",
     {
       resolve: "gatsby-source-filesystem",
