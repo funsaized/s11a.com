@@ -2,19 +2,21 @@
 title: "Writing a Cosmos DB stored procedure with continuation"
 slug: writing-a-cosmos-db-stored-procedure-with-continuation
 cover: "../thumbnails/azure.png"
-category: "test3"
+category: "Cloud"
 categories:
-  - Code
-  - Backend
   - Cloud
+  - Backend
+  - Database
 date: "03/11/2023"
 thumbnail: "../thumbnails/azure.png"
+description: "Learn to implement pagination in Cosmos DB stored procedures using continuation tokens. Complete guide with JavaScript and Java examples."
 tags:
   - Azure
   - Cosmos
-  - Data
+  - Database
   - Java
   - JavaScript
+  - Pagination
 time: "5 min"
 type: "post"
 ---

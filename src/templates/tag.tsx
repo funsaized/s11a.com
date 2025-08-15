@@ -1,8 +1,12 @@
-import React from "react";
+import React, { useState } from "react";
 import Helmet from "react-helmet";
 import { graphql } from "gatsby";
 import Layout from "../layout";
 import PostListing from "../components/PostListing/PostListing";
+import DynamicBreadcrumb from "../components/Breadcrumb/Breadcrumb";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card";
+import { Badge } from "../components/ui/badge";
+import { Button } from "../components/ui/button";
 import config from "../../data/SiteConfig";
 
 interface TagTemplateProps {
@@ -43,13 +47,158 @@ function TagTemplate({
 }: TagTemplateProps): React.ReactElement {
   const { tag } = pageContext;
   const postEdges = data.allMarkdownRemark.edges;
+  const [viewMode, setViewMode] = useState<'cards' | 'simple'>('cards');
+
+  // Create breadcrumb items
+  const breadcrumbItems = [
+    { label: "Blog", href: "/blog" },
+    { label: `Tag: ${tag}` }
+  ];
+
+  // Get unique categories from all posts with this tag
+  const allCategories = Array.from(
+    new Set(
+      postEdges
+        .map(edge => edge.node.frontmatter.category)
+        .filter(Boolean)
+    )
+  ).sort();
+
+  // Get related tags (tags that appear with this tag)
+  const relatedTags = Array.from(
+    new Set(
+      postEdges.flatMap(edge => 
+        (edge.node.frontmatter.tags || []).filter(t => t !== tag)
+      )
+    )
+  ).sort();
 
   return (
     <Layout>
-      <div className="tag-container container">
-        <h2>Posts with matching tag:</h2>
+      <div className="tag-container">
         <Helmet title={`Posts tagged as "${tag}" | ${config.siteTitle}`} />
-        <PostListing postEdges={postEdges} />
+        <div className="container mx-auto px-4 py-8 max-w-6xl">
+          {/* Breadcrumb Navigation */}
+          <DynamicBreadcrumb items={breadcrumbItems} className="mb-6" />
+          
+          {/* Tag Header */}
+          <div className="mb-8">
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h1 className="text-4xl font-bold mb-2">
+                  <Badge variant="outline" className="mr-3 text-sm">
+                    Tag
+                  </Badge>
+                  {tag}
+                </h1>
+                <p className="text-lg text-muted-foreground">
+                  {data.allMarkdownRemark.totalCount} post{data.allMarkdownRemark.totalCount !== 1 ? 's' : ''} tagged with "{tag}"
+                </p>
+              </div>
+              
+              <div className="flex items-center gap-2">
+                <Button
+                  variant={viewMode === 'cards' ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setViewMode('cards')}
+                >
+                  Cards
+                </Button>
+                <Button
+                  variant={viewMode === 'simple' ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setViewMode('simple')}
+                >
+                  List
+                </Button>
+              </div>
+            </div>
+
+            {/* Tag Stats */}
+            <Card>
+              <CardContent className="p-6">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div>
+                    <CardTitle className="text-sm font-medium text-muted-foreground mb-1">
+                      TOTAL POSTS
+                    </CardTitle>
+                    <div className="text-2xl font-bold">{data.allMarkdownRemark.totalCount}</div>
+                  </div>
+                  
+                  <div>
+                    <CardTitle className="text-sm font-medium text-muted-foreground mb-1">
+                      CATEGORIES
+                    </CardTitle>
+                    <div className="text-2xl font-bold">{allCategories.length}</div>
+                  </div>
+                  
+                  <div>
+                    <CardTitle className="text-sm font-medium text-muted-foreground mb-1">
+                      READING TIME
+                    </CardTitle>
+                    <div className="text-2xl font-bold">
+                      {Math.round(postEdges.reduce((total, edge) => total + edge.node.timeToRead, 0))} min
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Related Content */}
+                <div className="mt-6 pt-6 border-t space-y-4">
+                  {/* Categories */}
+                  {allCategories.length > 0 && (
+                    <div>
+                      <CardTitle className="text-sm font-medium text-muted-foreground mb-3">
+                        CATEGORIES
+                      </CardTitle>
+                      <div className="flex flex-wrap gap-2">
+                        {allCategories.map((category) => (
+                          <Badge key={category} variant="secondary" className="hover:bg-primary/20 transition-colors">
+                            <a href={`/categories/${category?.toLowerCase()}`} className="text-inherit no-underline">
+                              {category}
+                            </a>
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Related Tags */}
+                  {relatedTags.length > 0 && (
+                    <div>
+                      <CardTitle className="text-sm font-medium text-muted-foreground mb-3">
+                        RELATED TAGS
+                      </CardTitle>
+                      <div className="flex flex-wrap gap-2">
+                        {relatedTags.slice(0, 10).map((relatedTag) => (
+                          <Badge key={relatedTag} variant="outline" className="hover:bg-primary/20 transition-colors">
+                            <a href={`/tags/${relatedTag.toLowerCase()}`} className="text-inherit no-underline">
+                              {relatedTag}
+                            </a>
+                          </Badge>
+                        ))}
+                        {relatedTags.length > 10 && (
+                          <Badge variant="outline">
+                            +{relatedTags.length - 10} more
+                          </Badge>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+          
+          {/* Posts Listing */}
+          <PostListing 
+            postEdges={postEdges} 
+            simple={viewMode === 'simple'}
+            expanded={viewMode === 'cards'}
+            showExcerpt={viewMode === 'cards'}
+            showTags={viewMode === 'cards'}
+            showReadingTime={true}
+          />
+        </div>
       </div>
     </Layout>
   );

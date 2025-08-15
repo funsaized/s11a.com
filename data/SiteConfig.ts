@@ -8,7 +8,7 @@ const config: Config = {
   siteUrl: "https://s11a.com", // Domain of your website without pathPrefix.
   repo: "https://github.com/funsaized/s11a.com",
   pathPrefix: "", // Prefixes all links. For cases when deployed to example.github.io/gatsby-advanced-starter/.
-  siteDescription: "A personal development blog", // Website description used for RSS feeds/meta description tag.
+  siteDescription: "Personal blog by Sai Nimmagadda focusing on software development, cloud architecture, and modern web technologies. Explore tutorials, insights, and code examples.", // Website description used for RSS feeds/meta description tag.
   siteRss: "/rss.xml", // Path to the RSS file.
   postDefaultCategoryID: "Tech", // Default category for posts.
   dateFromFormat: "MM-DD-YYYY", // Date format used in the frontmatter.
@@ -18,7 +18,7 @@ const config: Config = {
   userTwitter: "Funsaized", // Optionally renders "Follow Me" in the UserInfo segment.
   userLocation: "NC, USA", // User location to display in the author segment.
   userAvatar: "https://api.adorable.io/avatars/150/test.png", // User avatar to display in the author segment.
-  userDescription: "building in public 🚀 | there’s no place like 127.0.0.1", // User description to display in the author segment.
+  userDescription: "Software developer passionate about cloud architecture, modern web technologies, and building scalable solutions. Sharing knowledge through code and tutorials.", // User description to display in the author segment.
   // Links to social profiles/projects you want to display in the author segment/navigation bar.
   userLinks: [
     {
@@ -50,6 +50,11 @@ const config: Config = {
   copyright: "Copyright © 2024. Sai Nimmagadda", // Copyright string for the footer of the website and RSS feed.
   themeColor: "#9dd4cf", // Used for setting manifest and progress theme colors.
   backgroundColor: "#e0e0e0", // Used for setting manifest background color.
+  // SEO enhancements
+  siteFBAppID: "", // Facebook App ID for Open Graph
+  siteLanguage: "en", // Website language
+  siteLocale: "en_US", // Website locale
+  twitterHandle: "@Funsaized", // Twitter handle with @
 };
 
 // Validate

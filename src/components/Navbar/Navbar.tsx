@@ -3,7 +3,9 @@ import { Link } from "gatsby";
 import { StaticImage } from "gatsby-plugin-image";
 import { MenuLink } from "../../models";
 import { ThemeToggle } from "../ThemeToggle/ThemeToggle";
-import { SidebarTrigger } from "../ui/sidebar-trigger";
+import { SidebarTrigger } from "../ui/sidebar";
+import SearchTrigger from "../SearchTrigger/SearchTrigger";
+import SearchDialog from "../SearchDialog/SearchDialog";
 
 interface NavbarProps {
   menuLinks: MenuLink[];
@@ -11,6 +13,7 @@ interface NavbarProps {
 
 function Navbar({ menuLinks }: NavbarProps): React.ReactElement {
   const [scrolled, setScrolled] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
 
   const navOnScroll = useCallback(() => {
     if (window.scrollY > 20) {
@@ -51,7 +54,7 @@ function Navbar({ menuLinks }: NavbarProps): React.ReactElement {
           </Link>
         </div>
         <div className="flex flex-row justify-end flex-1 items-center">
-          <div className="hidden md:flex items-center">
+          <div className="hidden md:flex items-center space-x-2">
             {menuLinks.map((link) => (
               <Link
                 key={link.name}
@@ -70,6 +73,12 @@ function Navbar({ menuLinks }: NavbarProps): React.ReactElement {
                 {link.name}
               </Link>
             ))}
+            <SearchTrigger
+              onClick={() => setSearchOpen(true)}
+              variant="ghost"
+              size="sm"
+              className="ml-2"
+            />
           </div>
           <div className="md:hidden flex items-center space-x-2">
             {menuLinks.slice(0, 2).map((link) => (
@@ -82,10 +91,20 @@ function Navbar({ menuLinks }: NavbarProps): React.ReactElement {
                 {link.name}
               </Link>
             ))}
+            <SearchTrigger
+              onClick={() => setSearchOpen(true)}
+              variant="ghost"
+              size="icon"
+              showShortcut={false}
+              className="h-8 w-8"
+            />
           </div>
           <ThemeToggle />
         </div>
       </div>
+      
+      {/* Search Dialog */}
+      <SearchDialog open={searchOpen} onOpenChange={setSearchOpen} />
     </nav>
   );
 }

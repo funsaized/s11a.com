@@ -1,14 +1,15 @@
 ---
-title: "Making garlic bot more random with a self scheduling serverless function"
+title: "Making garlic bot more random with serverless scheduling"
 slug: making-garlic-bot-more-random-with-a-self-scheduling-serverless-function
 cover: "../images/lambda_cover.png"
-category: "test3"
+category: "Cloud"
 categories:
-  - Code
-  - Backend
   - Cloud
+  - Serverless
+  - AWS
 date: "01/26/2022"
 thumbnail: "../thumbnails/lambda.png"
+description: "Enhance your Discord bot with AWS Lambda and EventBridge scheduling for improved randomization and automation."
 tags:
   - AWS
   - CloudWatch

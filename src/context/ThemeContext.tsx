@@ -15,6 +15,7 @@ interface ThemeContextType {
   resolvedTheme: ResolvedTheme;
   setTheme: (theme: Theme) => void;
   toggleTheme: () => void;
+  isLoading: boolean;
 }
 
 // Context
@@ -32,6 +33,7 @@ export function ThemeProvider({
 }: ThemeProviderProps): React.ReactElement {
   const [theme, setThemeState] = useState<Theme>(defaultTheme);
   const [resolvedTheme, setResolvedTheme] = useState<ResolvedTheme>("light");
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
   // Get system preference
   const getSystemTheme = (): ResolvedTheme => {
@@ -97,6 +99,10 @@ export function ThemeProvider({
   useEffect(() => {
     if (typeof window === "undefined") return;
 
+    // Prevent FOUC by temporarily disabling transitions
+    const root = document.documentElement;
+    root.classList.add("no-transitions");
+
     // Get saved theme preference
     let savedTheme: Theme = defaultTheme;
     try {
@@ -111,6 +117,17 @@ export function ThemeProvider({
     setThemeState(savedTheme);
     updateTheme(savedTheme);
 
+    // Re-enable transitions after a short delay
+    const enableTransitions = () => {
+      root.classList.remove("no-transitions");
+      setIsLoading(false);
+    };
+    
+    // Use requestAnimationFrame to ensure DOM is updated first
+    requestAnimationFrame(() => {
+      setTimeout(enableTransitions, 50);
+    });
+
     // Listen for system theme changes
     const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
     const handleChange = () => {
@@ -118,22 +135,30 @@ export function ThemeProvider({
         const newResolved = getSystemTheme();
         setResolvedTheme(newResolved);
         // Update DOM to reflect system preference change
-        const root = document.documentElement;
-        root.classList.remove("dark", "light");
-        root.setAttribute("data-theme", "system");
+        const docRoot = document.documentElement;
+        docRoot.classList.remove("dark", "light");
+        docRoot.setAttribute("data-theme", "system");
       }
     };
 
     mediaQuery.addEventListener("change", handleChange);
-    return () => mediaQuery.removeEventListener("change", handleChange);
+    return () => {
+      mediaQuery.removeEventListener("change", handleChange);
+      // Cleanup: ensure transitions are enabled if component unmounts
+      root.classList.remove("no-transitions");
+    };
   }, [defaultTheme]);
 
-  const value: ThemeContextType = {
-    theme,
-    resolvedTheme,
-    setTheme,
-    toggleTheme,
-  };
+  const value: ThemeContextType = React.useMemo(
+    () => ({
+      theme,
+      resolvedTheme,
+      setTheme,
+      toggleTheme,
+      isLoading,
+    }),
+    [theme, resolvedTheme, setTheme, toggleTheme, isLoading]
+  );
 
   return (
     <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>

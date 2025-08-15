@@ -2,17 +2,20 @@
 title: "My custom Operator Mono VSCode styles"
 slug: my-custom-operator-mono-vscode-setup
 cover: "../thumbnails/azure.png"
-category: "test3"
+category: "Tools"
 categories:
-  - Code
-  - Backend
-  - Cloud
+  - Tools
+  - Development
+  - Editor
 date: "07/13/2024"
 thumbnail: "../thumbnails/vscode.png"
+description: "Customize VSCode with Operator Mono font and cursive italics. Complete setup guide with CSS styles and configuration."
 tags:
   - CSS
   - JavaScript
   - Tools
+  - VSCode
+  - Fonts
 time: "5 min"
 type: "post"
 ---

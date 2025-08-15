@@ -1,0 +1,141 @@
+/* Enhanced theme toggle animations and micro-interactions */
+
+/* Icon transition keyframes */
+@keyframes theme-icon-switch {
+  0% {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
+  50% {
+    opacity: 0;
+    transform: scale(0.8) rotate(180deg);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(360deg);
+  }
+}
+
+@keyframes theme-icon-glow {
+  0%, 100% {
+    filter: drop-shadow(0 0 0px transparent);
+  }
+  50% {
+    filter: drop-shadow(0 0 8px currentColor);
+  }
+}
+
+/* Theme toggle button enhancements */
+.theme-toggle-icon {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.theme-toggle-icon:hover {
+  animation: theme-icon-glow 2s ease-in-out infinite;
+}
+
+.theme-toggle-switching .theme-toggle-icon {
+  animation: theme-icon-switch 0.3s ease-in-out;
+}
+
+/* Theme indicator dot animations */
+.theme-indicator-dot {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 0 0 0 currentColor;
+}
+
+.theme-indicator-dot:hover {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.theme-indicator-dot.switching {
+  animation: ping 0.5s cubic-bezier(0, 0, 0.2, 1) 2;
+}
+
+/* Tooltip enhancements for keyboard shortcuts */
+.theme-toggle-tooltip kbd {
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
+  border: 1px solid hsl(var(--border));
+}
+
+/* Dark mode specific adjustments */
+.dark .theme-toggle-tooltip kbd {
+  box-shadow: 0 1px 3px rgba(255, 255, 255, 0.1), 0 1px 2px rgba(255, 255, 255, 0.06);
+}
+
+/* Reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  .theme-toggle-icon,
+  .theme-indicator-dot {
+    animation: none !important;
+    transition-duration: 0.01ms !important;
+  }
+  
+  .theme-toggle-switching .theme-toggle-icon {
+    animation: none !important;
+    transform: scale(0.95);
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .theme-toggle-icon {
+    filter: contrast(1.5);
+  }
+  
+  .theme-indicator-dot {
+    border: 1px solid currentColor;
+  }
+  
+  .theme-toggle-tooltip kbd {
+    border-width: 2px;
+    font-weight: 700;
+  }
+}
+
+/* Focus-visible styles for better keyboard navigation */
+.theme-toggle-button:focus-visible {
+  outline: 2px solid hsl(var(--ring));
+  outline-offset: 2px;
+  box-shadow: 0 0 0 2px hsl(var(--ring));
+}
+
+/* Loading state styles */
+.theme-toggle-loading {
+  cursor: wait !important;
+  opacity: 0.7;
+}
+
+.theme-toggle-loading .theme-toggle-icon {
+  animation: pulse 1s ease-in-out infinite;
+}
+
+/* Theme-specific icon colors with better contrast */
+.theme-icon-sun {
+  color: #f59e0b; /* amber-500 */
+}
+
+.dark .theme-icon-sun {
+  color: #fbbf24; /* amber-400 */
+}
+
+.theme-icon-moon {
+  color: #2563eb; /* blue-600 */
+}
+
+.dark .theme-icon-moon {
+  color: #60a5fa; /* blue-400 */
+}
+
+.theme-icon-monitor {
+  color: #7c3aed; /* violet-600 */
+}
+
+.dark .theme-icon-monitor {
+  color: #a78bfa; /* violet-400 */
+}
