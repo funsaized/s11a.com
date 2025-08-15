@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import Helmet from "react-helmet";
 import config from "../../data/SiteConfig";
 import "./index.css";
@@ -25,10 +25,29 @@ interface MainLayoutProps {
 }
 
 function MainLayout({ children }: MainLayoutProps): React.ReactElement {
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+
   // Initialize no-transition class to prevent FOUC
   useEffect(() => {
     // Add no-transitions class immediately
     document.body.classList.add('no-transitions');
+    
+    // Read sidebar state from cookie after hydration
+    const getSidebarStateFromCookie = () => {
+      if (typeof document !== 'undefined') {
+        const cookies = document.cookie.split(';');
+        const sidebarCookie = cookies.find(cookie => 
+          cookie.trim().startsWith('sidebar_state=')
+        );
+        if (sidebarCookie) {
+          const value = sidebarCookie.split('=')[1];
+          return value === 'true';
+        }
+      }
+      return true; // default to open if no cookie found
+    };
+
+    setSidebarOpen(getSidebarStateFromCookie());
     
     // Remove no-transitions class after initial paint
     const timer = setTimeout(() => {
@@ -37,6 +56,14 @@ function MainLayout({ children }: MainLayoutProps): React.ReactElement {
 
     return () => clearTimeout(timer);
   }, []);
+
+  // Handle sidebar state changes and persist to cookie
+  const handleSidebarChange = (open: boolean) => {
+    setSidebarOpen(open);
+    if (typeof document !== 'undefined') {
+      document.cookie = `sidebar_state=${open}; path=/; max-age=${60 * 60 * 24 * 7}`;
+    }
+  };
 
   // Critical CSS for above-the-fold content
   const criticalCSS = `
@@ -93,7 +120,7 @@ function MainLayout({ children }: MainLayoutProps): React.ReactElement {
             <meta name="theme-color" content="hsl(var(--background))" />
       </Helmet>
       
-      <SidebarProvider defaultOpen={true}>
+      <SidebarProvider open={sidebarOpen} onOpenChange={handleSidebarChange}>
         {/* Global scroll progress indicator */}
         <ScrollProgress 
           height={3}
