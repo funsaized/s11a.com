@@ -76,22 +76,22 @@ function PostListing({
             key={post.title}
             className="block hover:opacity-80 transition-opacity"
           >
-            <div className="flex items-center gap-6">
-              <div className="flex-shrink-0 w-16 h-16 flex items-center justify-center">
+            <div className="flex items-center gap-4 md:gap-6">
+              <div className="flex-shrink-0 w-12 h-12 md:w-16 md:h-16 flex items-center justify-center">
                 {thumbnail ? (
                   <GatsbyImage 
                     image={thumbnail} 
                     alt="" 
-                    className="w-16 h-16 object-cover rounded"
+                    className="w-12 h-12 md:w-16 md:h-16 object-cover rounded-md"
                   />
                 ) : (
-                  <div className="w-16 h-16 bg-muted rounded flex items-center justify-center">
-                    <span className="text-muted-foreground text-lg">📄</span>
+                  <div className="w-12 h-12 md:w-16 md:h-16 bg-muted rounded-md flex items-center justify-center">
+                    <span className="text-muted-foreground text-base md:text-lg">📄</span>
                   </div>
                 )}
               </div>
               <div className="flex-1 min-w-0">
-                <h2 className="text-base font-medium text-foreground hover:text-primary transition-colors leading-snug">
+                <h2 className="text-sm md:text-base font-medium text-foreground hover:text-primary hover:underline transition-all leading-snug line-clamp-2">
                   {post.title}
                 </h2>
               </div>

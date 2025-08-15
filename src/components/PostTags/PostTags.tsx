@@ -9,7 +9,7 @@ interface PostTagsProps {
 
 function PostTags({ tags }: PostTagsProps): React.ReactElement {
   return (
-    <div className="flex flex-wrap gap-2">
+    <div className="flex flex-wrap gap-1.5 sm:gap-2">
       {tags &&
         tags.map((tag) => (
           <Link

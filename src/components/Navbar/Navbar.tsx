@@ -49,24 +49,38 @@ function Navbar({ menuLinks }: NavbarProps): React.ReactElement {
           </Link>
         </div>
         <div className="flex flex-row justify-end flex-1 items-center">
-          {menuLinks.map((link) => (
-            <Link
-              key={link.name}
-              to={link.link}
-              className={`flex items-center text-base font-medium py-4 px-3 text-muted-foreground hover:text-foreground transition-colors ${
-                scrolled
-                  ? "hover:border-b-2 hover:border-primary active:border-b-2 active:border-dashed active:border-primary"
-                  : ""
-              }`}
-              activeClassName={
-                scrolled
-                  ? "text-foreground border-b-2 border-primary"
-                  : "text-foreground"
-              }
-            >
-              {link.name}
-            </Link>
-          ))}
+          <div className="hidden md:flex items-center">
+            {menuLinks.map((link) => (
+              <Link
+                key={link.name}
+                to={link.link}
+                className={`flex items-center text-base font-medium py-4 px-3 text-muted-foreground hover:text-foreground transition-colors ${
+                  scrolled
+                    ? "hover:border-b-2 hover:border-primary active:border-b-2 active:border-dashed active:border-primary"
+                    : ""
+                }`}
+                activeClassName={
+                  scrolled
+                    ? "text-foreground border-b-2 border-primary"
+                    : "text-foreground"
+                }
+              >
+                {link.name}
+              </Link>
+            ))}
+          </div>
+          <div className="md:hidden flex items-center space-x-2">
+            {menuLinks.slice(0, 2).map((link) => (
+              <Link
+                key={link.name}
+                to={link.link}
+                className="flex items-center text-sm font-medium py-2 px-2 text-muted-foreground hover:text-foreground transition-colors"
+                activeClassName="text-foreground"
+              >
+                {link.name}
+              </Link>
+            ))}
+          </div>
           <ThemeToggle />
         </div>
       </div>

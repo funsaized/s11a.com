@@ -9,7 +9,7 @@ interface ProjectListingProps {
 
 function ProjectListing({ projects }: ProjectListingProps): React.ReactElement {
   return (
-    <div className="grid gap-6 md:grid-cols-2">
+    <div className="grid gap-4 sm:gap-6 sm:grid-cols-1 lg:grid-cols-2">
       {projects.map((project) => (
         <Card key={project.title}>
           <CardHeader>
