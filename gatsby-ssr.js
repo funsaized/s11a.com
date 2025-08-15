@@ -26,10 +26,13 @@ export const onRenderBody = ({ setHeadComponents }) => {
         
         // Apply theme before page load
         if (theme === 'system') {
-          // Let CSS handle system preference
-          document.documentElement.removeAttribute('data-theme');
+          // Remove explicit classes and let CSS media query handle system preference
+          document.documentElement.classList.remove('dark', 'light');
+          document.documentElement.setAttribute('data-theme', 'system');
         } else {
-          // Set explicit theme
+          // Set explicit theme class
+          document.documentElement.classList.remove('dark', 'light');
+          document.documentElement.classList.add(theme);
           document.documentElement.setAttribute('data-theme', theme);
         }
       } catch (e) {

@@ -1,57 +1,34 @@
-import React from 'react';
-import { useTheme } from '../../context/ThemeContext';
-import './ThemeToggle.scss';
+import * as React from "react"
+import { Moon, Sun, Monitor } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { useTheme } from "../../context/ThemeContext"
 
-interface ThemeToggleProps {
-  className?: string;
-  showLabel?: boolean;
-}
+export function ThemeToggle() {
+  const { theme, toggleTheme } = useTheme()
 
-export function ThemeToggle({ 
-  className = '', 
-  showLabel = false 
-}: ThemeToggleProps): React.ReactElement {
-  const { theme, toggleTheme } = useTheme();
-
-  // Theme icons and labels
-  const themeConfig = {
-    light: {
-      icon: '☀️',
-      label: 'Light',
-      ariaLabel: 'Switch to dark theme'
-    },
-    dark: {
-      icon: '🌙',
-      label: 'Dark',
-      ariaLabel: 'Switch to system theme'
-    },
-    system: {
-      icon: '💻',
-      label: 'Auto',
-      ariaLabel: 'Switch to light theme'
+  // Get the appropriate icon based on current theme
+  const getIcon = () => {
+    switch (theme) {
+      case "light":
+        return <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all" />
+      case "dark":
+        return <Moon className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all" />
+      case "system":
+        return <Monitor className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all" />
+      default:
+        return <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all" />
     }
-  };
-
-  const currentConfig = themeConfig[theme];
+  }
 
   return (
-    <button
-      type="button"
-      className={`theme-toggle ${className}`}
+    <Button
+      variant="ghost"
+      size="icon"
       onClick={toggleTheme}
-      aria-label={currentConfig.ariaLabel}
-      title={`Current theme: ${currentConfig.label}. Click to cycle themes.`}
+      title={`Current theme: ${theme}. Click to cycle to next theme.`}
     >
-      <span className="theme-toggle__icon" aria-hidden="true">
-        {currentConfig.icon}
-      </span>
-      {showLabel && (
-        <span className="theme-toggle__label">
-          {currentConfig.label}
-        </span>
-      )}
-    </button>
-  );
+      {getIcon()}
+      <span className="sr-only">Toggle theme (current: {theme})</span>
+    </Button>
+  )
 }
-
-export default ThemeToggle;

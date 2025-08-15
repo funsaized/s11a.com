@@ -55,12 +55,17 @@ export function ThemeProvider({
     setResolvedTheme(resolved);
 
     if (typeof document !== "undefined") {
+      const root = document.documentElement;
+      
       if (newTheme === "system") {
-        // Remove explicit theme attribute to let CSS handle system preference
-        document.documentElement.removeAttribute("data-theme");
+        // Remove explicit dark class and let CSS media query handle it
+        root.classList.remove("dark", "light");
+        root.setAttribute("data-theme", "system");
       } else {
-        // Set explicit theme
-        document.documentElement.setAttribute("data-theme", resolved);
+        // Set explicit theme class
+        root.classList.remove("dark", "light");
+        root.classList.add(resolved);
+        root.setAttribute("data-theme", resolved);
       }
     }
   };
@@ -109,9 +114,13 @@ export function ThemeProvider({
     // Listen for system theme changes
     const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
     const handleChange = () => {
-      if (savedTheme === "system") {
+      if (theme === "system") {
         const newResolved = getSystemTheme();
         setResolvedTheme(newResolved);
+        // Update DOM to reflect system preference change
+        const root = document.documentElement;
+        root.classList.remove("dark", "light");
+        root.setAttribute("data-theme", "system");
       }
     };
 

@@ -31,6 +31,11 @@ export const onCreateWebpackConfig: GatsbyNode["onCreateWebpackConfig"] = ({
       }),
     ],
     resolve: {
+      alias: {
+        "@/components": path.resolve(__dirname, "src/components"),
+        "@/lib": path.resolve(__dirname, "src/lib"),
+        "@/styles": path.resolve(__dirname, "src/styles"),
+      },
       fallback: {
         crypto: false,
         assert: false,
