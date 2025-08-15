@@ -1,16 +1,16 @@
 .projects .github-button {
-  // Match view button exactly
+  // Match view button exactly but slightly larger for better dark mode visibility
   display: inline-flex !important;
   align-items: center !important;
   white-space: nowrap !important;
-  padding: 0.4rem 0.8rem !important;
-  font-size: 0.9rem !important;
+  padding: 0.5rem 1rem !important;
+  font-size: 0.95rem !important;
   line-height: 1.2 !important;
   height: auto !important;
   
   svg {
-    width: 14px !important;
-    height: 14px !important;
-    margin-right: 4px !important;
+    width: 16px !important;
+    height: 16px !important;
+    margin-right: 6px !important;
   }
 }

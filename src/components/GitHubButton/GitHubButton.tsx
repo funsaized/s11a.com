@@ -25,21 +25,21 @@ function GitHubButton({
       aria-label={ariaLabel}
       style={{
         fontWeight: 600,
-        color: "#24292e",
-        backgroundColor: "#fafbfc",
-        border: "1px solid #d1d5da",
+        color: "var(--color-text-primary)",
+        backgroundColor: "var(--color-bg-secondary)",
+        border: "1px solid var(--color-border-primary)",
         borderRadius: "6px",
         textDecoration: "none",
         cursor: "pointer",
         transition: "background-color 0.2s cubic-bezier(0.3, 0, 0.5, 1)",
       }}
       onMouseEnter={(e) => {
-        e.currentTarget.style.backgroundColor = "#f3f4f6";
-        e.currentTarget.style.borderColor = "#c6cbd1";
+        e.currentTarget.style.backgroundColor = "var(--color-bg-tertiary)";
+        e.currentTarget.style.borderColor = "var(--color-border-secondary)";
       }}
       onMouseLeave={(e) => {
-        e.currentTarget.style.backgroundColor = "#fafbfc";
-        e.currentTarget.style.borderColor = "#d1d5da";
+        e.currentTarget.style.backgroundColor = "var(--color-bg-secondary)";
+        e.currentTarget.style.borderColor = "var(--color-border-primary)";
       }}
     >
       <svg
