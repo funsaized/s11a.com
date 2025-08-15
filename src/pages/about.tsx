@@ -7,7 +7,7 @@ import config from "../../data/SiteConfig";
 function AboutPage(): React.ReactElement {
   return (
     <Layout>
-      <div className="about container">
+      <div className="container mx-auto px-4 py-8 max-w-4xl">
         <Helmet title={`About | ${config.siteTitle}`} />
         <About />
       </div>

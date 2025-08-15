@@ -25,17 +25,19 @@ function Navbar({ menuLinks }: NavbarProps): React.ReactElement {
   }, [navOnScroll]);
 
   return (
-    <nav 
+    <nav
       className={`fixed w-full top-0 left-0 z-30 bg-background border-b border-border transition-all duration-300 ${
-        scrolled ? 'shadow-md' : ''
+        scrolled ? "shadow-md" : ""
       }`}
     >
-      <div className={`px-8 max-w-7xl mx-auto flex items-center justify-between transition-all duration-300 ${
-        scrolled ? 'h-[60px]' : 'h-[55px]'
-      }`}>
+      <div
+        className={`px-8 max-w-7xl mx-auto flex items-center justify-between transition-all duration-300 ${
+          scrolled ? "h-[60px]" : "h-[55px]"
+        }`}
+      >
         <div className="text-xl font-semibold">
-          <Link 
-            to="/" 
+          <Link
+            to="/"
             className="flex items-center text-foreground hover:text-primary font-semibold text-lg transition-colors"
           >
             <StaticImage
@@ -48,13 +50,19 @@ function Navbar({ menuLinks }: NavbarProps): React.ReactElement {
         </div>
         <div className="flex flex-row justify-end flex-1 items-center">
           {menuLinks.map((link) => (
-            <Link 
-              key={link.name} 
-              to={link.link} 
+            <Link
+              key={link.name}
+              to={link.link}
               className={`flex items-center text-base font-medium py-4 px-3 text-muted-foreground hover:text-foreground transition-colors ${
-                scrolled ? 'hover:border-b-2 hover:border-primary active:border-b-2 active:border-dashed active:border-primary' : ''
+                scrolled
+                  ? "hover:border-b-2 hover:border-primary active:border-b-2 active:border-dashed active:border-primary"
+                  : ""
               }`}
-              activeClassName={scrolled ? 'text-foreground border-b-2 border-primary' : 'text-foreground'}
+              activeClassName={
+                scrolled
+                  ? "text-foreground border-b-2 border-primary"
+                  : "text-foreground"
+              }
             >
               {link.name}
             </Link>

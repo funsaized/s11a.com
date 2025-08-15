@@ -2,6 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Import Prism.js theme for syntax highlighting */
+@import "prismjs/themes/prism.css";
+
+
 @layer base {
   :root {
     --background: 0 0% 100%;
@@ -105,13 +109,35 @@
   }
 }
 
-/* Syntax highlighting for code blocks */
+/* Custom styling for inline code and prose compatibility */
 @layer components {
-  pre[class*="language-"] {
-    @apply rounded-lg bg-muted p-4 overflow-x-auto;
+  /* Inline code styling is now handled by typography plugin */
+  .prose code:not(pre code) {
+    background: hsl(var(--muted)) !important;
+    color: hsl(var(--foreground)) !important;
+    font-weight: 500 !important;
   }
   
-  code:not(pre code) {
-    @apply bg-muted px-1 py-0.5 rounded text-sm;
+  /* Enhanced code block styling with light theme */
+  .prose pre[class*="language-"] {
+    @apply rounded-lg overflow-x-auto shadow-lg;
+    background: #f8f9fa !important; /* Light background */
+    border: 1px solid hsl(var(--border));
+    margin-top: 2rem !important;
+    margin-bottom: 2rem !important;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
+  }
+  
+  .prose pre[class*="language-"] code {
+    background: transparent !important;
+    padding: 0 !important;
+    font-family: 'JetBrains Mono Variable', 'JetBrains Mono', 'Menlo', 'Monaco', 'Consolas', 'Liberation Mono', 'Courier New', monospace !important;
+  }
+  
+  /* Ensure proper heading underlines */
+  .prose h2, .prose h3 {
+    padding-bottom: 0.5rem !important;
+    border-bottom: 1px solid hsl(var(--border)) !important;
+    margin-bottom: 1.5rem !important;
   }
 }

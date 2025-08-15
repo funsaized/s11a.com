@@ -100,38 +100,45 @@ function BlogPage({ data }: BlogPageProps): React.ReactElement {
     <Layout>
       <Helmet title={`Articles – ${config.siteTitle}`} />
       <SEO />
-      <div className="container">
-        <h1>Articles</h1>
-        <div className="category-container">
-          {categories.map((category) => {
-            const active = currentCategories.includes(category.fieldValue);
+      <div className="container mx-auto px-4 py-6 max-w-4xl">
+        <div className="max-w-2xl mx-auto">
+          <h1 className="text-5xl font-bold mb-4">Articles</h1>
+          
+          <div className="flex flex-wrap gap-2 mb-6">
+            {categories.map((category) => {
+              const active = currentCategories.includes(category.fieldValue);
 
-            return (
-              <div
-                className={`category-filter ${active ? "active" : ""}`}
-                key={category.fieldValue}
-                role="button"
-                tabIndex={0}
-                onClick={() => handleCategoryClick(category.fieldValue)}
-                onKeyDown={(event) => handleKeyDown(event, category.fieldValue)}
-              >
-                {category.fieldValue}
-              </div>
-            );
-          })}
+              return (
+                <button
+                  key={category.fieldValue}
+                  className={`px-3 py-1 rounded-full text-sm transition-colors ${
+                    active 
+                      ? "bg-primary text-primary-foreground" 
+                      : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
+                  }`}
+                  onClick={() => handleCategoryClick(category.fieldValue)}
+                  onKeyDown={(event) => handleKeyDown(event, category.fieldValue)}
+                >
+                  {category.fieldValue}
+                </button>
+              );
+            })}
+          </div>
+          
+          <div className="flex items-center gap-4 mb-6">
+            <input
+              className="flex-1 px-3 py-2 bg-background border border-input rounded-md focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent"
+              type="text"
+              name="searchTerm"
+              value={searchTerm}
+              placeholder="Type here to filter posts..."
+              onChange={handleChange}
+            />
+            <div className="px-3 py-2 bg-muted rounded-md font-medium">{filterCount}</div>
+          </div>
+          
+          <PostListing postEdges={filteredPosts} expanded />
         </div>
-        <div className="search-container">
-          <input
-            className="search"
-            type="text"
-            name="searchTerm"
-            value={searchTerm}
-            placeholder="Type here to filter posts..."
-            onChange={handleChange}
-          />
-          <div className="filter-count">{filterCount}</div>
-        </div>
-        <PostListing postEdges={filteredPosts} expanded />
       </div>
     </Layout>
   );
