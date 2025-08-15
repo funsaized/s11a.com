@@ -1,6 +1,6 @@
 import React from "react";
-import { Button } from "@/components/ui/button";
 import { Search } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 interface SearchTriggerProps {
@@ -24,19 +24,26 @@ function SearchTrigger({
       size={size}
       onClick={onClick}
       className={cn(
-        "relative justify-start text-sm text-muted-foreground",
+        "relative text-sm text-muted-foreground flex items-center",
+        size === "icon" ? "justify-center" : "justify-center gap-3",
         size === "default" && "h-9 px-3",
-        className
+        size === "sm" && "h-9 px-3",
+        className,
       )}
     >
-      <Search className="mr-2 h-4 w-4" />
-      <span className="hidden sm:inline-flex">Search...</span>
-      <span className="sm:hidden">Search</span>
-      {showShortcut && (
-        <kbd className="pointer-events-none absolute right-1.5 top-1.5 hidden h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium opacity-100 sm:flex">
-          <span className="text-xs">⌘</span>K
-        </kbd>
+      {size !== "icon" && (
+        <div className="flex items-center gap-2">
+          <Search className="h-4 w-4 shrink-0" />
+          <span className="hidden sm:inline-flex truncate">Search...</span>
+          <span className="sm:hidden truncate">Search</span>
+          {showShortcut && (
+            <kbd className="pointer-events-none hidden h-5 select-none items-center rounded border bg-muted px-1 font-mono text-[10px] font-medium opacity-100 sm:flex ml-2">
+              <span className="text-xs">⌘</span>K
+            </kbd>
+          )}
+        </div>
       )}
+      {size === "icon" && <Search className="h-4 w-4" />}
     </Button>
   );
 }

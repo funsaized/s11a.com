@@ -77,7 +77,7 @@ function Navbar({ menuLinks }: NavbarProps): React.ReactElement {
               onClick={() => setSearchOpen(true)}
               variant="ghost"
               size="sm"
-              className="ml-2"
+              className="ml-3"
             />
           </div>
           <div className="md:hidden flex items-center space-x-2">

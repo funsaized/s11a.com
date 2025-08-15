@@ -245,7 +245,7 @@ export const ExpandableFloatingActionButton: React.FC<{
               >
                 {action.label}
               </motion.span>
-            </div>
+            </motion.div>
           );
         })}
       </motion.div>
