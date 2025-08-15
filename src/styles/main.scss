@@ -15,6 +15,7 @@
 
 @use "base/variables";
 @use "base/mixins";
+@use "base/fonts"; // Font optimization with font-display: swap
 
 //==============================================================================
 // Reset
@@ -36,3 +37,4 @@
 @use "components/navigation";
 @use "components/layout";
 @use "components/material_light";
+@use "components/accessibility"; // Accessibility improvements

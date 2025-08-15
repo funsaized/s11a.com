@@ -16,14 +16,23 @@ function MainLayout({ children }: MainLayoutProps): React.ReactElement {
       <Helmet>
         <meta name="description" content={config.siteDescription} />
         <html lang="en" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" />
+        {/* Resource hints for better performance */}
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
         <link rel="dns-prefetch" href="https://fonts.gstatic.com" />
+        <link rel="dns-prefetch" href="https://cdn.jsdelivr.net" />
+        <link rel="preconnect" href="https://cdn.jsdelivr.net" />
         <meta
           name="viewport"
           content="width=device-width, initial-scale=1, shrink-to-fit=no"
         />
         <meta httpEquiv="x-ua-compatible" content="ie=edge" />
       </Helmet>
+      {/* Skip navigation link for accessibility */}
+      <a href="#main-content" className="skip-nav">
+        Skip to main content
+      </a>
       <Navbar menuLinks={config.menuLinks} />
       <main id="main-content">{children}</main>
       <Footer />

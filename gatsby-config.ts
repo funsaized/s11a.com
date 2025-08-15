@@ -45,6 +45,9 @@ const gatsbyConfig: GatsbyConfig = {
       options: {
         // eslint-disable-next-line import/no-extraneous-dependencies, global-require
         implementation: require("sass"),
+        sassOptions: {
+          silenceDeprecations: ['legacy-js-api'], // Temporarily silence the deprecation warning
+        },
       },
     },
     "gatsby-plugin-react-helmet",
