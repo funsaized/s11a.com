@@ -1,16 +1,79 @@
-.projects .github-button {
-  // Match view button exactly but slightly larger for better dark mode visibility
-  display: inline-flex !important;
-  align-items: center !important;
-  white-space: nowrap !important;
-  padding: 0.5rem 1rem !important;
-  font-size: 0.95rem !important;
-  line-height: 1.2 !important;
-  height: auto !important;
+@use "../../styles/base/variables" as *;
+
+.github-button {
+  // Base styles - clean and modern
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
   
-  svg {
-    width: 16px !important;
-    height: 16px !important;
-    margin-right: 6px !important;
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--color-border-primary);
+  border-radius: $border-radius;
+  
+  background: var(--color-bg-secondary);
+  color: var(--color-text-primary);
+  
+  font-size: 0.9rem;
+  font-weight: 500;
+  line-height: 1.2;
+  text-decoration: none;
+  white-space: nowrap;
+  
+  transition: all 0.2s ease;
+  cursor: pointer;
+  
+  // Hover and focus states
+  &:hover,
+  &:focus {
+    background: var(--color-bg-tertiary);
+    border-color: var(--color-border-secondary);
+    color: var(--color-text-primary);
+    text-decoration: none;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px var(--color-shadow-light);
+  }
+  
+  &:active {
+    transform: translateY(0);
+    box-shadow: 0 1px 4px var(--color-shadow-light);
+  }
+  
+  // Icon styling
+  .github-icon {
+    width: 16px;
+    height: 16px;
+    fill: currentColor;
+    flex-shrink: 0;
+  }
+  
+  // Text styling
+  .github-text {
+    flex-shrink: 0;
+  }
+}
+
+// Project-specific sizing overrides
+.projects .github-button {
+  // Match the view button styling in projects
+  font-size: 0.9rem;
+  padding: 0.45rem 1rem;
+  
+  // Ensure consistent button group alignment
+  .github-icon {
+    width: 14px;
+    height: 14px;
+  }
+}
+
+// Responsive adjustments
+@media screen and (max-width: 480px) {
+  .projects .github-button {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.85rem;
+    
+    .github-icon {
+      width: 13px;
+      height: 13px;
+    }
   }
 }
