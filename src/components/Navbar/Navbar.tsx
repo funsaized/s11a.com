@@ -3,6 +3,7 @@ import { Link } from "gatsby";
 import { StaticImage } from "gatsby-plugin-image";
 import { MenuLink } from "../../models";
 import { ThemeToggle } from "../ThemeToggle/ThemeToggle";
+import { SidebarTrigger } from "../ui/sidebar-trigger";
 
 interface NavbarProps {
   menuLinks: MenuLink[];
@@ -31,18 +32,19 @@ function Navbar({ menuLinks }: NavbarProps): React.ReactElement {
       }`}
     >
       <div
-        className={`px-8 max-w-7xl mx-auto flex items-center justify-between transition-all duration-300 ${
+        className={`px-4 max-w-7xl mr-auto flex items-center justify-between transition-all duration-300 ${
           scrolled ? "h-[60px]" : "h-[55px]"
         }`}
       >
-        <div className="text-xl font-semibold">
+        <div className="text-xl font-semibold flex items-center">
+          <SidebarTrigger className="mr-3 hidden md:flex" />
           <Link
             to="/"
             className="flex items-center text-foreground hover:text-primary font-semibold text-lg transition-colors"
           >
             <StaticImage
               src="../../images/face.png"
-              className="w-[30px] mr-4"
+              className="w-[30px] mr-3"
               alt="Face"
             />
             <span className="hidden md:block">Sai Nimmagadda</span>
