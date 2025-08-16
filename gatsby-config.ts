@@ -83,38 +83,95 @@ const gatsbyConfig: GatsbyConfig = {
         excludes: ["/dev-404-page/", "/404/", "/404.html", "/offline-plugin-app-shell-fallback/"],
         query: `
           {
+            site {
+              siteMetadata {
+                siteUrl
+              }
+            }
             allSitePage {
               nodes {
                 path
+                pageContext
               }
             }
             allMarkdownRemark {
               nodes {
                 fields {
                   slug
+                  date
                 }
                 frontmatter {
                   date
+                  title
+                }
+                parent {
+                  ... on File {
+                    modifiedTime(formatString: "YYYY-MM-DD")
+                  }
                 }
               }
             }
           }
         `,
-        serialize: ({ allSitePage, allMarkdownRemark }: any) => {
-          const pages = allSitePage.nodes.map((page: any) => ({
+        resolveSiteUrl: () => config.siteUrl,
+        resolvePages: ({
+          allSitePage: { nodes: allPages },
+          allMarkdownRemark: { nodes: allPosts }
+        }: any) => {
+          // Create a map of blog post data by slug for quick lookup
+          const postDataMap = allPosts.reduce((acc: any, post: any) => {
+            if (post.fields?.slug) {
+              // Ensure the slug matches the URL path format
+              const slug = post.fields.slug.endsWith('/') ? post.fields.slug : `${post.fields.slug}/`;
+              acc[slug] = {
+                modifiedTime: post.parent?.modifiedTime,
+                date: post.frontmatter?.date || post.fields?.date,
+              };
+            }
+            return acc;
+          }, {});
+
+          // Map all pages with their metadata
+          return allPages.map((page: any) => {
+            // Get the blog post data if this is a blog post page
+            const postData = postDataMap[page.path];
+            
+            // Determine if this is a blog post (not a tag, category, or static page)
+            const isBlogPost = postData && 
+                              !page.path.includes('/tags/') && 
+                              !page.path.includes('/categories/') &&
+                              page.path !== '/' &&
+                              page.path !== '/blog/' &&
+                              page.path !== '/about/';
+            
+            return {
+              path: page.path,
+              // Use modified time if available, otherwise use post date for blog posts
+              lastmod: isBlogPost ? (postData.modifiedTime || postData.date) : undefined,
+              // Set changefreq based on page type
+              changefreq: page.path === '/' ? 'daily' : 
+                         page.path === '/blog/' ? 'weekly' :
+                         page.path.includes('/tags/') ? 'monthly' :
+                         page.path.includes('/categories/') ? 'monthly' :
+                         isBlogPost ? 'monthly' : 'weekly',
+              // Set priority based on page importance
+              priority: page.path === '/' ? 1.0 :
+                       page.path === '/blog/' ? 0.9 :
+                       page.path === '/about/' ? 0.8 :
+                       isBlogPost ? 0.7 :
+                       page.path.includes('/tags/') ? 0.5 :
+                       page.path.includes('/categories/') ? 0.5 :
+                       0.6,
+            };
+          });
+        },
+        serialize: (page: any) => {
+          return {
             url: page.path,
-            changefreq: "weekly",
-            priority: page.path === "/" ? 1.0 : 0.7,
-          }));
-          
-          const posts = allMarkdownRemark.nodes.map((post: any) => ({
-            url: post.fields.slug,
-            changefreq: "monthly",
-            priority: 0.8,
-            lastmod: post.frontmatter.date,
-          }));
-          
-          return [...pages, ...posts];
+            lastmod: page.lastmod,
+            changefreq: page.changefreq,
+            priority: page.priority,
+          };
         },
       },
     },
