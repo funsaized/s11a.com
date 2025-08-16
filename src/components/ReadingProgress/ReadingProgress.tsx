@@ -3,9 +3,9 @@ import { cn } from "../../lib/utils";
 import { Progress } from "../ui/progress";
 import { ReadingProgressProps } from "../../models";
 
-function ReadingProgress({ 
-  target = ".prose", 
-  className 
+function ReadingProgress({
+  target = ".prose",
+  className,
 }: ReadingProgressProps): React.ReactElement {
   const [progress, setProgress] = useState(0);
 
@@ -17,7 +17,8 @@ function ReadingProgress({
       const rect = targetElement.getBoundingClientRect();
       const windowHeight = window.innerHeight;
       const documentHeight = rect.height;
-      const scrollTop = window.scrollY - (targetElement as HTMLElement).offsetTop;
+      const scrollTop =
+        window.scrollY - (targetElement as HTMLElement).offsetTop;
 
       if (scrollTop <= 0) {
         setProgress(0);
@@ -29,7 +30,8 @@ function ReadingProgress({
         return;
       }
 
-      const progressPercent = (scrollTop / (documentHeight - windowHeight)) * 100;
+      const progressPercent =
+        (scrollTop / (documentHeight - windowHeight)) * 100;
       setProgress(Math.max(0, Math.min(100, progressPercent)));
     };
 
@@ -48,10 +50,7 @@ function ReadingProgress({
 
   return (
     <div className={cn("fixed top-0 left-0 right-0 z-50", className)}>
-      <Progress 
-        value={progress} 
-        className="h-1 rounded-none bg-transparent"
-      />
+      <Progress value={progress} className="h-1 rounded-none bg-transparent" />
     </div>
   );
 }

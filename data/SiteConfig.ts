@@ -8,7 +8,8 @@ const config: Config = {
   siteUrl: "https://s11a.com", // Domain of your website without pathPrefix.
   repo: "https://github.com/funsaized/s11a.com",
   pathPrefix: "", // Prefixes all links. For cases when deployed to example.github.io/gatsby-advanced-starter/.
-  siteDescription: "Personal blog by Sai Nimmagadda focusing on software development, cloud architecture, and modern web technologies. Explore tutorials, insights, and code examples.", // Website description used for RSS feeds/meta description tag.
+  siteDescription:
+    "Personal blog by Sai Nimmagadda focusing on software development, cloud architecture, and modern web technologies. Explore tutorials, insights, and code examples.", // Website description used for RSS feeds/meta description tag.
   siteRss: "/rss.xml", // Path to the RSS file.
   postDefaultCategoryID: "Tech", // Default category for posts.
   dateFromFormat: "MM-DD-YYYY", // Date format used in the frontmatter.
@@ -18,7 +19,8 @@ const config: Config = {
   userTwitter: "Funsaized", // Optionally renders "Follow Me" in the UserInfo segment.
   userLocation: "NC, USA", // User location to display in the author segment.
   userAvatar: "https://api.adorable.io/avatars/150/test.png", // User avatar to display in the author segment.
-  userDescription: "Software developer passionate about cloud architecture, modern web technologies, and building scalable solutions. Sharing knowledge through code and tutorials.", // User description to display in the author segment.
+  userDescription:
+    "Software developer passionate about cloud architecture, modern web technologies, and building scalable solutions. Sharing knowledge through code and tutorials.", // User description to display in the author segment.
   // Links to social profiles/projects you want to display in the author segment/navigation bar.
   userLinks: [
     {

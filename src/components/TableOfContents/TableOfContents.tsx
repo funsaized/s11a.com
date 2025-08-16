@@ -3,7 +3,10 @@ import { cn } from "../../lib/utils";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { TableOfContentsProps, TableOfContentsHeading } from "../../models";
 
-function TableOfContents({ headings, className }: TableOfContentsProps): React.ReactElement | null {
+function TableOfContents({
+  headings,
+  className,
+}: TableOfContentsProps): React.ReactElement | null {
   const [activeId, setActiveId] = useState<string>("");
 
   useEffect(() => {
@@ -18,14 +21,16 @@ function TableOfContents({ headings, className }: TableOfContentsProps): React.R
       {
         rootMargin: "-80px 0px -80px 0px",
         threshold: 0.1,
-      }
+      },
     );
 
     // Observe all headings
     const headingElements = headings.flatMap((heading) => {
       const elements = [document.getElementById(heading.id)];
       if (heading.children) {
-        elements.push(...heading.children.map(child => document.getElementById(child.id)));
+        elements.push(
+          ...heading.children.map((child) => document.getElementById(child.id)),
+        );
       }
       return elements.filter(Boolean);
     });
@@ -64,7 +69,7 @@ function TableOfContents({ headings, className }: TableOfContentsProps): React.R
           heading.level === 2 && "font-medium",
           heading.level === 3 && "ml-3 text-muted-foreground",
           heading.level === 4 && "ml-6 text-muted-foreground text-xs",
-          activeId === heading.id && "text-primary bg-primary/10 font-medium"
+          activeId === heading.id && "text-primary bg-primary/10 font-medium",
         )}
       >
         {heading.title}
@@ -78,15 +83,20 @@ function TableOfContents({ headings, className }: TableOfContentsProps): React.R
   );
 
   return (
-    <Card className={cn("sticky top-24 max-h-[calc(100vh-120px)] overflow-y-auto", className)}>
+    <Card
+      className={cn(
+        "sticky top-24 max-h-[calc(100vh-120px)] overflow-y-auto",
+        className,
+      )}
+    >
       <CardHeader className="pb-3">
-        <CardTitle className="text-sm font-semibold">Table of Contents</CardTitle>
+        <CardTitle className="text-sm font-semibold">
+          Table of Contents
+        </CardTitle>
       </CardHeader>
       <CardContent className="pt-0">
         <nav>
-          <ul className="space-y-1">
-            {headings.map(renderHeading)}
-          </ul>
+          <ul className="space-y-1">{headings.map(renderHeading)}</ul>
         </nav>
       </CardContent>
     </Card>

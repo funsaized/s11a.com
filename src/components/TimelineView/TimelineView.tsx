@@ -1,18 +1,15 @@
 import React, { useMemo } from "react";
-import { 
-  Calendar,
-  Clock
-} from "lucide-react";
+import { Calendar, Clock } from "lucide-react";
+import { useStaticQuery, graphql, navigate } from "gatsby";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
-import { useStaticQuery, graphql, navigate } from "gatsby";
 
 interface TimelineViewProps {
   className?: string;
 }
 
-export function TimelineView({ 
-  className 
+export function TimelineView({
+  className,
 }: TimelineViewProps): React.ReactElement {
   const data = useStaticQuery(graphql`
     query TimelineQuery {
@@ -41,7 +38,7 @@ export function TimelineView({
 
   const postsByYear = useMemo(() => {
     const grouped: Record<string, any[]> = {};
-    
+
     data.posts.edges.forEach(({ node }: any) => {
       const year = new Date(node.fields.date).getFullYear().toString();
       if (!grouped[year]) {
@@ -53,11 +50,13 @@ export function TimelineView({
     return grouped;
   }, [data]);
 
-  const years = Object.keys(postsByYear).sort((a, b) => parseInt(b) - parseInt(a));
+  const years = Object.keys(postsByYear).sort(
+    (a, b) => parseInt(b, 10) - parseInt(a, 10),
+  );
 
   return (
     <div className={cn("space-y-8", className)}>
-      {years.map(year => (
+      {years.map((year) => (
         <div key={year} className="relative">
           {/* Year Header */}
           <div className="sticky top-4 z-10 mb-6">
@@ -77,13 +76,20 @@ export function TimelineView({
                 key={post.fields.slug}
                 className="relative group cursor-pointer"
                 onClick={() => navigate(post.fields.slug)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    navigate(post.fields.slug);
+                  }
+                }}
+                role="button"
+                tabIndex={0}
               >
                 {/* Timeline Line */}
                 <div className="absolute -left-6 top-6 w-px h-full bg-border group-last:hidden" />
-                
+
                 {/* Timeline Dot */}
                 <div className="absolute -left-8 top-6 w-3 h-3 bg-primary rounded-full border-2 border-background shadow-md" />
-                
+
                 {/* Post Card */}
                 <div className="bg-card border border-border rounded-lg p-4 hover:shadow-md transition-all duration-200 hover:border-primary/50">
                   <div className="flex items-start justify-between gap-4">
@@ -104,11 +110,17 @@ export function TimelineView({
                             {post.frontmatter.category}
                           </Badge>
                         )}
-                        {post.frontmatter.tags?.slice(0, 2).map((tag: string) => (
-                          <Badge key={tag} variant="outline" className="text-xs">
-                            {tag}
-                          </Badge>
-                        ))}
+                        {post.frontmatter.tags
+                          ?.slice(0, 2)
+                          .map((tag: string) => (
+                            <Badge
+                              key={tag}
+                              variant="outline"
+                              className="text-xs"
+                            >
+                              {tag}
+                            </Badge>
+                          ))}
                         {post.frontmatter.tags?.length > 2 && (
                           <span className="text-xs text-muted-foreground">
                             +{post.frontmatter.tags.length - 2} more
@@ -117,9 +129,9 @@ export function TimelineView({
                       </div>
                     </div>
                     <div className="text-sm text-muted-foreground whitespace-nowrap">
-                      {new Date(post.fields.date).toLocaleDateString('en-US', {
-                        month: 'short',
-                        day: 'numeric'
+                      {new Date(post.fields.date).toLocaleDateString("en-US", {
+                        month: "short",
+                        day: "numeric",
                       })}
                     </div>
                   </div>

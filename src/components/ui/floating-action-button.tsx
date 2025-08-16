@@ -1,26 +1,26 @@
-import React, { useRef, useState, useEffect } from 'react';
-import { motion, useSpring, useTransform } from 'framer-motion';
-import { Button } from './button';
-import { cn } from '@/lib/utils';
+import React, { useRef, useState, useEffect } from "react";
+import { motion, useSpring, useTransform } from "framer-motion";
+import { Button } from "./button";
+import { cn } from "@/lib/utils";
 
 interface FloatingActionButtonProps {
   children: React.ReactNode;
   onClick?: () => void;
-  position?: 'bottom-right' | 'bottom-left' | 'top-right' | 'top-left';
+  position?: "bottom-right" | "bottom-left" | "top-right" | "top-left";
   magnetic?: boolean;
   className?: string;
-  size?: 'sm' | 'md' | 'lg';
-  variant?: 'default' | 'secondary' | 'gradient';
+  size?: "sm" | "md" | "lg";
+  variant?: "default" | "secondary" | "gradient";
 }
 
 const FloatingActionButton: React.FC<FloatingActionButtonProps> = ({
   children,
   onClick,
-  position = 'bottom-right',
+  position = "bottom-right",
   magnetic = true,
   className,
-  size = 'md',
-  variant = 'gradient',
+  size = "md",
+  variant = "gradient",
 }) => {
   const ref = useRef<HTMLButtonElement>(null);
   const [bounds, setBounds] = useState({ width: 0, height: 0 });
@@ -30,8 +30,8 @@ const FloatingActionButton: React.FC<FloatingActionButtonProps> = ({
   const mouseY = useSpring(0, { stiffness: 300, damping: 30 });
 
   // Transform mouse position to button rotation
-  const rotateX = useTransform(mouseY, [-0.5, 0.5], ['7.5deg', '-7.5deg']);
-  const rotateY = useTransform(mouseX, [-0.5, 0.5], ['-7.5deg', '7.5deg']);
+  const rotateX = useTransform(mouseY, [-0.5, 0.5], ["7.5deg", "-7.5deg"]);
+  const rotateY = useTransform(mouseX, [-0.5, 0.5], ["-7.5deg", "7.5deg"]);
 
   useEffect(() => {
     if (ref.current) {
@@ -46,7 +46,7 @@ const FloatingActionButton: React.FC<FloatingActionButtonProps> = ({
     const rect = ref.current.getBoundingClientRect();
     const centerX = rect.left + rect.width / 2;
     const centerY = rect.top + rect.height / 2;
-    
+
     const mouseXPos = (e.clientX - centerX) / rect.width;
     const mouseYPos = (e.clientY - centerY) / rect.height;
 
@@ -61,30 +61,26 @@ const FloatingActionButton: React.FC<FloatingActionButtonProps> = ({
 
   // Position classes
   const positionClasses = {
-    'bottom-right': 'bottom-6 right-6',
-    'bottom-left': 'bottom-6 left-6',
-    'top-right': 'top-6 right-6',
-    'top-left': 'top-6 left-6',
+    "bottom-right": "bottom-6 right-6",
+    "bottom-left": "bottom-6 left-6",
+    "top-right": "top-6 right-6",
+    "top-left": "top-6 left-6",
   };
 
   // Size classes
   const sizeClasses = {
-    sm: 'h-12 w-12 text-sm',
-    md: 'h-14 w-14 text-base',
-    lg: 'h-16 w-16 text-lg',
+    sm: "h-12 w-12 text-sm",
+    md: "h-14 w-14 text-base",
+    lg: "h-16 w-16 text-lg",
   };
 
   return (
     <motion.div
-      className={cn(
-        'fixed z-50',
-        positionClasses[position],
-        className
-      )}
+      className={cn("fixed z-50", positionClasses[position], className)}
       initial={{ scale: 0, rotate: -180 }}
       animate={{ scale: 1, rotate: 0 }}
       transition={{
-        type: 'spring',
+        type: "spring",
         stiffness: 260,
         damping: 20,
         delay: 0.5,
@@ -98,15 +94,15 @@ const FloatingActionButton: React.FC<FloatingActionButtonProps> = ({
         variant={variant}
         size="icon"
         className={cn(
-          'rounded-full shadow-lg hover:shadow-xl transition-all duration-300',
-          'backdrop-blur-sm border border-white/20',
+          "rounded-full shadow-lg hover:shadow-xl transition-all duration-300",
+          "backdrop-blur-sm border border-white/20",
           sizeClasses[size],
-          magnetic && 'cursor-pointer'
+          magnetic && "cursor-pointer",
         )}
         style={{
           rotateX: magnetic ? rotateX : 0,
           rotateY: magnetic ? rotateY : 0,
-          transformStyle: 'preserve-3d',
+          transformStyle: "preserve-3d",
         }}
         onMouseMove={handleMouseMove}
         onMouseLeave={handleMouseLeave}
@@ -131,8 +127,8 @@ export const ExpandableFloatingActionButton: React.FC<{
     label: string;
     onClick: () => void;
   }>;
-  position?: 'bottom-right' | 'bottom-left' | 'top-right' | 'top-left';
-}> = ({ mainIcon, actions, position = 'bottom-right' }) => {
+  position?: "bottom-right" | "bottom-left" | "top-right" | "top-left";
+}> = ({ mainIcon, actions, position = "bottom-right" }) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
   const containerVariants = {
@@ -154,7 +150,7 @@ export const ExpandableFloatingActionButton: React.FC<{
       scale: 0,
       rotate: -90,
       transition: {
-        type: 'spring',
+        type: "spring",
         stiffness: 300,
         damping: 30,
       },
@@ -163,7 +159,7 @@ export const ExpandableFloatingActionButton: React.FC<{
       scale: 1,
       rotate: 0,
       transition: {
-        type: 'spring',
+        type: "spring",
         stiffness: 300,
         damping: 30,
       },
@@ -173,34 +169,36 @@ export const ExpandableFloatingActionButton: React.FC<{
   // Position-based offset calculation
   const getItemPosition = (index: number) => {
     const spacing = 60;
-    const angle = position.includes('right') ? -90 : 90; // Fan direction
+    const angle = position.includes("right") ? -90 : 90; // Fan direction
     const radians = (angle * Math.PI) / 180;
-    
-    if (position.includes('bottom')) {
+
+    if (position.includes("bottom")) {
       return {
-        x: Math.cos(radians + (index * 0.3)) * spacing * (index + 1),
-        y: Math.sin(radians + (index * 0.3)) * spacing * (index + 1),
+        x: Math.cos(radians + index * 0.3) * spacing * (index + 1),
+        y: Math.sin(radians + index * 0.3) * spacing * (index + 1),
       };
     } else {
       return {
-        x: Math.cos(radians - (index * 0.3)) * spacing * (index + 1),
-        y: Math.sin(radians - (index * 0.3)) * spacing * (index + 1),
+        x: Math.cos(radians - index * 0.3) * spacing * (index + 1),
+        y: Math.sin(radians - index * 0.3) * spacing * (index + 1),
       };
     }
   };
 
   return (
-    <div className={cn('fixed z-50', {
-      'bottom-6 right-6': position === 'bottom-right',
-      'bottom-6 left-6': position === 'bottom-left',
-      'top-6 right-6': position === 'top-right',
-      'top-6 left-6': position === 'top-left',
-    })}>
+    <div
+      className={cn("fixed z-50", {
+        "bottom-6 right-6": position === "bottom-right",
+        "bottom-6 left-6": position === "bottom-left",
+        "top-6 right-6": position === "top-right",
+        "top-6 left-6": position === "top-left",
+      })}
+    >
       {/* Action items */}
       <motion.div
         variants={containerVariants}
         initial="closed"
-        animate={isExpanded ? 'open' : 'closed'}
+        animate={isExpanded ? "open" : "closed"}
         className="absolute inset-0"
       >
         {actions.map((action, index) => {
@@ -210,11 +208,11 @@ export const ExpandableFloatingActionButton: React.FC<{
               key={index}
               variants={itemVariants}
               style={{
-                position: 'absolute',
-                bottom: position.includes('bottom') ? 0 : 'auto',
-                top: position.includes('top') ? 0 : 'auto',
-                right: position.includes('right') ? 0 : 'auto',
-                left: position.includes('left') ? 0 : 'auto',
+                position: "absolute",
+                bottom: position.includes("bottom") ? 0 : "auto",
+                top: position.includes("top") ? 0 : "auto",
+                right: position.includes("right") ? 0 : "auto",
+                left: position.includes("left") ? 0 : "auto",
                 x: itemPosition.x,
                 y: itemPosition.y,
               }}
@@ -232,11 +230,11 @@ export const ExpandableFloatingActionButton: React.FC<{
               >
                 {action.icon}
               </Button>
-              
+
               {/* Label tooltip */}
               <motion.span
                 initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ 
+                animate={{
                   opacity: isExpanded ? 1 : 0,
                   scale: isExpanded ? 1 : 0.8,
                 }}

@@ -1,11 +1,11 @@
-import React, { useRef, useEffect, useState } from 'react';
-import { motion, useScroll, useTransform, useSpring } from 'framer-motion';
+import React, { useRef, useEffect, useState } from "react";
+import { motion, useScroll, useTransform, useSpring } from "framer-motion";
 
 interface ParallaxProps {
   children: React.ReactNode;
   speed?: number;
   className?: string;
-  direction?: 'up' | 'down' | 'left' | 'right';
+  direction?: "up" | "down" | "left" | "right";
   enableOnDesktop?: boolean;
   enableOnMobile?: boolean;
 }
@@ -13,31 +13,31 @@ interface ParallaxProps {
 const Parallax: React.FC<ParallaxProps> = ({
   children,
   speed = 0.5,
-  className = '',
-  direction = 'up',
+  className = "",
+  direction = "up",
   enableOnDesktop = true,
   enableOnMobile = false,
 }) => {
   const ref = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
     target: ref,
-    offset: ['start end', 'end start'],
+    offset: ["start end", "end start"],
   });
 
   // Create smooth spring animations
   const springConfig = { stiffness: 100, damping: 30, restDelta: 0.001 };
-  
+
   // Transform scroll progress based on direction and speed
   const getTransformValue = () => {
     const range = window.innerHeight * speed;
     switch (direction) {
-      case 'up':
+      case "up":
         return useTransform(scrollYProgress, [0, 1], [range, -range]);
-      case 'down':
+      case "down":
         return useTransform(scrollYProgress, [0, 1], [-range, range]);
-      case 'left':
+      case "left":
         return useTransform(scrollYProgress, [0, 1], [range, -range]);
-      case 'right':
+      case "right":
         return useTransform(scrollYProgress, [0, 1], [-range, range]);
       default:
         return useTransform(scrollYProgress, [0, 1], [range, -range]);
@@ -49,25 +49,27 @@ const Parallax: React.FC<ParallaxProps> = ({
 
   // Media query detection
   const [isMobile, setIsMobile] = useState(false);
-  
+
   useEffect(() => {
     const checkIsMobile = () => {
       setIsMobile(window.innerWidth < 768);
     };
-    
+
     checkIsMobile();
-    window.addEventListener('resize', checkIsMobile);
-    
-    return () => window.removeEventListener('resize', checkIsMobile);
+    window.addEventListener("resize", checkIsMobile);
+
+    return () => window.removeEventListener("resize", checkIsMobile);
   }, []);
 
   // Determine if parallax should be enabled
-  const isEnabled = (isMobile && enableOnMobile) || (!isMobile && enableOnDesktop);
+  const isEnabled =
+    (isMobile && enableOnMobile) || (!isMobile && enableOnDesktop);
 
   // Reduce motion for accessibility
-  const prefersReducedMotion = typeof window !== 'undefined' 
-    ? window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    : false;
+  const prefersReducedMotion =
+    typeof window !== "undefined"
+      ? window.matchMedia("(prefers-reduced-motion: reduce)").matches
+      : false;
 
   if (!isEnabled || prefersReducedMotion) {
     return <div className={className}>{children}</div>;
@@ -75,11 +77,11 @@ const Parallax: React.FC<ParallaxProps> = ({
 
   const motionStyle = () => {
     switch (direction) {
-      case 'up':
-      case 'down':
+      case "up":
+      case "down":
         return { y: smoothTransform };
-      case 'left':
-      case 'right':
+      case "left":
+      case "right":
         return { x: smoothTransform };
       default:
         return { y: smoothTransform };
@@ -88,10 +90,7 @@ const Parallax: React.FC<ParallaxProps> = ({
 
   return (
     <div ref={ref} className={className}>
-      <motion.div
-        style={motionStyle()}
-        className="will-change-transform"
-      >
+      <motion.div style={motionStyle()} className="will-change-transform">
         {children}
       </motion.div>
     </div>
@@ -104,11 +103,7 @@ export const ParallaxText: React.FC<{
   className?: string;
   speed?: number;
 }> = ({ children, className, speed = 0.3 }) => (
-  <Parallax 
-    speed={speed} 
-    className={className}
-    enableOnMobile={true}
-  >
+  <Parallax speed={speed} className={className} enableOnMobile={true}>
     {children}
   </Parallax>
 );
@@ -118,8 +113,8 @@ export const ParallaxImage: React.FC<{
   className?: string;
   speed?: number;
 }> = ({ children, className, speed = 0.8 }) => (
-  <Parallax 
-    speed={speed} 
+  <Parallax
+    speed={speed}
     className={className}
     enableOnDesktop={true}
     enableOnMobile={false}
@@ -134,7 +129,7 @@ export const ParallaxLayers: React.FC<{
   className?: string;
 }> = ({ children, className }) => {
   const layers = React.Children.toArray(children);
-  
+
   return (
     <div className={`relative ${className}`}>
       {layers.map((layer, index) => {

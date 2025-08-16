@@ -3,35 +3,42 @@ import { TableOfContentsHeading } from "../models";
 /**
  * Extract headings from HTML content and create a hierarchical structure
  */
-export function extractHeadings(html: string, maxDepth: number = 4): TableOfContentsHeading[] {
+export function extractHeadings(
+  html: string,
+  maxDepth: number = 4,
+): TableOfContentsHeading[] {
   if (typeof window === "undefined") {
     return []; // Return empty array during SSR
   }
 
   const parser = new DOMParser();
   const doc = parser.parseFromString(html, "text/html");
-  
+
   // Find all headings (h1-h6)
   const headingElements = Array.from(
-    doc.querySelectorAll("h1, h2, h3, h4, h5, h6")
+    doc.querySelectorAll("h1, h2, h3, h4, h5, h6"),
   ) as HTMLHeadingElement[];
 
   // Filter by max depth and ensure IDs exist
   const validHeadings = headingElements
     .filter((heading) => {
-      const level = parseInt(heading.tagName.charAt(1));
+      const level = parseInt(heading.tagName.charAt(1), 10);
       return level <= maxDepth;
     })
     .map((heading, index) => {
       // Ensure heading has an ID
       if (!heading.id) {
-        heading.id = `heading-${index}-${heading.textContent?.toLowerCase().replace(/\s+/g, "-").replace(/[^\w-]/g, "")}`;
+        // eslint-disable-next-line no-param-reassign
+        heading.id = `heading-${index}-${heading.textContent
+          ?.toLowerCase()
+          .replace(/\s+/g, "-")
+          .replace(/[^\w-]/g, "")}`;
       }
       return {
         element: heading,
         id: heading.id,
         title: heading.textContent?.trim() || "",
-        level: parseInt(heading.tagName.charAt(1)),
+        level: parseInt(heading.tagName.charAt(1), 10),
       };
     });
 
@@ -78,14 +85,18 @@ export function ensureHeadingIds(html: string): string {
 
   const parser = new DOMParser();
   const doc = parser.parseFromString(html, "text/html");
-  
+
   const headingElements = Array.from(
-    doc.querySelectorAll("h1, h2, h3, h4, h5, h6")
+    doc.querySelectorAll("h1, h2, h3, h4, h5, h6"),
   ) as HTMLHeadingElement[];
 
   headingElements.forEach((heading, index) => {
     if (!heading.id) {
-      const id = `heading-${index}-${heading.textContent?.toLowerCase().replace(/\s+/g, "-").replace(/[^\w-]/g, "")}`;
+      const id = `heading-${index}-${heading.textContent
+        ?.toLowerCase()
+        .replace(/\s+/g, "-")
+        .replace(/[^\w-]/g, "")}`;
+      // eslint-disable-next-line no-param-reassign
       heading.id = id;
     }
   });
@@ -96,7 +107,10 @@ export function ensureHeadingIds(html: string): string {
 /**
  * Calculate reading time based on content
  */
-export function calculateReadingTime(html: string, wordsPerMinute: number = 200): number {
+export function calculateReadingTime(
+  html: string,
+  wordsPerMinute: number = 200,
+): number {
   if (typeof window === "undefined") {
     return 0; // Return 0 during SSR
   }
@@ -105,6 +119,6 @@ export function calculateReadingTime(html: string, wordsPerMinute: number = 200)
   const doc = parser.parseFromString(html, "text/html");
   const text = doc.body.textContent || "";
   const wordCount = text.trim().split(/\s+/).length;
-  
+
   return Math.ceil(wordCount / wordsPerMinute);
 }

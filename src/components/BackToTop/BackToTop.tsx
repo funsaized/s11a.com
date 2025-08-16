@@ -3,9 +3,9 @@ import { cn } from "../../lib/utils";
 import { Button } from "../ui/button";
 import { BackToTopProps } from "../../models";
 
-function BackToTop({ 
-  threshold = 400, 
-  className 
+function BackToTop({
+  threshold = 400,
+  className,
 }: BackToTopProps): React.ReactElement | null {
   const [isVisible, setIsVisible] = useState(false);
 
@@ -44,7 +44,7 @@ function BackToTop({
         "fixed bottom-6 right-6 z-40 h-12 w-12 rounded-full shadow-lg",
         "bg-primary hover:bg-primary/90 text-primary-foreground",
         "transition-all duration-300 hover:scale-110",
-        className
+        className,
       )}
       aria-label="Back to top"
     >

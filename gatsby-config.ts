@@ -65,14 +65,14 @@ const gatsbyConfig: GatsbyConfig = {
   ],
   plugins: [
     // Bundle analyzer for development insights
-    ...(process.env.NODE_ENV === "development"
+    ...(process.env.ANALYZE
       ? [
           {
             resolve: "gatsby-plugin-webpack-bundle-analyser-v2",
             options: {
               analyzerMode: "server",
               analyzerPort: 8080,
-              openAnalyzer: false,
+              openAnalyzer: true,
             },
           },
         ]
@@ -80,7 +80,12 @@ const gatsbyConfig: GatsbyConfig = {
     {
       resolve: "gatsby-plugin-sitemap",
       options: {
-        excludes: ["/dev-404-page/", "/404/", "/404.html", "/offline-plugin-app-shell-fallback/"],
+        excludes: [
+          "/dev-404-page/",
+          "/404/",
+          "/404.html",
+          "/offline-plugin-app-shell-fallback/",
+        ],
         query: `
           {
             site {
@@ -116,13 +121,15 @@ const gatsbyConfig: GatsbyConfig = {
         resolveSiteUrl: () => config.siteUrl,
         resolvePages: ({
           allSitePage: { nodes: allPages },
-          allMarkdownRemark: { nodes: allPosts }
+          allMarkdownRemark: { nodes: allPosts },
         }: any) => {
           // Create a map of blog post data by slug for quick lookup
           const postDataMap = allPosts.reduce((acc: any, post: any) => {
             if (post.fields?.slug) {
               // Ensure the slug matches the URL path format
-              const slug = post.fields.slug.endsWith('/') ? post.fields.slug : `${post.fields.slug}/`;
+              const slug = post.fields.slug.endsWith("/")
+                ? post.fields.slug
+                : `${post.fields.slug}/`;
               acc[slug] = {
                 modifiedTime: post.parent?.modifiedTime,
                 date: post.frontmatter?.date || post.fields?.date,
@@ -135,44 +142,50 @@ const gatsbyConfig: GatsbyConfig = {
           return allPages.map((page: any) => {
             // Get the blog post data if this is a blog post page
             const postData = postDataMap[page.path];
-            
+
             // Determine if this is a blog post (not a tag, category, or static page)
-            const isBlogPost = postData && 
-                              !page.path.includes('/tags/') && 
-                              !page.path.includes('/categories/') &&
-                              page.path !== '/' &&
-                              page.path !== '/blog/' &&
-                              page.path !== '/about/';
-            
+            const isBlogPost =
+              postData &&
+              !page.path.includes("/tags/") &&
+              !page.path.includes("/categories/") &&
+              page.path !== "/" &&
+              page.path !== "/blog/" &&
+              page.path !== "/about/";
+
             return {
               path: page.path,
               // Use modified time if available, otherwise use post date for blog posts
-              lastmod: isBlogPost ? (postData.modifiedTime || postData.date) : undefined,
+              lastmod: isBlogPost
+                ? postData.modifiedTime || postData.date
+                : undefined,
               // Set changefreq based on page type
-              changefreq: page.path === '/' ? 'daily' : 
-                         page.path === '/blog/' ? 'weekly' :
-                         page.path.includes('/tags/') ? 'monthly' :
-                         page.path.includes('/categories/') ? 'monthly' :
-                         isBlogPost ? 'monthly' : 'weekly',
+              changefreq: (() => {
+                if (page.path === "/") return "daily";
+                if (page.path === "/blog/") return "weekly";
+                if (page.path.includes("/tags/")) return "monthly";
+                if (page.path.includes("/categories/")) return "monthly";
+                if (isBlogPost) return "monthly";
+                return "weekly";
+              })(),
               // Set priority based on page importance
-              priority: page.path === '/' ? 1.0 :
-                       page.path === '/blog/' ? 0.9 :
-                       page.path === '/about/' ? 0.8 :
-                       isBlogPost ? 0.7 :
-                       page.path.includes('/tags/') ? 0.5 :
-                       page.path.includes('/categories/') ? 0.5 :
-                       0.6,
+              priority: (() => {
+                if (page.path === "/") return 1.0;
+                if (page.path === "/blog/") return 0.9;
+                if (page.path === "/about/") return 0.8;
+                if (isBlogPost) return 0.7;
+                if (page.path.includes("/tags/")) return 0.5;
+                if (page.path.includes("/categories/")) return 0.5;
+                return 0.6;
+              })(),
             };
           });
         },
-        serialize: (page: any) => {
-          return {
-            url: page.path,
-            lastmod: page.lastmod,
-            changefreq: page.changefreq,
-            priority: page.priority,
-          };
-        },
+        serialize: (page: any) => ({
+          url: page.path,
+          lastmod: page.lastmod,
+          changefreq: page.changefreq,
+          priority: page.priority,
+        }),
       },
     },
     {
@@ -180,12 +193,19 @@ const gatsbyConfig: GatsbyConfig = {
       options: {
         host: config.siteUrl,
         sitemap: `${config.siteUrl}/sitemap.xml`,
-        policy: [{
-          userAgent: "*",
-          allow: "/",
-          disallow: ["/dev-404-page/", "/404/", "/404.html", "/offline-plugin-app-shell-fallback/"],
-          crawlDelay: 2,
-        }],
+        policy: [
+          {
+            userAgent: "*",
+            allow: "/",
+            disallow: [
+              "/dev-404-page/",
+              "/404/",
+              "/404.html",
+              "/offline-plugin-app-shell-fallback/",
+            ],
+            crawlDelay: 2,
+          },
+        ],
       },
     },
     "gatsby-disable-404",

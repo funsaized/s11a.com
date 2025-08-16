@@ -1,30 +1,34 @@
 import React from "react";
-import { CodeBlock, InlineCodeBlock, CollapsibleCodeBlock } from "../CodeBlock/CodeBlock";
-import { 
-  Callout, 
-  InfoCallout, 
-  WarningCallout, 
-  TipCallout, 
-  SuccessCallout 
+import { Code, Lightbulb, Eye, Share, Zap, Navigation } from "lucide-react";
+import {
+  CodeBlock,
+  InlineCodeBlock,
+  CollapsibleCodeBlock,
+} from "../CodeBlock/CodeBlock";
+import {
+  Callout,
+  InfoCallout,
+  WarningCallout,
+  TipCallout,
+  SuccessCallout,
 } from "../Callout/Callout";
-import { 
-  ExpandableSection, 
-  FAQSection, 
-  Accordion 
+import {
+  ExpandableSection,
+  FAQSection,
+  Accordion,
 } from "../ExpandableSection/ExpandableSection";
 import ReadingExperience from "../ReadingExperience/ReadingExperience";
-import { 
-  SocialShare, 
-  ReactionSystem, 
-  NewsletterSignup 
+import {
+  SocialShare,
+  ReactionSystem,
+  NewsletterSignup,
 } from "../SocialEngagement/SocialEngagement";
 import { PWAFeatures } from "../PWAFeatures/PWAFeatures";
 import CategoryTagFilter from "../CategoryTagFilter/CategoryTagFilter";
 import TimelineView from "../TimelineView/TimelineView";
-import RelatedContentSidebar from "../RelatedContentSidebar/RelatedContentSidebar";
+// import RelatedContentSidebar from "../RelatedContentSidebar/RelatedContentSidebar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Code, Lightbulb, Eye, Share, Zap, Navigation } from "lucide-react";
 
 export function AdvancedFeaturesDemo(): React.ReactElement {
   return (
@@ -32,7 +36,8 @@ export function AdvancedFeaturesDemo(): React.ReactElement {
       <div className="text-center space-y-4">
         <h1 className="text-4xl font-bold">Advanced Blog Features</h1>
         <p className="text-xl text-muted-foreground">
-          A comprehensive demonstration of modern blog components and functionality
+          A comprehensive demonstration of modern blog components and
+          functionality
         </p>
         <div className="flex justify-center gap-2 flex-wrap">
           <Badge variant="secondary">TypeScript</Badge>
@@ -52,9 +57,11 @@ export function AdvancedFeaturesDemo(): React.ReactElement {
         </CardHeader>
         <CardContent className="space-y-6">
           <div>
-            <h3 className="text-lg font-semibold mb-3">Standard Code Block with Copy</h3>
+            <h3 className="text-lg font-semibold mb-3">
+              Standard Code Block with Copy
+            </h3>
             <CodeBlock language="tsx" title="React Component Example">
-{`import React, { useState } from 'react';
+              {`import React, { useState } from 'react';
 
 export function Counter(): React.ReactElement {
   const [count, setCount] = useState(0);
@@ -74,12 +81,14 @@ export function Counter(): React.ReactElement {
           </div>
 
           <div>
-            <h3 className="text-lg font-semibold mb-3">Collapsible Code Block</h3>
-            <CollapsibleCodeBlock 
-              language="json" 
+            <h3 className="text-lg font-semibold mb-3">
+              Collapsible Code Block
+            </h3>
+            <CollapsibleCodeBlock
+              language="json"
               title="Package.json Configuration"
             >
-{`{
+              {`{
   "name": "my-blog",
   "version": "1.0.0",
   "dependencies": {
@@ -105,8 +114,9 @@ export function Counter(): React.ReactElement {
           <div>
             <h3 className="text-lg font-semibold mb-3">Inline Code</h3>
             <p>
-              You can use <InlineCodeBlock>useState</InlineCodeBlock> hook to manage state
-              or install packages with <InlineCodeBlock>npm install package-name</InlineCodeBlock>.
+              You can use <InlineCodeBlock>useState</InlineCodeBlock> hook to
+              manage state or install packages with{" "}
+              <InlineCodeBlock>npm install package-name</InlineCodeBlock>.
             </p>
           </div>
         </CardContent>
@@ -122,23 +132,23 @@ export function Counter(): React.ReactElement {
         </CardHeader>
         <CardContent className="space-y-6">
           <InfoCallout title="Information">
-            This is an informational callout that provides helpful context or explanations 
-            for your readers.
+            This is an informational callout that provides helpful context or
+            explanations for your readers.
           </InfoCallout>
 
           <WarningCallout title="Important Warning">
-            This callout highlights important warnings that users should be aware of before 
-            proceeding with certain actions.
+            This callout highlights important warnings that users should be
+            aware of before proceeding with certain actions.
           </WarningCallout>
 
           <TipCallout>
-            Pro tip: You can customize the appearance and behavior of these callouts to match 
-            your design system perfectly.
+            Pro tip: You can customize the appearance and behavior of these
+            callouts to match your design system perfectly.
           </TipCallout>
 
           <SuccessCallout title="Success!">
-            This callout celebrates successful operations or provides positive feedback 
-            to your users.
+            This callout celebrates successful operations or provides positive
+            feedback to your users.
           </SuccessCallout>
 
           <Callout type="code" title="Code Snippet">
@@ -158,15 +168,17 @@ export function Counter(): React.ReactElement {
         </CardHeader>
         <CardContent className="space-y-6">
           <div>
-            <h3 className="text-lg font-semibold mb-3">Standard Expandable Section</h3>
+            <h3 className="text-lg font-semibold mb-3">
+              Standard Expandable Section
+            </h3>
             <ExpandableSection title="Advanced Configuration Options">
               <p>
-                Here you can include detailed configuration instructions, code examples,
-                or any other content that might be too lengthy for the main flow but
-                valuable for interested readers.
+                Here you can include detailed configuration instructions, code
+                examples, or any other content that might be too lengthy for the
+                main flow but valuable for interested readers.
               </p>
               <CodeBlock language="yaml" title="config.yml">
-{`# Advanced configuration
+                {`# Advanced configuration
 advanced:
   caching: true
   compression: gzip
@@ -210,9 +222,12 @@ advanced:
         <CardContent>
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="text-lg font-semibold mb-2">Enhanced Reading Tools</h3>
+              <h3 className="text-lg font-semibold mb-2">
+                Enhanced Reading Tools
+              </h3>
               <p className="text-muted-foreground">
-                Reading mode, text-to-speech, print options, and font customization
+                Reading mode, text-to-speech, print options, and font
+                customization
               </p>
             </div>
             <ReadingExperience articleId="demo-content" />
@@ -240,8 +255,8 @@ advanced:
 
           <div>
             <h3 className="text-lg font-semibold mb-3">Reaction System</h3>
-            <ReactionSystem 
-              postId="demo-post" 
+            <ReactionSystem
+              postId="demo-post"
               initialCounts={{ like: 12, love: 8, happy: 3, wow: 1 }}
             />
           </div>
@@ -263,7 +278,9 @@ advanced:
         </CardHeader>
         <CardContent className="space-y-6">
           <div>
-            <h3 className="text-lg font-semibold mb-3">Category & Tag Filter</h3>
+            <h3 className="text-lg font-semibold mb-3">
+              Category & Tag Filter
+            </h3>
             <CategoryTagFilter />
           </div>
 
@@ -286,13 +303,13 @@ advanced:
         </CardHeader>
         <CardContent>
           <p className="text-muted-foreground mb-4">
-            PWA features include install prompts, offline indicators, notification management,
-            and service worker updates. These features enhance the user experience by providing
-            app-like functionality.
+            PWA features include install prompts, offline indicators,
+            notification management, and service worker updates. These features
+            enhance the user experience by providing app-like functionality.
           </p>
           <InfoCallout>
-            PWA features are automatically active in the background. Try going offline or
-            visiting on a mobile device to see the install prompt!
+            PWA features are automatically active in the background. Try going
+            offline or visiting on a mobile device to see the install prompt!
           </InfoCallout>
         </CardContent>
       </Card>

@@ -58,7 +58,7 @@ export function ThemeProvider({
 
     if (typeof document !== "undefined") {
       const root = document.documentElement;
-      
+
       if (newTheme === "system") {
         // Remove explicit dark class and let CSS media query handle it
         root.classList.remove("dark", "light");
@@ -122,10 +122,11 @@ export function ThemeProvider({
       root.classList.remove("no-transitions");
       setIsLoading(false);
     };
-    
+
     // Use requestAnimationFrame to ensure DOM is updated first
     requestAnimationFrame(() => {
       setTimeout(enableTransitions, 50);
+      return undefined;
     });
 
     // Listen for system theme changes
@@ -157,7 +158,7 @@ export function ThemeProvider({
       toggleTheme,
       isLoading,
     }),
-    [theme, resolvedTheme, setTheme, toggleTheme, isLoading]
+    [theme, resolvedTheme, setTheme, toggleTheme, isLoading],
   );
 
   return (

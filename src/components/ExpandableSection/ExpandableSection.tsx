@@ -31,7 +31,9 @@ export function ExpandableSection({
   onToggle,
 }: ExpandableSectionProps): React.ReactElement {
   const [isExpanded, setIsExpanded] = useState(defaultExpanded);
-  const [height, setHeight] = useState<number | undefined>(defaultExpanded ? undefined : 0);
+  const [height, setHeight] = useState<number | undefined>(
+    defaultExpanded ? undefined : 0,
+  );
   const contentRef = useRef<HTMLDivElement>(null);
   const measureRef = useRef<HTMLDivElement>(null);
 
@@ -54,7 +56,7 @@ export function ExpandableSection({
 
   const handleToggle = () => {
     const newExpanded = !isExpanded;
-    
+
     if (newExpanded && measureRef.current) {
       setHeight(measureRef.current.scrollHeight);
     } else {
@@ -95,11 +97,11 @@ export function ExpandableSection({
   const styles = sizeStyles[size];
 
   return (
-    <div 
+    <div
       className={cn(
         "transition-all duration-200 hover:shadow-md",
         variantStyles[variant],
-        className
+        className,
       )}
     >
       {/* Header */}
@@ -110,59 +112,55 @@ export function ExpandableSection({
           "w-full justify-between h-auto hover:bg-transparent focus:bg-transparent",
           styles.padding,
           "p-0 font-normal text-left",
-          headerClassName
+          headerClassName,
         )}
         aria-expanded={isExpanded}
-        aria-controls={`expandable-content-${title.replace(/\s+/g, '-').toLowerCase()}`}
+        aria-controls={`expandable-content-${title.replace(/\s+/g, "-").toLowerCase()}`}
       >
         <div className="flex items-center gap-3">
           {icon && (
-            <div className={cn("flex-shrink-0", styles.iconSize)}>
-              {icon}
-            </div>
+            <div className={cn("flex-shrink-0", styles.iconSize)}>{icon}</div>
           )}
-          <span className={cn(styles.titleSize, "truncate")}>
-            {title}
-          </span>
+          <span className={cn(styles.titleSize, "truncate")}>{title}</span>
         </div>
-        
+
         <div className="flex-shrink-0 ml-3">
           {isExpanded ? (
-            <ChevronDown 
+            <ChevronDown
               className={cn(
                 styles.iconSize,
-                "transition-transform duration-200 text-muted-foreground"
-              )} 
+                "transition-transform duration-200 text-muted-foreground",
+              )}
             />
           ) : (
-            <ChevronRight 
+            <ChevronRight
               className={cn(
                 styles.iconSize,
-                "transition-transform duration-200 text-muted-foreground"
-              )} 
+                "transition-transform duration-200 text-muted-foreground",
+              )}
             />
           )}
         </div>
       </Button>
 
       {/* Content */}
-      <div 
+      <div
         ref={contentRef}
         className="overflow-hidden transition-all ease-in-out"
         style={{
-          height: height,
+          height,
           transitionDuration: `${animationDuration}ms`,
         }}
-        id={`expandable-content-${title.replace(/\s+/g, '-').toLowerCase()}`}
+        id={`expandable-content-${title.replace(/\s+/g, "-").toLowerCase()}`}
         aria-hidden={!isExpanded}
       >
-        <div 
+        <div
           ref={measureRef}
           className={cn(
             styles.padding,
             "pt-0",
             styles.spacing,
-            contentClassName
+            contentClassName,
           )}
         >
           <div className="prose prose-sm dark:prose-invert max-w-none [&>*:first-child]:mt-0 [&>*:last-child]:mb-0">
@@ -175,13 +173,13 @@ export function ExpandableSection({
 }
 
 // Convenience components for different variants
-export const BorderedExpandableSection = (props: Omit<ExpandableSectionProps, "variant">) => (
-  <ExpandableSection {...props} variant="bordered" />
-);
+export function BorderedExpandableSection(props: Omit<ExpandableSectionProps, "variant">) {
+  return <ExpandableSection {...props} variant="bordered" />
+}
 
-export const MinimalExpandableSection = (props: Omit<ExpandableSectionProps, "variant">) => (
-  <ExpandableSection {...props} variant="minimal" />
-);
+export function MinimalExpandableSection(props: Omit<ExpandableSectionProps, "variant">) {
+  return <ExpandableSection {...props} variant="minimal" />
+}
 
 // FAQ-specific expandable section with enhanced styling
 export function FAQSection({
@@ -215,10 +213,10 @@ interface AccordionProps {
   className?: string;
 }
 
-export function Accordion({ 
-  children, 
-  allowMultiple = false, 
-  className 
+export function Accordion({
+  children,
+  allowMultiple = false,
+  className,
 }: AccordionProps): React.ReactElement {
   const [expandedItems, setExpandedItems] = useState<Set<number>>(new Set());
 

@@ -1,27 +1,27 @@
-import React from 'react';
-import { motion } from 'framer-motion';
+import React from "react";
+import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 
 interface SkeletonProps extends React.ComponentProps<"div"> {
-  variant?: 'default' | 'wave' | 'shimmer' | 'glow';
-  speed?: 'slow' | 'normal' | 'fast';
+  variant?: "default" | "wave" | "shimmer" | "glow";
+  speed?: "slow" | "normal" | "fast";
 }
 
 // Animation variants for different skeleton types
 const skeletonVariants = {
   wave: {
-    backgroundPosition: ['200% 0', '-200% 0'],
+    backgroundPosition: ["200% 0", "-200% 0"],
     transition: {
       duration: 2,
-      ease: 'linear',
+      ease: "linear",
       repeat: Infinity,
     },
   },
   shimmer: {
-    x: ['-100%', '100%'],
+    x: ["-100%", "100%"],
     transition: {
       duration: 1.5,
-      ease: 'linear',
+      ease: "linear",
       repeat: Infinity,
       repeatDelay: 0.5,
     },
@@ -31,7 +31,7 @@ const skeletonVariants = {
     scale: [1, 1.02, 1],
     transition: {
       duration: 2,
-      ease: 'easeInOut',
+      ease: "easeInOut",
       repeat: Infinity,
     },
   },
@@ -43,15 +43,15 @@ const speedConfig = {
   fast: { duration: 1 },
 };
 
-function Skeleton({ 
-  className, 
-  variant = 'default',
-  speed = 'normal',
-  ...props 
+function Skeleton({
+  className,
+  variant = "default",
+  speed = "normal",
+  ...props
 }: SkeletonProps) {
   const baseClasses = "bg-accent rounded-md relative overflow-hidden";
-  
-  if (variant === 'default') {
+
+  if (variant === "default") {
     return (
       <div
         data-slot="skeleton"
@@ -61,18 +61,19 @@ function Skeleton({
     );
   }
 
-  if (variant === 'wave') {
+  if (variant === "wave") {
     return (
       <motion.div
         data-slot="skeleton"
         className={cn(
           baseClasses,
           "bg-gradient-to-r from-accent via-accent/50 to-accent bg-[length:200%_100%]",
-          className
+          className,
         )}
         animate={skeletonVariants.wave}
         style={{
-          backgroundImage: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent)',
+          backgroundImage:
+            "linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent)",
         }}
         transition={{
           ...skeletonVariants.wave.transition,
@@ -83,7 +84,7 @@ function Skeleton({
     );
   }
 
-  if (variant === 'shimmer') {
+  if (variant === "shimmer") {
     return (
       <div
         data-slot="skeleton"
@@ -102,7 +103,7 @@ function Skeleton({
     );
   }
 
-  if (variant === 'glow') {
+  if (variant === "glow") {
     return (
       <motion.div
         data-slot="skeleton"
@@ -127,9 +128,9 @@ function Skeleton({
 }
 
 // Preset skeleton components for common use cases
-const SkeletonText: React.FC<{ lines?: number; className?: string }> = ({ 
-  lines = 3, 
-  className 
+const SkeletonText: React.FC<{ lines?: number; className?: string }> = ({
+  lines = 3,
+  className,
 }) => (
   <div className={cn("space-y-2", className)}>
     {Array.from({ length: lines }).map((_, i) => (
@@ -138,7 +139,7 @@ const SkeletonText: React.FC<{ lines?: number; className?: string }> = ({
         variant="shimmer"
         className={cn(
           "h-4",
-          i === lines - 1 ? "w-3/4" : "w-full" // Last line is shorter
+          i === lines - 1 ? "w-3/4" : "w-full", // Last line is shorter
         )}
       />
     ))}
@@ -156,19 +157,16 @@ const SkeletonCard: React.FC<{ className?: string }> = ({ className }) => (
   </div>
 );
 
-const SkeletonAvatar: React.FC<{ 
-  size?: 'sm' | 'md' | 'lg'; 
+const SkeletonAvatar: React.FC<{
+  size?: "sm" | "md" | "lg";
   className?: string;
-}> = ({ 
-  size = 'md', 
-  className 
-}) => {
+}> = ({ size = "md", className }) => {
   const sizeClasses = {
-    sm: 'h-8 w-8',
-    md: 'h-12 w-12',
-    lg: 'h-16 w-16',
+    sm: "h-8 w-8",
+    md: "h-12 w-12",
+    lg: "h-16 w-16",
   };
-  
+
   return (
     <Skeleton
       variant="glow"
@@ -178,10 +176,7 @@ const SkeletonAvatar: React.FC<{
 };
 
 const SkeletonButton: React.FC<{ className?: string }> = ({ className }) => (
-  <Skeleton 
-    variant="wave" 
-    className={cn("h-9 w-24 rounded-md", className)} 
-  />
+  <Skeleton variant="wave" className={cn("h-9 w-24 rounded-md", className)} />
 );
 
 // Animated skeleton group that reveals in sequence
@@ -191,7 +186,7 @@ const SkeletonGroup: React.FC<{
   className?: string;
 }> = ({ children, staggerDelay = 0.1, className }) => {
   const childrenArray = React.Children.toArray(children);
-  
+
   return (
     <div className={className}>
       {childrenArray.map((child, index) => (
@@ -202,7 +197,7 @@ const SkeletonGroup: React.FC<{
           transition={{
             delay: index * staggerDelay,
             duration: 0.5,
-            ease: 'easeOut',
+            ease: "easeOut",
           }}
         >
           {child}
@@ -212,11 +207,11 @@ const SkeletonGroup: React.FC<{
   );
 };
 
-export { 
-  Skeleton, 
-  SkeletonText, 
-  SkeletonCard, 
-  SkeletonAvatar, 
-  SkeletonButton, 
-  SkeletonGroup 
+export {
+  Skeleton,
+  SkeletonText,
+  SkeletonCard,
+  SkeletonAvatar,
+  SkeletonButton,
+  SkeletonGroup,
 };

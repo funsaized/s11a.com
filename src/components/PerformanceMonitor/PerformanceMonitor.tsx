@@ -1,11 +1,11 @@
-import React, { useEffect } from 'react';
-import { onCLS, onFCP, onLCP, onTTFB, onINP } from 'web-vitals';
+import React, { useEffect } from "react";
+import { onCLS, onFCP, onLCP, onTTFB, onINP } from "web-vitals";
 
 interface PerformanceMetric {
   name: string;
   value: number;
   delta: number;
-  rating: 'good' | 'needs-improvement' | 'poor';
+  rating: "good" | "needs-improvement" | "poor";
   navigationType: string;
 }
 
@@ -17,7 +17,7 @@ interface PerformanceMonitorProps {
 
 const PerformanceMonitor: React.FC<PerformanceMonitorProps> = ({
   enableAnalytics = false,
-  reportToConsole = process.env.NODE_ENV === 'development',
+  reportToConsole = process.env.NODE_ENV === "development",
   reportToAnalytics,
 }) => {
   useEffect(() => {
@@ -28,15 +28,20 @@ const PerformanceMonitor: React.FC<PerformanceMonitorProps> = ({
         value: metric.value,
         delta: metric.delta,
         rating: metric.rating,
-        navigationType: metric.navigationType || 'unknown',
+        navigationType: metric.navigationType || "unknown",
       };
 
       // Console logging in development
       if (reportToConsole) {
-        const color = metric.rating === 'good' ? 'green' : metric.rating === 'needs-improvement' ? 'orange' : 'red';
+        const color =
+          metric.rating === "good"
+            ? "green"
+            : metric.rating === "needs-improvement"
+              ? "orange"
+              : "red";
         console.log(
           `%c${metric.name}: ${Math.round(metric.value)}ms (${metric.rating})`,
-          `color: ${color}; font-weight: bold;`
+          `color: ${color}; font-weight: bold;`,
         );
       }
 
@@ -46,9 +51,13 @@ const PerformanceMonitor: React.FC<PerformanceMonitorProps> = ({
       }
 
       // Send to Google Analytics 4 if available
-      if (typeof window !== 'undefined' && (window as any).gtag && enableAnalytics) {
-        (window as any).gtag('event', metric.name, {
-          event_category: 'Web Vitals',
+      if (
+        typeof window !== "undefined" &&
+        (window as any).gtag &&
+        enableAnalytics
+      ) {
+        (window as any).gtag("event", metric.name, {
+          event_category: "Web Vitals",
           value: Math.round(metric.value),
           custom_parameter_1: metric.rating,
         });
@@ -60,27 +69,31 @@ const PerformanceMonitor: React.FC<PerformanceMonitorProps> = ({
     onFCP(handleMetric);
     onLCP(handleMetric);
     onTTFB(handleMetric);
-    
+
     // INP (Interaction to Next Paint) - replacement for FID in v5
     onINP(handleMetric);
 
     // Layout shift prevention observer
-    if ('PerformanceObserver' in window) {
+    if ("PerformanceObserver" in window) {
       const clsObserver = new PerformanceObserver((list) => {
         for (const entry of list.getEntries()) {
-          if (entry.entryType === 'layout-shift' && !(entry as any).hadRecentInput) {
+          if (
+            entry.entryType === "layout-shift" &&
+            !(entry as any).hadRecentInput
+          ) {
             const layoutShiftEntry = entry as any;
             if (layoutShiftEntry.value > 0.1 && reportToConsole) {
               console.warn(
                 `⚠️ Layout Shift detected: ${layoutShiftEntry.value.toFixed(4)}`,
-                layoutShiftEntry.sources?.map((source: any) => source.node) || []
+                layoutShiftEntry.sources?.map((source: any) => source.node) ||
+                  [],
               );
             }
           }
         }
       });
 
-      clsObserver.observe({ type: 'layout-shift', buffered: true });
+      clsObserver.observe({ type: "layout-shift", buffered: true });
 
       // Long task observer for performance issues
       const longTaskObserver = new PerformanceObserver((list) => {
@@ -88,14 +101,14 @@ const PerformanceMonitor: React.FC<PerformanceMonitorProps> = ({
           if (entry.duration > 50 && reportToConsole) {
             console.warn(
               `🐌 Long task detected: ${Math.round(entry.duration)}ms`,
-              entry.name
+              entry.name,
             );
           }
         }
       });
 
       try {
-        longTaskObserver.observe({ type: 'longtask', buffered: true });
+        longTaskObserver.observe({ type: "longtask", buffered: true });
       } catch (e) {
         // Long task API not supported
       }
@@ -106,13 +119,13 @@ const PerformanceMonitor: React.FC<PerformanceMonitorProps> = ({
           const resource = entry as PerformanceResourceTiming;
           if (resource.duration > 1000 && reportToConsole) {
             console.warn(
-              `📦 Slow resource: ${resource.name} took ${Math.round(resource.duration)}ms`
+              `📦 Slow resource: ${resource.name} took ${Math.round(resource.duration)}ms`,
             );
           }
         }
       });
 
-      resourceObserver.observe({ type: 'resource', buffered: true });
+      resourceObserver.observe({ type: "resource", buffered: true });
 
       // Cleanup observers
       return () => {
@@ -126,20 +139,23 @@ const PerformanceMonitor: React.FC<PerformanceMonitorProps> = ({
   // CLS Prevention: Add stabilization for dynamic content
   useEffect(() => {
     // Add resize observer for dynamic content
-    if ('ResizeObserver' in window) {
+    if ("ResizeObserver" in window) {
       const resizeObserver = new ResizeObserver((entries) => {
         for (const entry of entries) {
           const element = entry.target as HTMLElement;
-          
+
           // Add transition to prevent jarring layout shifts
-          if (!element.style.transition.includes('height')) {
-            element.style.transition = `${element.style.transition} height 0.2s ease-out`.trim();
+          if (!element.style.transition.includes("height")) {
+            element.style.transition =
+              `${element.style.transition} height 0.2s ease-out`.trim();
           }
         }
       });
 
       // Observe common dynamic elements
-      const dynamicElements = document.querySelectorAll('[data-dynamic], .dynamic-content');
+      const dynamicElements = document.querySelectorAll(
+        "[data-dynamic], .dynamic-content",
+      );
       dynamicElements.forEach((element) => {
         resizeObserver.observe(element);
       });
@@ -155,7 +171,9 @@ const PerformanceMonitor: React.FC<PerformanceMonitorProps> = ({
 export default PerformanceMonitor;
 
 // Utility function for manual performance reporting
-export const reportWebVitals = (reportToAnalytics?: (metric: PerformanceMetric) => void) => {
+export const reportWebVitals = (
+  reportToAnalytics?: (metric: PerformanceMetric) => void,
+) => {
   const handleMetric = (metric: any) => {
     if (reportToAnalytics) {
       reportToAnalytics({
@@ -163,7 +181,7 @@ export const reportWebVitals = (reportToAnalytics?: (metric: PerformanceMetric) 
         value: metric.value,
         delta: metric.delta,
         rating: metric.rating,
-        navigationType: metric.navigationType || 'unknown',
+        navigationType: metric.navigationType || "unknown",
       });
     }
   };
@@ -180,12 +198,11 @@ export const checkPerformanceBudgets = (): Promise<{
   lcp: { value: number; budget: number; passed: boolean };
   inp: { value: number; budget: number; passed: boolean };
   cls: { value: number; budget: number; passed: boolean };
-}> => {
-  return new Promise((resolve) => {
+}> => new Promise((resolve) => {
     const budgets = {
       lcp: 2500, // 2.5s
-      inp: 200,  // 200ms (INP replaces FID)
-      cls: 0.1,  // 0.1
+      inp: 200, // 200ms (INP replaces FID)
+      cls: 0.1, // 0.1
     };
 
     const results = {
@@ -222,4 +239,3 @@ export const checkPerformanceBudgets = (): Promise<{
       checkComplete();
     });
   });
-};

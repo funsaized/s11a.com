@@ -1,11 +1,6 @@
 import React, { useState } from "react";
-import { 
-  Filter,
-  Search,
-  FolderOpen,
-  Tag,
-  X
-} from "lucide-react";
+import { Filter, Search, FolderOpen, Tag, X } from "lucide-react";
+import { useStaticQuery, graphql } from "gatsby";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -13,10 +8,9 @@ import {
   SheetContent,
   SheetHeader,
   SheetTitle,
-  SheetTrigger
+  SheetTrigger,
 } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
-import { useStaticQuery, graphql } from "gatsby";
 
 interface FilterState {
   categories: string[];
@@ -30,9 +24,9 @@ interface CategoryTagFilterProps {
   onFilterChange?: (filters: FilterState) => void;
 }
 
-export function CategoryTagFilter({ 
+export function CategoryTagFilter({
   className,
-  onFilterChange
+  onFilterChange,
 }: CategoryTagFilterProps): React.ReactElement {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [filters, setFilters] = useState<FilterState>({
@@ -95,14 +89,14 @@ export function CategoryTagFilter({
 
   const toggleCategory = (category: string) => {
     const updated = filters.categories.includes(category)
-      ? filters.categories.filter(c => c !== category)
+      ? filters.categories.filter((c) => c !== category)
       : [...filters.categories, category];
     updateFilters({ categories: updated });
   };
 
   const toggleTag = (tag: string) => {
     const updated = filters.tags.includes(tag)
-      ? filters.tags.filter(t => t !== tag)
+      ? filters.tags.filter((t) => t !== tag)
       : [...filters.tags, tag];
     updateFilters({ tags: updated });
   };
@@ -121,8 +115,8 @@ export function CategoryTagFilter({
             <Filter className="h-4 w-4 mr-2" />
             Filter
             {activeFilterCount > 0 && (
-              <Badge 
-                variant="secondary" 
+              <Badge
+                variant="secondary"
                 className="ml-2 h-5 w-5 p-0 text-xs flex items-center justify-center"
               >
                 {activeFilterCount}
@@ -137,17 +131,25 @@ export function CategoryTagFilter({
               Filter Posts
             </SheetTitle>
           </SheetHeader>
-          
+
           <div className="mt-6 space-y-6">
             {/* Search */}
             <div>
-              <label className="text-sm font-medium mb-3 block">Search</label>
+              <label
+                htmlFor="search-posts"
+                className="text-sm font-medium mb-3 block"
+              >
+                Search
+              </label>
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <input
+                  id="search-posts"
                   type="text"
                   value={filters.searchTerm}
-                  onChange={(e) => updateFilters({ searchTerm: e.target.value })}
+                  onChange={(e) =>
+                    updateFilters({ searchTerm: e.target.value })
+                  }
                   placeholder="Search posts..."
                   className="w-full pl-10 pr-4 py-2 bg-background border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-ring"
                 />
@@ -156,13 +158,16 @@ export function CategoryTagFilter({
 
             {/* Categories */}
             <div>
-              <label className="text-sm font-medium mb-3 block flex items-center gap-2">
+              <div className="text-sm font-medium mb-3 flex items-center gap-2">
                 <FolderOpen className="h-4 w-4" />
                 Categories
-              </label>
+              </div>
               <div className="space-y-2 max-h-48 overflow-y-auto">
                 {categories.map((category: any) => (
-                  <div key={category.fieldValue} className="flex items-center gap-2">
+                  <div
+                    key={category.fieldValue}
+                    className="flex items-center gap-2"
+                  >
                     <input
                       type="checkbox"
                       id={`category-${category.fieldValue}`}
@@ -170,7 +175,7 @@ export function CategoryTagFilter({
                       onChange={() => toggleCategory(category.fieldValue)}
                       className="rounded border-border"
                     />
-                    <label 
+                    <label
                       htmlFor={`category-${category.fieldValue}`}
                       className="flex-1 text-sm cursor-pointer"
                     >
@@ -186,10 +191,10 @@ export function CategoryTagFilter({
 
             {/* Tags */}
             <div>
-              <label className="text-sm font-medium mb-3 block flex items-center gap-2">
+              <div className="text-sm font-medium mb-3 flex items-center gap-2">
                 <Tag className="h-4 w-4" />
                 Tags
-              </label>
+              </div>
               <div className="space-y-2 max-h-48 overflow-y-auto">
                 {tags.map((tag: any) => (
                   <div key={tag.fieldValue} className="flex items-center gap-2">
@@ -200,7 +205,7 @@ export function CategoryTagFilter({
                       onChange={() => toggleTag(tag.fieldValue)}
                       className="rounded border-border"
                     />
-                    <label 
+                    <label
                       htmlFor={`tag-${tag.fieldValue}`}
                       className="flex-1 text-sm cursor-pointer"
                     >
@@ -216,7 +221,11 @@ export function CategoryTagFilter({
 
             {/* Actions */}
             <div className="pt-4 border-t space-y-2">
-              <Button onClick={clearFilters} variant="outline" className="w-full">
+              <Button
+                onClick={clearFilters}
+                variant="outline"
+                className="w-full"
+              >
                 <X className="h-4 w-4 mr-2" />
                 Clear All Filters
               </Button>
@@ -228,10 +237,10 @@ export function CategoryTagFilter({
       {/* Active Filters Display */}
       {activeFilterCount > 0 && (
         <div className="flex flex-wrap items-center gap-1">
-          {filters.categories.map(category => (
-            <Badge 
-              key={category} 
-              variant="secondary" 
+          {filters.categories.map((category) => (
+            <Badge
+              key={category}
+              variant="secondary"
               className="text-xs cursor-pointer hover:bg-destructive hover:text-destructive-foreground"
               onClick={() => toggleCategory(category)}
             >
@@ -239,10 +248,10 @@ export function CategoryTagFilter({
               <X className="h-3 w-3 ml-1" />
             </Badge>
           ))}
-          {filters.tags.map(tag => (
-            <Badge 
-              key={tag} 
-              variant="outline" 
+          {filters.tags.map((tag) => (
+            <Badge
+              key={tag}
+              variant="outline"
               className="text-xs cursor-pointer hover:bg-destructive hover:text-destructive-foreground"
               onClick={() => toggleTag(tag)}
             >

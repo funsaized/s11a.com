@@ -1,7 +1,7 @@
 import React, { useState, useRef } from "react";
 import { Check, Copy, ChevronDown, ChevronUp, Terminal } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { 
+import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
@@ -96,11 +96,11 @@ export function CodeBlock({
   const shouldShowToggle = collapsible && lines.length > 10;
 
   return (
-    <div 
+    <div
       className={cn(
         "relative group rounded-lg border bg-muted/30 overflow-hidden",
         "shadow-sm hover:shadow-md transition-shadow duration-200",
-        className
+        className,
       )}
     >
       {/* Header */}
@@ -116,7 +116,7 @@ export function CodeBlock({
             </span>
           )}
         </div>
-        
+
         <div className="flex items-center gap-1">
           {shouldShowToggle && (
             <Tooltip>
@@ -140,7 +140,7 @@ export function CodeBlock({
               </TooltipContent>
             </Tooltip>
           )}
-          
+
           <Tooltip>
             <TooltipTrigger asChild>
               <Button
@@ -165,51 +165,45 @@ export function CodeBlock({
       </div>
 
       {/* Code Content */}
-      <div 
+      <div
         className={cn(
           "relative transition-all duration-300 ease-in-out",
-          !expanded && shouldShowToggle && "max-h-60 overflow-hidden"
+          !expanded && shouldShowToggle && "max-h-60 overflow-hidden",
         )}
       >
-        <pre 
+        <pre
           className={cn(
             "overflow-auto p-4 text-sm font-mono leading-relaxed",
-            !expanded && "scrollbar-thin scrollbar-thumb-muted scrollbar-track-transparent"
+            !expanded &&
+              "scrollbar-thin scrollbar-thumb-muted scrollbar-track-transparent",
           )}
-          style={{ 
-            maxHeight: expanded ? maxHeight : undefined 
+          style={{
+            maxHeight: expanded ? maxHeight : undefined,
           }}
         >
-          <code 
+          <code
             ref={codeRef}
-            className={cn(
-              `language-${language}`,
-              "block whitespace-pre"
-            )}
+            className={cn(`language-${language}`, "block whitespace-pre")}
           >
-            {showLineNumbers ? (
-              lines.map((line, index) => (
-                <div key={index} className="table-row">
-                  <span 
-                    className="table-cell select-none text-right pr-4 text-muted-foreground w-10 sticky left-0 bg-muted/30"
-                    style={{ minWidth: '2.5rem' }}
-                  >
-                    {index + 1}
-                  </span>
-                  <span className="table-cell">
-                    {line}
-                  </span>
-                </div>
-              ))
-            ) : (
-              children
-            )}
+            {showLineNumbers
+              ? lines.map((line, index) => (
+                  <div key={index} className="table-row">
+                    <span
+                      className="table-cell select-none text-right pr-4 text-muted-foreground w-10 sticky left-0 bg-muted/30"
+                      style={{ minWidth: "2.5rem" }}
+                    >
+                      {index + 1}
+                    </span>
+                    <span className="table-cell">{line}</span>
+                  </div>
+                ))
+              : children}
           </code>
         </pre>
-        
+
         {/* Fade overlay when collapsed */}
         {!expanded && shouldShowToggle && (
-          <div 
+          <div
             className="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-muted/30 to-transparent pointer-events-none"
             aria-hidden="true"
           />
@@ -220,61 +214,57 @@ export function CodeBlock({
 }
 
 // Export component variants for different use cases
-export const InlineCodeBlock = ({ 
-  children, 
-  className 
-}: { 
-  children: string; 
+export function InlineCodeBlock({
+  children,
+  className,
+}: {
+  children: string;
   className?: string;
-}) => (
-  <code 
+}) {
+  return <code
     className={cn(
       "relative rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold",
       "border border-border/50",
-      className
+      className,
     )}
   >
     {children}
   </code>
-);
+}
 
-export const SimpleCodeBlock = ({ 
-  children, 
+export function SimpleCodeBlock({
+  children,
   language,
-  className 
-}: { 
-  children: string; 
+  className,
+}: {
+  children: string;
   language?: string;
   className?: string;
-}) => (
-  <CodeBlock
-    className={className}
-    showLineNumbers={false}
-    collapsible={false}
-  >
+}) {
+  return <CodeBlock className={className} showLineNumbers={false} collapsible={false}>
     {children}
   </CodeBlock>
-);
+}
 
-export const CollapsibleCodeBlock = ({ 
+export function CollapsibleCodeBlock({
   children,
   language,
   title,
-  className 
-}: { 
-  children: string; 
+  className,
+}: {
+  children: string;
   language?: string;
   title?: string;
   className?: string;
-}) => (
-  <CodeBlock
+}) {
+  return <CodeBlock
     className={className}
     language={language}
     title={title}
-    collapsible={true}
+    collapsible
   >
     {children}
   </CodeBlock>
-);
+}
 
 export default CodeBlock;

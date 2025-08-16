@@ -25,6 +25,6 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": ["src/**/*", "gatsby-*.js", "data/*.js"],
+  "include": ["src/**/*", "gatsby-*.js", "gatsby-*.ts", "data/*.js", "declarations.d.ts", "tailwind.config.js"],
   "exclude": ["node_modules", "public", ".cache"]
 }

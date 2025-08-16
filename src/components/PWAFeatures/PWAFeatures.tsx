@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { 
+import {
   Download,
-  Wifi,
   WifiOff,
   Bell,
   BellOff,
@@ -10,17 +9,23 @@ import {
   Smartphone,
   X,
   Reload,
-  Check
+  Check,
 } from "lucide-react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
-import { toast } from "sonner";
 
 interface PWAFeaturesProps {
   className?: string;
@@ -29,7 +34,7 @@ interface PWAFeaturesProps {
 interface BeforeInstallPromptEvent extends Event {
   readonly platforms: string[];
   readonly userChoice: Promise<{
-    outcome: 'accepted' | 'dismissed';
+    outcome: "accepted" | "dismissed";
     platform: string;
   }>;
   prompt(): Promise<void>;
@@ -43,12 +48,13 @@ interface OfflinePost {
   estimatedReadTime: number;
 }
 
-export function PWAInstallPrompt({ 
-  className 
-}: { 
+export function PWAInstallPrompt({
+  className,
+}: {
   className?: string;
 }): React.ReactElement | null {
-  const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
+  const [deferredPrompt, setDeferredPrompt] =
+    useState<BeforeInstallPromptEvent | null>(null);
   const [showInstallPrompt, setShowInstallPrompt] = useState(false);
   const [isInstalled, setIsInstalled] = useState(false);
   const [isStandalone, setIsStandalone] = useState(false);
@@ -56,9 +62,10 @@ export function PWAInstallPrompt({
   useEffect(() => {
     // Check if app is already installed/running in standalone mode
     const checkStandalone = () => {
-      const isStandaloneMode = window.matchMedia('(display-mode: standalone)').matches ||
-                             (window.navigator as any).standalone ||
-                             document.referrer.includes('android-app://');
+      const isStandaloneMode =
+        window.matchMedia("(display-mode: standalone)").matches ||
+        (window.navigator as any).standalone ||
+        document.referrer.includes("android-app://");
       setIsStandalone(isStandaloneMode);
     };
 
@@ -68,12 +75,12 @@ export function PWAInstallPrompt({
     const handleBeforeInstallPrompt = (e: Event) => {
       e.preventDefault();
       setDeferredPrompt(e as BeforeInstallPromptEvent);
-      
+
       // Show install prompt after a delay if not dismissed recently
-      const lastDismissed = localStorage.getItem('pwa-install-dismissed');
+      const lastDismissed = localStorage.getItem("pwa-install-dismissed");
       const oneDayAgo = Date.now() - 24 * 60 * 60 * 1000;
-      
-      if (!lastDismissed || parseInt(lastDismissed) < oneDayAgo) {
+
+      if (!lastDismissed || parseInt(lastDismissed, 10) < oneDayAgo) {
         setTimeout(() => setShowInstallPrompt(true), 5000);
       }
     };
@@ -86,12 +93,15 @@ export function PWAInstallPrompt({
       toast.success("App installed successfully!");
     };
 
-    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-    window.addEventListener('appinstalled', handleAppInstalled);
+    window.addEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
+    window.addEventListener("appinstalled", handleAppInstalled);
 
     return () => {
-      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-      window.removeEventListener('appinstalled', handleAppInstalled);
+      window.removeEventListener(
+        "beforeinstallprompt",
+        handleBeforeInstallPrompt,
+      );
+      window.removeEventListener("appinstalled", handleAppInstalled);
     };
   }, []);
 
@@ -101,22 +111,22 @@ export function PWAInstallPrompt({
     try {
       await deferredPrompt.prompt();
       const { outcome } = await deferredPrompt.userChoice;
-      
-      if (outcome === 'accepted') {
+
+      if (outcome === "accepted") {
         setShowInstallPrompt(false);
       } else {
-        localStorage.setItem('pwa-install-dismissed', Date.now().toString());
+        localStorage.setItem("pwa-install-dismissed", Date.now().toString());
       }
-      
+
       setDeferredPrompt(null);
     } catch (error) {
-      console.error('Install prompt failed:', error);
+      console.error("Install prompt failed:", error);
     }
   };
 
   const handleDismiss = () => {
     setShowInstallPrompt(false);
-    localStorage.setItem('pwa-install-dismissed', Date.now().toString());
+    localStorage.setItem("pwa-install-dismissed", Date.now().toString());
   };
 
   // Don't show if already installed or in standalone mode
@@ -125,7 +135,12 @@ export function PWAInstallPrompt({
   }
 
   return (
-    <Card className={cn("fixed bottom-4 right-4 z-50 max-w-sm shadow-lg", className)}>
+    <Card
+      className={cn(
+        "fixed bottom-4 right-4 z-50 max-w-sm shadow-lg",
+        className,
+      )}
+    >
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-2">
@@ -143,7 +158,8 @@ export function PWAInstallPrompt({
           </Button>
         </div>
         <CardDescription className="text-sm">
-          Install this app on your device for a better experience with offline access and notifications.
+          Install this app on your device for a better experience with offline
+          access and notifications.
         </CardDescription>
       </CardHeader>
       <CardContent className="pt-0">
@@ -161,9 +177,9 @@ export function PWAInstallPrompt({
   );
 }
 
-export function OfflineIndicator({ 
-  className 
-}: { 
+export function OfflineIndicator({
+  className,
+}: {
   className?: string;
 }): React.ReactElement {
   const [isOnline, setIsOnline] = useState(true);
@@ -173,7 +189,7 @@ export function OfflineIndicator({
     const updateOnlineStatus = () => {
       const online = navigator.onLine;
       setIsOnline(online);
-      
+
       if (!online && !showOfflineBanner) {
         setShowOfflineBanner(true);
         toast.error("You're offline. Some features may not work properly.");
@@ -185,22 +201,24 @@ export function OfflineIndicator({
 
     updateOnlineStatus();
 
-    window.addEventListener('online', updateOnlineStatus);
-    window.addEventListener('offline', updateOnlineStatus);
+    window.addEventListener("online", updateOnlineStatus);
+    window.addEventListener("offline", updateOnlineStatus);
 
     return () => {
-      window.removeEventListener('online', updateOnlineStatus);
-      window.removeEventListener('offline', updateOnlineStatus);
+      window.removeEventListener("online", updateOnlineStatus);
+      window.removeEventListener("offline", updateOnlineStatus);
     };
   }, [showOfflineBanner]);
 
   if (isOnline) return null;
 
   return (
-    <div className={cn(
-      "fixed top-0 left-0 right-0 bg-orange-500 text-white text-sm text-center py-2 z-50",
-      className
-    )}>
+    <div
+      className={cn(
+        "fixed top-0 left-0 right-0 bg-orange-500 text-white text-sm text-center py-2 z-50",
+        className,
+      )}
+    >
       <div className="flex items-center justify-center gap-2">
         <WifiOff className="h-4 w-4" />
         <span>You're offline - viewing cached content</span>
@@ -209,28 +227,29 @@ export function OfflineIndicator({
   );
 }
 
-export function NotificationManager({ 
-  className 
-}: { 
+export function NotificationManager({
+  className,
+}: {
   className?: string;
 }): React.ReactElement {
-  const [permission, setPermission] = useState<NotificationPermission>('default');
+  const [permission, setPermission] =
+    useState<NotificationPermission>("default");
   const [subscribed, setSubscribed] = useState(false);
 
   useEffect(() => {
     // Check current notification permission
-    if ('Notification' in window) {
+    if ("Notification" in window) {
       setPermission(Notification.permission);
     }
 
     // Check if already subscribed (simplified - would need service worker integration)
-    const savedSubscription = localStorage.getItem('notification-subscribed');
-    setSubscribed(savedSubscription === 'true');
+    const savedSubscription = localStorage.getItem("notification-subscribed");
+    setSubscribed(savedSubscription === "true");
   }, []);
 
   const requestNotificationPermission = async () => {
-    if (!('Notification' in window)) {
-      toast.error('Notifications are not supported in this browser');
+    if (!("Notification" in window)) {
+      toast.error("Notifications are not supported in this browser");
       return;
     }
 
@@ -238,36 +257,38 @@ export function NotificationManager({
       const permission = await Notification.requestPermission();
       setPermission(permission);
 
-      if (permission === 'granted') {
+      if (permission === "granted") {
         setSubscribed(true);
-        localStorage.setItem('notification-subscribed', 'true');
-        toast.success('Notifications enabled! You\'ll be notified of new posts.');
-        
+        localStorage.setItem("notification-subscribed", "true");
+        toast.success(
+          "Notifications enabled! You'll be notified of new posts.",
+        );
+
         // Show a test notification
-        new Notification('Notifications enabled!', {
-          body: 'You\'ll now receive notifications about new blog posts.',
-          icon: '/favicon.png',
+        new Notification("Notifications enabled!", {
+          body: "You'll now receive notifications about new blog posts.",
+          icon: "/favicon.png",
         });
       } else {
-        toast.error('Notification permission denied');
+        toast.error("Notification permission denied");
       }
     } catch (error) {
-      console.error('Error requesting notification permission:', error);
-      toast.error('Failed to enable notifications');
+      console.error("Error requesting notification permission:", error);
+      toast.error("Failed to enable notifications");
     }
   };
 
   const unsubscribeNotifications = () => {
     setSubscribed(false);
-    localStorage.setItem('notification-subscribed', 'false');
-    toast.success('Notifications disabled');
+    localStorage.setItem("notification-subscribed", "false");
+    toast.success("Notifications disabled");
   };
 
-  if (!('Notification' in window)) return null;
+  if (!("Notification" in window)) return null;
 
   return (
     <div className={cn("flex items-center gap-2", className)}>
-      {permission === 'granted' && subscribed ? (
+      {permission === "granted" && subscribed ? (
         <Tooltip>
           <TooltipTrigger asChild>
             <Button
@@ -302,9 +323,9 @@ export function NotificationManager({
   );
 }
 
-export function OfflineReadingQueue({ 
-  className 
-}: { 
+export function OfflineReadingQueue({
+  className,
+}: {
   className?: string;
 }): React.ReactElement {
   const [offlinePosts, setOfflinePosts] = useState<OfflinePost[]>([]);
@@ -313,58 +334,69 @@ export function OfflineReadingQueue({
   useEffect(() => {
     // Load offline posts from localStorage
     try {
-      const saved = localStorage.getItem('offline-reading-queue');
+      const saved = localStorage.getItem("offline-reading-queue");
       if (saved) {
         setOfflinePosts(JSON.parse(saved));
       }
     } catch (error) {
-      console.warn('Failed to load offline reading queue:', error);
+      console.warn("Failed to load offline reading queue:", error);
     }
 
     // Get current post slug from URL
-    if (typeof window !== 'undefined') {
+    if (typeof window !== "undefined") {
       const path = window.location.pathname;
       setCurrentPost(path);
     }
   }, []);
 
-  const saveToOffline = useCallback(async (slug: string, title: string) => {
-    try {
-      // In a real implementation, you would fetch the full content
-      // For now, we'll simulate this
-      const content = document.querySelector('article')?.innerHTML || '';
-      const estimatedReadTime = Math.ceil(content.length / 1000); // Rough estimate
-      
-      const newPost: OfflinePost = {
-        slug,
-        title,
-        content,
-        dateAdded: new Date().toISOString(),
-        estimatedReadTime,
-      };
+  const saveToOffline = useCallback(
+    async (slug: string, title: string) => {
+      try {
+        // In a real implementation, you would fetch the full content
+        // For now, we'll simulate this
+        const content = document.querySelector("article")?.innerHTML || "";
+        const estimatedReadTime = Math.ceil(content.length / 1000); // Rough estimate
 
-      const updated = [...offlinePosts.filter(p => p.slug !== slug), newPost];
+        const newPost: OfflinePost = {
+          slug,
+          title,
+          content,
+          dateAdded: new Date().toISOString(),
+          estimatedReadTime,
+        };
+
+        const updated = [
+          ...offlinePosts.filter((p) => p.slug !== slug),
+          newPost,
+        ];
+        setOfflinePosts(updated);
+
+        localStorage.setItem("offline-reading-queue", JSON.stringify(updated));
+        toast.success("Post saved for offline reading!");
+      } catch (error) {
+        console.error("Failed to save post for offline:", error);
+        toast.error("Failed to save post for offline reading");
+      }
+    },
+    [offlinePosts],
+  );
+
+  const removeFromOffline = useCallback(
+    (slug: string) => {
+      const updated = offlinePosts.filter((p) => p.slug !== slug);
       setOfflinePosts(updated);
-      
-      localStorage.setItem('offline-reading-queue', JSON.stringify(updated));
-      toast.success('Post saved for offline reading!');
-    } catch (error) {
-      console.error('Failed to save post for offline:', error);
-      toast.error('Failed to save post for offline reading');
-    }
-  }, [offlinePosts]);
+      localStorage.setItem("offline-reading-queue", JSON.stringify(updated));
+      toast.success("Removed from offline reading queue");
+    },
+    [offlinePosts],
+  );
 
-  const removeFromOffline = useCallback((slug: string) => {
-    const updated = offlinePosts.filter(p => p.slug !== slug);
-    setOfflinePosts(updated);
-    localStorage.setItem('offline-reading-queue', JSON.stringify(updated));
-    toast.success('Removed from offline reading queue');
-  }, [offlinePosts]);
-
-  const isPostSaved = currentPost ? offlinePosts.some(p => p.slug === currentPost) : false;
+  const isPostSaved = currentPost
+    ? offlinePosts.some((p) => p.slug === currentPost)
+    : false;
 
   // Get current page title (simplified)
-  const currentTitle = typeof document !== 'undefined' ? document.title : '';
+  const currentTitle = typeof document !== "undefined" ? document.title : "";
 
   return (
     <div className={cn("flex items-center gap-2", className)}>
@@ -383,7 +415,11 @@ export function OfflineReadingQueue({
                 }
               }}
               className="h-8 w-8 p-0"
-              aria-label={isPostSaved ? "Remove from offline queue" : "Save for offline reading"}
+              aria-label={
+                isPostSaved
+                  ? "Remove from offline queue"
+                  : "Save for offline reading"
+              }
             >
               {isPostSaved ? (
                 <BookmarkCheck className="h-4 w-4 text-primary" />
@@ -393,7 +429,9 @@ export function OfflineReadingQueue({
             </Button>
           </TooltipTrigger>
           <TooltipContent>
-            {isPostSaved ? "Remove from offline queue" : "Save for offline reading"}
+            {isPostSaved
+              ? "Remove from offline queue"
+              : "Save for offline reading"}
           </TooltipContent>
         </Tooltip>
       )}
@@ -409,7 +447,9 @@ export function OfflineReadingQueue({
               onClick={() => {
                 // Navigate to offline reading queue page
                 // This would be implemented as a separate page
-                toast.info(`${offlinePosts.length} posts saved for offline reading`);
+                toast.info(
+                  `${offlinePosts.length} posts saved for offline reading`,
+                );
               }}
             >
               <Bookmark className="h-4 w-4 mr-1" />
@@ -423,9 +463,9 @@ export function OfflineReadingQueue({
   );
 }
 
-export function ServiceWorkerUpdater({ 
-  className 
-}: { 
+export function ServiceWorkerUpdater({
+  className,
+}: {
   className?: string;
 }): React.ReactElement | null {
   const [showUpdatePrompt, setShowUpdatePrompt] = useState(false);
@@ -433,13 +473,13 @@ export function ServiceWorkerUpdater({
 
   useEffect(() => {
     // Register service worker update listener
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.addEventListener('controllerchange', () => {
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.addEventListener("controllerchange", () => {
         setShowUpdatePrompt(true);
       });
 
       // Check for waiting service worker
-      navigator.serviceWorker.getRegistration().then(registration => {
+      navigator.serviceWorker.getRegistration().then((registration) => {
         if (registration?.waiting) {
           setShowUpdatePrompt(true);
         }
@@ -448,22 +488,22 @@ export function ServiceWorkerUpdater({
   }, []);
 
   const handleUpdate = async () => {
-    if (!('serviceWorker' in navigator)) return;
+    if (!("serviceWorker" in navigator)) return;
 
     setIsUpdating(true);
 
     try {
       const registration = await navigator.serviceWorker.getRegistration();
       if (registration?.waiting) {
-        registration.waiting.postMessage({ type: 'SKIP_WAITING' });
+        registration.waiting.postMessage({ type: "SKIP_WAITING" });
       }
-      
+
       // Reload page to get updated content
       setTimeout(() => {
         window.location.reload();
       }, 1000);
     } catch (error) {
-      console.error('Failed to update app:', error);
+      console.error("Failed to update app:", error);
       setIsUpdating(false);
     }
   };
@@ -475,7 +515,9 @@ export function ServiceWorkerUpdater({
   if (!showUpdatePrompt) return null;
 
   return (
-    <Card className={cn("fixed bottom-4 left-4 z-50 max-w-sm shadow-lg", className)}>
+    <Card
+      className={cn("fixed bottom-4 left-4 z-50 max-w-sm shadow-lg", className)}
+    >
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-2">
@@ -498,9 +540,9 @@ export function ServiceWorkerUpdater({
       </CardHeader>
       <CardContent className="pt-0">
         <div className="flex gap-2">
-          <Button 
-            onClick={handleUpdate} 
-            className="flex-1" 
+          <Button
+            onClick={handleUpdate}
+            className="flex-1"
             size="sm"
             disabled={isUpdating}
           >
@@ -526,7 +568,9 @@ export function ServiceWorkerUpdater({
 }
 
 // Combined PWA Features Component
-export function PWAFeatures({ className }: PWAFeaturesProps): React.ReactElement {
+export function PWAFeatures({
+  className,
+}: PWAFeaturesProps): React.ReactElement {
   return (
     <div className={cn(className)}>
       <PWAInstallPrompt />

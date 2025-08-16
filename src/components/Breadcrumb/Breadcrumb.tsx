@@ -1,5 +1,6 @@
 import React from "react";
 import { Link } from "gatsby";
+import { Home } from "lucide-react";
 import {
   Breadcrumb,
   BreadcrumbList,
@@ -8,7 +9,6 @@ import {
   BreadcrumbSeparator,
   BreadcrumbPage,
 } from "@/components/ui/breadcrumb";
-import { Home } from "lucide-react";
 
 interface BreadcrumbItem {
   label: string;
@@ -20,7 +20,10 @@ interface DynamicBreadcrumbProps {
   className?: string;
 }
 
-function DynamicBreadcrumb({ items, className }: DynamicBreadcrumbProps): React.ReactElement {
+function DynamicBreadcrumb({
+  items,
+  className,
+}: DynamicBreadcrumbProps): React.ReactElement {
   return (
     <Breadcrumb className={className}>
       <BreadcrumbList>
@@ -33,12 +36,12 @@ function DynamicBreadcrumb({ items, className }: DynamicBreadcrumbProps): React.
             </Link>
           </BreadcrumbLink>
         </BreadcrumbItem>
-        
+
         {items.length > 0 && <BreadcrumbSeparator />}
-        
+
         {items.map((item, index) => {
           const isLast = index === items.length - 1;
-          
+
           return (
             <React.Fragment key={index}>
               <BreadcrumbItem>
@@ -52,7 +55,7 @@ function DynamicBreadcrumb({ items, className }: DynamicBreadcrumbProps): React.
                   <span className="text-muted-foreground">{item.label}</span>
                 )}
               </BreadcrumbItem>
-              
+
               {!isLast && <BreadcrumbSeparator />}
             </React.Fragment>
           );

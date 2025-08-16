@@ -102,7 +102,7 @@ function Navbar({ menuLinks }: NavbarProps): React.ReactElement {
           <ThemeToggle />
         </div>
       </div>
-      
+
       {/* Search Dialog */}
       <SearchDialog open={searchOpen} onOpenChange={setSearchOpen} />
     </nav>

@@ -1,5 +1,5 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import React, { useEffect, useRef, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface FLIPProps {
   children: React.ReactNode;
@@ -15,7 +15,7 @@ const FLIPAnimation: React.FC<FLIPProps> = ({
   flipKey,
   className,
   duration = 0.3,
-  easing = 'easeInOut',
+  easing = "easeInOut",
 }) => {
   const ref = useRef<HTMLDivElement>(null);
   const [prevRect, setPrevRect] = useState<DOMRect | null>(null);
@@ -34,26 +34,31 @@ const FLIPAnimation: React.FC<FLIPProps> = ({
 
       if (deltaX !== 0 || deltaY !== 0 || deltaW !== 1 || deltaH !== 1) {
         setIsAnimating(true);
-        
+
         // Apply inverse transformation immediately
         ref.current.style.transform = `translate(${deltaX}px, ${deltaY}px) scale(${deltaW}, ${deltaH})`;
-        ref.current.style.transformOrigin = 'top left';
-        
-        // Play the animation
-        const animation = ref.current.animate([
-          { transform: `translate(${deltaX}px, ${deltaY}px) scale(${deltaW}, ${deltaH})` },
-          { transform: 'translate(0px, 0px) scale(1, 1)' }
-        ], {
-          duration: duration * 1000,
-          easing,
-          fill: 'both',
-        });
+        ref.current.style.transformOrigin = "top left";
 
-        animation.addEventListener('finish', () => {
+        // Play the animation
+        const animation = ref.current.animate(
+          [
+            {
+              transform: `translate(${deltaX}px, ${deltaY}px) scale(${deltaW}, ${deltaH})`,
+            },
+            { transform: "translate(0px, 0px) scale(1, 1)" },
+          ],
+          {
+            duration: duration * 1000,
+            easing,
+            fill: "both",
+          },
+        );
+
+        animation.addEventListener("finish", () => {
           setIsAnimating(false);
           if (ref.current) {
-            ref.current.style.transform = '';
-            ref.current.style.transformOrigin = '';
+            ref.current.style.transform = "";
+            ref.current.style.transformOrigin = "";
           }
         });
       }
@@ -67,7 +72,7 @@ const FLIPAnimation: React.FC<FLIPProps> = ({
       ref={ref}
       className={className}
       style={{
-        willChange: isAnimating ? 'transform' : 'auto',
+        willChange: isAnimating ? "transform" : "auto",
       }}
     >
       {children}
@@ -86,7 +91,7 @@ export const SharedElement: React.FC<{
       layoutId={id}
       className={className}
       transition={{
-        type: 'spring',
+        type: "spring",
         stiffness: 300,
         damping: 30,
       }}
@@ -106,7 +111,7 @@ export const LayoutAnimator: React.FC<{
       layout
       className={className}
       transition={{
-        type: 'spring',
+        type: "spring",
         stiffness: 300,
         damping: 30,
         mass: 0.8,
@@ -130,7 +135,7 @@ export const GridItemAnimator: React.FC<{
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.8 }}
       transition={{
-        layout: { type: 'spring', stiffness: 300, damping: 30 },
+        layout: { type: "spring", stiffness: 300, damping: 30 },
         opacity: { duration: 0.3 },
         scale: { duration: 0.3 },
         delay: index * 0.05, // Stagger animation
@@ -160,7 +165,7 @@ export const ReorderableList: React.FC<{
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, x: -300 }}
             transition={{
-              layout: { type: 'spring', stiffness: 300, damping: 30 },
+              layout: { type: "spring", stiffness: 300, damping: 30 },
               opacity: { duration: 0.2 },
               y: { duration: 0.2 },
               x: { duration: 0.2 },
@@ -190,7 +195,7 @@ export const MorphingContainer: React.FC<{
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 1.05 }}
         transition={{
-          layout: { type: 'spring', stiffness: 300, damping: 30 },
+          layout: { type: "spring", stiffness: 300, damping: 30 },
           opacity: { duration: 0.2 },
           scale: { duration: 0.2 },
         }}

@@ -1,120 +1,130 @@
-import * as React from "react"
-import { Moon, Sun, Monitor } from "lucide-react"
-import { Button } from "@/components/ui/button"
+import * as React from "react";
+import { Moon, Sun, Monitor } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
-} from "@/components/ui/tooltip"
-import { useTheme } from "../../context/ThemeContext"
-import { cn } from "@/lib/utils"
-import "./ThemeToggle.css"
+} from "@/components/ui/tooltip";
+import { useTheme } from "../../context/ThemeContext";
+import { cn } from "@/lib/utils";
+import "./ThemeToggle.css";
 
 export interface ThemeToggleProps {
-  className?: string
-  showTooltip?: boolean
-  enableKeyboardShortcut?: boolean
+  className?: string;
+  showTooltip?: boolean;
+  enableKeyboardShortcut?: boolean;
 }
 
-export function ThemeToggle({ 
-  className, 
-  showTooltip = true, 
-  enableKeyboardShortcut = true 
+export function ThemeToggle({
+  className,
+  showTooltip = true,
+  enableKeyboardShortcut = true,
 }: ThemeToggleProps) {
-  const { theme, toggleTheme, resolvedTheme, isLoading } = useTheme()
-  const [isAnimating, setIsAnimating] = React.useState(false)
-  const [isHovered, setIsHovered] = React.useState(false)
-  const [isMac, setIsMac] = React.useState(false)
+  const { theme, toggleTheme, resolvedTheme, isLoading } = useTheme();
+  const [isAnimating, setIsAnimating] = React.useState(false);
+  const [isHovered, setIsHovered] = React.useState(false);
+  const [isMac, setIsMac] = React.useState(false);
 
   // Detect platform for keyboard shortcut display
   React.useEffect(() => {
-    setIsMac(typeof navigator !== 'undefined' && navigator.platform.includes('Mac'))
-  }, [])
+    setIsMac(
+      typeof navigator !== "undefined" && navigator.platform.includes("Mac"),
+    );
+  }, []);
 
   // Get the next theme in the cycle for tooltip
   const getNextTheme = () => {
-    const themeOrder = ["light", "dark", "system"]
-    const currentIndex = themeOrder.indexOf(theme)
-    const nextIndex = (currentIndex + 1) % themeOrder.length
-    return themeOrder[nextIndex]
-  }
+    const themeOrder = ["light", "dark", "system"];
+    const currentIndex = themeOrder.indexOf(theme);
+    const nextIndex = (currentIndex + 1) % themeOrder.length;
+    return themeOrder[nextIndex];
+  };
 
   // Get theme description for accessibility
   const getThemeDescription = (themeType: string) => {
     switch (themeType) {
-      case "light": return "Light mode"
-      case "dark": return "Dark mode" 
-      case "system": return "System preference"
-      default: return "Light mode"
+      case "light":
+        return "Light mode";
+      case "dark":
+        return "Dark mode";
+      case "system":
+        return "System preference";
+      default:
+        return "Light mode";
     }
-  }
+  };
 
   // Handle theme toggle with animation
   const handleToggle = () => {
-    setIsAnimating(true)
-    toggleTheme()
-    
+    setIsAnimating(true);
+    toggleTheme();
+
     // Reset animation state after transition
     setTimeout(() => {
-      setIsAnimating(false)
-    }, 200)
-  }
+      setIsAnimating(false);
+    }, 200);
+  };
 
   // Keyboard shortcut handler
   React.useEffect(() => {
-    if (!enableKeyboardShortcut) return
+    if (!enableKeyboardShortcut) return;
 
     const handleKeyDown = (event: KeyboardEvent) => {
       // Ctrl/Cmd + Shift + T to toggle theme
-      if ((event.ctrlKey || event.metaKey) && event.shiftKey && event.key === 'T') {
-        event.preventDefault()
-        handleToggle()
+      if (
+        (event.ctrlKey || event.metaKey) &&
+        event.shiftKey &&
+        event.key === "T"
+      ) {
+        event.preventDefault();
+        handleToggle();
       }
-    }
+    };
 
-    document.addEventListener('keydown', handleKeyDown)
-    return () => document.removeEventListener('keydown', handleKeyDown)
-  }, [enableKeyboardShortcut])
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [enableKeyboardShortcut]);
 
   // Get the appropriate icon with enhanced animations
   const getIcon = () => {
     const iconClasses = cn(
       "h-[1.2rem] w-[1.2rem] theme-toggle-icon drop-shadow-sm",
       isAnimating && "scale-95 rotate-12",
-      isHovered && "scale-110"
-    )
+      isHovered && "scale-110",
+    );
 
     switch (theme) {
       case "light":
         return (
-          <Sun 
-            className={cn(iconClasses, "theme-icon-sun")} 
+          <Sun
+            className={cn(iconClasses, "theme-icon-sun")}
             aria-hidden="true"
           />
-        )
+        );
       case "dark":
         return (
-          <Moon 
-            className={cn(iconClasses, "theme-icon-moon")} 
+          <Moon
+            className={cn(iconClasses, "theme-icon-moon")}
             aria-hidden="true"
           />
-        )
+        );
       case "system":
         return (
-          <Monitor 
-            className={cn(iconClasses, "theme-icon-monitor")} 
+          <Monitor
+            className={cn(iconClasses, "theme-icon-monitor")}
             aria-hidden="true"
           />
-        )
+        );
       default:
         return (
-          <Sun 
-            className={cn(iconClasses, "theme-icon-sun")} 
+          <Sun
+            className={cn(iconClasses, "theme-icon-sun")}
             aria-hidden="true"
           />
-        )
+        );
     }
-  }
+  };
 
   const tooltipContent = showTooltip ? (
     <div className="text-center theme-toggle-tooltip">
@@ -130,20 +140,16 @@ export function ThemeToggle({
       {enableKeyboardShortcut && (
         <div className="text-xs text-muted-foreground mt-1 border-t border-border/50 pt-1">
           <kbd className="px-1 py-0.5 text-xs bg-muted rounded">
-            {isMac ? '⌘' : 'Ctrl'}
+            {isMac ? "⌘" : "Ctrl"}
           </kbd>
-          {' + '}
-          <kbd className="px-1 py-0.5 text-xs bg-muted rounded">
-            Shift
-          </kbd>
-          {' + '}
-          <kbd className="px-1 py-0.5 text-xs bg-muted rounded">
-            T
-          </kbd>
+          {" + "}
+          <kbd className="px-1 py-0.5 text-xs bg-muted rounded">Shift</kbd>
+          {" + "}
+          <kbd className="px-1 py-0.5 text-xs bg-muted rounded">T</kbd>
         </div>
       )}
     </div>
-  ) : null
+  ) : null;
 
   const buttonElement = (
     <Button
@@ -161,52 +167,50 @@ export function ThemeToggle({
         "disabled:opacity-50 disabled:cursor-wait",
         isAnimating && "theme-toggle-switching",
         isLoading && "theme-toggle-loading",
-        className
+        className,
       )}
       aria-label={`Current theme: ${getThemeDescription(theme)}${theme === "system" ? ` (${resolvedTheme})` : ""}. Click to switch to ${getThemeDescription(getNextTheme())}.`}
     >
       {getIcon()}
-      
+
       {/* Visual indicator for current theme */}
-      <div 
+      <div
         className={cn(
           "absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-1 h-1 rounded-full theme-indicator-dot",
           theme === "light" && "bg-amber-500 theme-icon-sun",
-          theme === "dark" && "bg-blue-600 theme-icon-moon", 
+          theme === "dark" && "bg-blue-600 theme-icon-moon",
           theme === "system" && "bg-violet-600 theme-icon-monitor",
           isHovered && !isLoading ? "scale-125" : "scale-100",
-          isAnimating && "switching"
+          isAnimating && "switching",
         )}
         aria-hidden="true"
       />
     </Button>
-  )
+  );
 
   if (!showTooltip) {
-    return buttonElement
+    return buttonElement;
   }
 
   return (
     <Tooltip>
-      <TooltipTrigger asChild>
-        {buttonElement}
-      </TooltipTrigger>
+      <TooltipTrigger asChild>{buttonElement}</TooltipTrigger>
       <TooltipContent side="bottom" sideOffset={8}>
         {tooltipContent}
       </TooltipContent>
     </Tooltip>
-  )
+  );
 }
 
 // Export variants for different use cases
-export const ThemeToggleSimple = (props: Omit<ThemeToggleProps, 'showTooltip'>) => (
-  <ThemeToggle {...props} showTooltip={false} />
-)
+export function ThemeToggleSimple(props: Omit<ThemeToggleProps, "showTooltip">) {
+  return <ThemeToggle {...props} showTooltip={false} />
+}
 
-export const ThemeToggleNoKeyboard = (props: Omit<ThemeToggleProps, 'enableKeyboardShortcut'>) => (
-  <ThemeToggle {...props} enableKeyboardShortcut={false} />
-)
+export function ThemeToggleNoKeyboard(props: Omit<ThemeToggleProps, "enableKeyboardShortcut">) {
+  return <ThemeToggle {...props} enableKeyboardShortcut={false} />
+}
 
-export const ThemeToggleBasic = (props: Omit<ThemeToggleProps, 'showTooltip' | 'enableKeyboardShortcut'>) => (
-  <ThemeToggle {...props} showTooltip={false} enableKeyboardShortcut={false} />
-)
+export function ThemeToggleBasic(props: Omit<ThemeToggleProps, "showTooltip" | "enableKeyboardShortcut">) {
+  return <ThemeToggle {...props} showTooltip={false} enableKeyboardShortcut={false} />
+}

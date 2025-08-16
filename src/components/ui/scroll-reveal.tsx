@@ -1,9 +1,9 @@
-import React, { useRef, useEffect, useState } from 'react';
-import { motion, useAnimation, useInView } from 'framer-motion';
+import React, { useRef, useEffect, useState } from "react";
+import { motion, useAnimation, useInView } from "framer-motion";
 
 interface ScrollRevealProps {
   children: React.ReactNode;
-  direction?: 'up' | 'down' | 'left' | 'right' | 'scale' | 'rotate';
+  direction?: "up" | "down" | "left" | "right" | "scale" | "rotate";
   delay?: number;
   duration?: number;
   distance?: number;
@@ -16,21 +16,21 @@ interface ScrollRevealProps {
 
 const ScrollReveal: React.FC<ScrollRevealProps> = ({
   children,
-  direction = 'up',
+  direction = "up",
   delay = 0,
   duration = 0.6,
   distance = 50,
-  className = '',
+  className = "",
   threshold = 0.1,
   once = true,
   cascade = false,
   cascadeDelay = 0.1,
 }) => {
   const ref = useRef(null);
-  const isInView = useInView(ref, { 
+  const isInView = useInView(ref, {
     once,
     amount: threshold,
-    margin: '-50px 0px',
+    margin: "-50px 0px",
   });
   const controls = useAnimation();
   const [hasAnimated, setHasAnimated] = useState(false);
@@ -64,7 +64,7 @@ const ScrollReveal: React.FC<ScrollRevealProps> = ({
   };
 
   const transition = {
-    type: 'spring',
+    type: "spring",
     duration: duration,
     bounce: 0.3,
     delay: delay,
@@ -72,10 +72,10 @@ const ScrollReveal: React.FC<ScrollRevealProps> = ({
 
   useEffect(() => {
     if (isInView && (!once || !hasAnimated)) {
-      controls.start('visible');
+      controls.start("visible");
       setHasAnimated(true);
     } else if (!isInView && !once) {
-      controls.start('hidden');
+      controls.start("hidden");
     }
   }, [isInView, controls, once, hasAnimated]);
 
@@ -91,9 +91,9 @@ const ScrollReveal: React.FC<ScrollRevealProps> = ({
             variants={variants[direction]}
             transition={{
               ...transition,
-              delay: delay + (index * cascadeDelay),
+              delay: delay + index * cascadeDelay,
             }}
-            style={{ display: 'contents' }}
+            style={{ display: "contents" }}
           >
             {child}
           </motion.div>
@@ -119,7 +119,7 @@ const ScrollReveal: React.FC<ScrollRevealProps> = ({
 // Higher-order component for easy scroll reveal wrapping
 export const withScrollReveal = <P extends object>(
   Component: React.ComponentType<P>,
-  options: Partial<ScrollRevealProps> = {}
+  options: Partial<ScrollRevealProps> = {},
 ) => {
   return React.forwardRef<any, P>((props, ref) => (
     <ScrollReveal {...options}>

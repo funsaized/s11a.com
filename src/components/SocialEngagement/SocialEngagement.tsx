@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { 
+import {
   Share2,
   Twitter,
   Facebook,
@@ -13,8 +13,9 @@ import {
   Zap,
   Copy,
   Check,
-  ExternalLink
+  ExternalLink,
 } from "lucide-react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
   Tooltip,
@@ -26,10 +27,9 @@ import {
   SheetContent,
   SheetHeader,
   SheetTitle,
-  SheetTrigger
+  SheetTrigger,
 } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
-import { toast } from "sonner";
 
 interface SocialShareProps {
   title: string;
@@ -46,18 +46,18 @@ interface ReactionProps {
 }
 
 const reactions = [
-  { name: 'like', icon: ThumbsUp, label: 'Like', color: 'text-blue-500' },
-  { name: 'love', icon: Heart, label: 'Love', color: 'text-red-500' },
-  { name: 'happy', icon: Smile, label: 'Happy', color: 'text-yellow-500' },
-  { name: 'wow', icon: Zap, label: 'Wow', color: 'text-purple-500' },
+  { name: "like", icon: ThumbsUp, label: "Like", color: "text-blue-500" },
+  { name: "love", icon: Heart, label: "Love", color: "text-red-500" },
+  { name: "happy", icon: Smile, label: "Happy", color: "text-yellow-500" },
+  { name: "wow", icon: Zap, label: "Wow", color: "text-purple-500" },
 ];
 
-export function SocialShare({ 
-  title, 
-  url, 
+export function SocialShare({
+  title,
+  url,
   description = "",
   author = "",
-  className 
+  className,
 }: SocialShareProps): React.ReactElement {
   const [copied, setCopied] = useState(false);
   const [shareUrl, setShareUrl] = useState(url || "");
@@ -90,7 +90,7 @@ export function SocialShare({
           url: shareUrl,
         });
       } catch (error) {
-        if ((error as Error).name !== 'AbortError') {
+        if ((error as Error).name !== "AbortError") {
           console.error("Failed to share:", error);
         }
       }
@@ -103,11 +103,11 @@ export function SocialShare({
     {
       name: "Twitter",
       icon: Twitter,
-      url: `https://twitter.com/intent/tweet?text=${encodeURIComponent(title)}&url=${encodeURIComponent(shareUrl)}${author ? `&via=${encodeURIComponent(author)}` : ''}`,
+      url: `https://twitter.com/intent/tweet?text=${encodeURIComponent(title)}&url=${encodeURIComponent(shareUrl)}${author ? `&via=${encodeURIComponent(author)}` : ""}`,
       color: "hover:text-blue-400",
     },
     {
-      name: "Facebook", 
+      name: "Facebook",
       icon: Facebook,
       url: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`,
       color: "hover:text-blue-600",
@@ -162,9 +162,7 @@ export function SocialShare({
             )}
           </Button>
         </TooltipTrigger>
-        <TooltipContent>
-          {copied ? "Copied!" : "Copy link"}
-        </TooltipContent>
+        <TooltipContent>{copied ? "Copied!" : "Copy link"}</TooltipContent>
       </Tooltip>
 
       {/* Custom Share Sheet */}
@@ -176,7 +174,7 @@ export function SocialShare({
               Share Article
             </SheetTitle>
           </SheetHeader>
-          
+
           <div className="mt-6 space-y-4">
             <div className="p-3 bg-muted rounded-lg">
               <h3 className="font-medium text-sm mb-1">{title}</h3>
@@ -192,7 +190,9 @@ export function SocialShare({
                   key={platform.name}
                   variant="outline"
                   className={cn("w-full justify-start", platform.color)}
-                  onClick={() => window.open(platform.url, '_blank', 'noopener,noreferrer')}
+                  onClick={() =>
+                    window.open(platform.url, "_blank", "noopener,noreferrer")
+                  }
                 >
                   <platform.icon className="h-4 w-4 mr-3" />
                   Share on {platform.name}
@@ -228,10 +228,10 @@ export function SocialShare({
   );
 }
 
-export function ReactionSystem({ 
-  postId, 
+export function ReactionSystem({
+  postId,
   initialCounts = {},
-  className 
+  className,
 }: ReactionProps): React.ReactElement {
   const [counts, setCounts] = useState<Record<string, number>>(initialCounts);
   const [userReactions, setUserReactions] = useState<Set<string>>(new Set());
@@ -250,51 +250,68 @@ export function ReactionSystem({
   }, [postId]);
 
   // Save user reactions to localStorage
-  const saveUserReactions = useCallback((reactions: Set<string>) => {
-    try {
-      localStorage.setItem(`reactions-${postId}`, JSON.stringify([...reactions]));
-    } catch (error) {
-      console.warn("Failed to save reactions:", error);
-    }
-  }, [postId]);
+  const saveUserReactions = useCallback(
+    (reactions: Set<string>) => {
+      try {
+        localStorage.setItem(
+          `reactions-${postId}`,
+          JSON.stringify([...reactions]),
+        );
+      } catch (error) {
+        console.warn("Failed to save reactions:", error);
+      }
+    },
+    [postId],
+  );
 
-  const handleReaction = useCallback(async (reactionName: string) => {
-    if (isLoading) return;
+  const handleReaction = useCallback(
+    async (reactionName: string) => {
+      if (isLoading) return;
 
-    setIsLoading(true);
-    const hasReacted = userReactions.has(reactionName);
-    const newReactions = new Set(userReactions);
-    const newCounts = { ...counts };
+      setIsLoading(true);
+      const hasReacted = userReactions.has(reactionName);
+      const newReactions = new Set(userReactions);
+      const newCounts = { ...counts };
 
-    if (hasReacted) {
-      // Remove reaction
-      newReactions.delete(reactionName);
-      newCounts[reactionName] = Math.max(0, (newCounts[reactionName] || 0) - 1);
-    } else {
-      // Add reaction
-      newReactions.add(reactionName);
-      newCounts[reactionName] = (newCounts[reactionName] || 0) + 1;
-    }
+      if (hasReacted) {
+        // Remove reaction
+        newReactions.delete(reactionName);
+        newCounts[reactionName] = Math.max(
+          0,
+          (newCounts[reactionName] || 0) - 1,
+        );
+      } else {
+        // Add reaction
+        newReactions.add(reactionName);
+        newCounts[reactionName] = (newCounts[reactionName] || 0) + 1;
+      }
 
-    // Update state optimistically
-    setUserReactions(newReactions);
-    setCounts(newCounts);
-    saveUserReactions(newReactions);
+      // Update state optimistically
+      setUserReactions(newReactions);
+      setCounts(newCounts);
+      saveUserReactions(newReactions);
 
-    // Here you could make an API call to persist to a backend
-    // For now, we'll just simulate a delay
-    await new Promise(resolve => setTimeout(resolve, 300));
-    
-    setIsLoading(false);
-    
-    // Show feedback
-    const reaction = reactions.find(r => r.name === reactionName);
-    if (reaction) {
-      toast.success(hasReacted ? `Removed ${reaction.label}` : `Added ${reaction.label}!`);
-    }
-  }, [isLoading, userReactions, counts, saveUserReactions]);
+      // Here you could make an API call to persist to a backend
+      // For now, we'll just simulate a delay
+      await new Promise((resolve) => setTimeout(resolve, 300));
 
-  const totalReactions = Object.values(counts).reduce((sum, count) => sum + count, 0);
+      setIsLoading(false);
+
+      // Show feedback
+      const reaction = reactions.find((r) => r.name === reactionName);
+      if (reaction) {
+        toast.success(
+          hasReacted ? `Removed ${reaction.label}` : `Added ${reaction.label}!`,
+        );
+      }
+    },
+    [isLoading, userReactions, counts, saveUserReactions],
+  );
+
+  const totalReactions = Object.values(counts).reduce(
+    (sum, count) => sum + count,
+    0,
+  );
 
   return (
     <div className={cn("flex items-center gap-1", className)}>
@@ -316,16 +333,14 @@ export function ReactionSystem({
                     "h-8 px-2 transition-all duration-200",
                     hasReacted && [
                       "bg-background shadow-sm scale-105",
-                      reaction.color
-                    ]
+                      reaction.color,
+                    ],
                   )}
                   aria-label={`${reaction.label} (${count})`}
                 >
                   <Icon className="h-4 w-4" />
                   {count > 0 && (
-                    <span className="ml-1 text-xs font-medium">
-                      {count}
-                    </span>
+                    <span className="ml-1 text-xs font-medium">{count}</span>
                   )}
                 </Button>
               </TooltipTrigger>
@@ -339,7 +354,7 @@ export function ReactionSystem({
 
       {totalReactions > 0 && (
         <span className="text-xs text-muted-foreground ml-2">
-          {totalReactions} reaction{totalReactions !== 1 ? 's' : ''}
+          {totalReactions} reaction{totalReactions !== 1 ? "s" : ""}
         </span>
       )}
     </div>
@@ -352,43 +367,48 @@ interface NewsletterSignupProps {
   compact?: boolean;
 }
 
-export function NewsletterSignup({ 
-  className, 
-  compact = false 
+export function NewsletterSignup({
+  className,
+  compact = false,
 }: NewsletterSignupProps): React.ReactElement {
   const [email, setEmail] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
 
-  const handleSubmit = useCallback(async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!email || isSubmitting) return;
+  const handleSubmit = useCallback(
+    async (e: React.FormEvent) => {
+      e.preventDefault();
+      if (!email || isSubmitting) return;
 
-    setIsSubmitting(true);
-    
-    // Simulate API call - replace with your newsletter service
-    try {
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      setIsSubmitted(true);
-      setEmail("");
-      toast.success("Thanks for subscribing!");
-      
-      // Reset after 3 seconds
-      setTimeout(() => setIsSubmitted(false), 3000);
-    } catch (error) {
-      toast.error("Failed to subscribe. Please try again.");
-    } finally {
-      setIsSubmitting(false);
-    }
-  }, [email, isSubmitting]);
+      setIsSubmitting(true);
+
+      // Simulate API call - replace with your newsletter service
+      try {
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+
+        setIsSubmitted(true);
+        setEmail("");
+        toast.success("Thanks for subscribing!");
+
+        // Reset after 3 seconds
+        setTimeout(() => setIsSubmitted(false), 3000);
+      } catch (error) {
+        toast.error("Failed to subscribe. Please try again.");
+      } finally {
+        setIsSubmitting(false);
+      }
+    },
+    [email, isSubmitting],
+  );
 
   if (isSubmitted) {
     return (
-      <div className={cn(
-        "flex items-center justify-center p-4 bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-800/30 rounded-lg text-green-700 dark:text-green-300",
-        className
-      )}>
+      <div
+        className={cn(
+          "flex items-center justify-center p-4 bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-800/30 rounded-lg text-green-700 dark:text-green-300",
+          className,
+        )}
+      >
         <Check className="h-5 w-5 mr-2" />
         <span className="font-medium">Successfully subscribed!</span>
       </div>
@@ -396,13 +416,13 @@ export function NewsletterSignup({
   }
 
   return (
-    <form 
-      onSubmit={handleSubmit} 
+    <form
+      onSubmit={handleSubmit}
       className={cn(
-        compact 
+        compact
           ? "flex gap-2 items-center"
           : "space-y-4 p-6 bg-muted/30 rounded-lg border",
-        className
+        className,
       )}
     >
       {!compact && (
@@ -424,13 +444,13 @@ export function NewsletterSignup({
           className={cn(
             "w-full px-3 py-2 bg-background border border-border rounded-md",
             "focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
-            "placeholder:text-muted-foreground"
+            "placeholder:text-muted-foreground",
           )}
         />
       </div>
 
-      <Button 
-        type="submit" 
+      <Button
+        type="submit"
         disabled={!email || isSubmitting}
         className={compact ? "shrink-0" : "w-full"}
       >

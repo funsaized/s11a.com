@@ -7,18 +7,20 @@ function calculateSimilarity(
   currentTags: string[],
   currentCategory: string | undefined,
   otherTags: string[],
-  otherCategory: string | undefined
+  otherCategory: string | undefined,
 ): number {
   let score = 0;
 
   // Tag similarity (weighted at 70%)
   if (currentTags.length > 0 && otherTags.length > 0) {
-    const currentTagSet = new Set(currentTags.map(tag => tag.toLowerCase()));
-    const otherTagSet = new Set(otherTags.map(tag => tag.toLowerCase()));
-    
-    const intersection = new Set([...currentTagSet].filter(tag => otherTagSet.has(tag)));
+    const currentTagSet = new Set(currentTags.map((tag) => tag.toLowerCase()));
+    const otherTagSet = new Set(otherTags.map((tag) => tag.toLowerCase()));
+
+    const intersection = new Set(
+      [...currentTagSet].filter((tag) => otherTagSet.has(tag)),
+    );
     const union = new Set([...currentTagSet, ...otherTagSet]);
-    
+
     const jaccardSimilarity = intersection.size / union.size;
     score += jaccardSimilarity * 0.7;
   }
@@ -43,7 +45,7 @@ export function findRelatedPosts(
     category?: string;
   },
   allPosts: PostEdge[],
-  limit: number = 4
+  limit: number = 4,
 ): RelatedPost[] {
   // Filter out the current post and calculate similarity scores
   const relatedPosts = allPosts
@@ -53,14 +55,15 @@ export function findRelatedPosts(
         currentPost.tags,
         currentPost.category,
         edge.node.frontmatter.tags,
-        edge.node.frontmatter.category
+        edge.node.frontmatter.category,
       );
 
       return {
         slug: edge.node.fields.slug,
         title: edge.node.frontmatter.title,
         excerpt: edge.node.excerpt,
-        thumbnail: edge.node.frontmatter.thumbnail?.childImageSharp?.gatsbyImageData,
+        thumbnail:
+          edge.node.frontmatter.thumbnail?.childImageSharp?.gatsbyImageData,
         tags: edge.node.frontmatter.tags,
         timeToRead: edge.node.timeToRead,
         date: edge.node.fields.date,
@@ -75,14 +78,21 @@ export function findRelatedPosts(
   if (relatedPosts.length < limit) {
     const recentPosts = allPosts
       .filter((edge) => edge.node.fields.slug !== currentPost.slug)
-      .filter((edge) => !relatedPosts.some(rp => rp.slug === edge.node.fields.slug))
-      .sort((a, b) => new Date(b.node.fields.date).getTime() - new Date(a.node.fields.date).getTime())
+      .filter(
+        (edge) => !relatedPosts.some((rp) => rp.slug === edge.node.fields.slug),
+      )
+      .sort(
+        (a, b) =>
+          new Date(b.node.fields.date).getTime() -
+          new Date(a.node.fields.date).getTime(),
+      )
       .slice(0, limit - relatedPosts.length)
       .map((edge) => ({
         slug: edge.node.fields.slug,
         title: edge.node.frontmatter.title,
         excerpt: edge.node.excerpt,
-        thumbnail: edge.node.frontmatter.thumbnail?.childImageSharp?.gatsbyImageData,
+        thumbnail:
+          edge.node.frontmatter.thumbnail?.childImageSharp?.gatsbyImageData,
         tags: edge.node.frontmatter.tags,
         timeToRead: edge.node.timeToRead,
         date: edge.node.fields.date,
@@ -116,7 +126,7 @@ export function formatRelativeDate(dateString: string): string {
   if (diffInDays < 7) return `${diffInDays} days ago`;
   if (diffInDays < 30) return `${Math.floor(diffInDays / 7)} weeks ago`;
   if (diffInDays < 365) return `${Math.floor(diffInDays / 30)} months ago`;
-  
+
   return date.toLocaleDateString("en-US", {
     year: "numeric",
     month: "short",

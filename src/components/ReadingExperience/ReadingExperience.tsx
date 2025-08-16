@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { 
+import {
   BookOpen,
-  Type, 
+  Type,
   Volume2,
   VolumeX,
   Printer,
@@ -11,20 +11,20 @@ import {
   Settings,
   Minus,
   Plus,
-  Palette
+  Palette,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { 
+import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { 
+import {
   Sheet,
   SheetContent,
   SheetHeader,
   SheetTitle,
-  SheetTrigger
+  SheetTrigger,
 } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
 import { useTheme } from "../../context/ThemeContext";
@@ -33,7 +33,7 @@ interface ReadingPreferences {
   fontSize: number;
   lineHeight: number;
   fontFamily: string;
-  readingWidth: 'narrow' | 'normal' | 'wide';
+  readingWidth: "narrow" | "normal" | "wide";
   readingMode: boolean;
   dyslexicFont: boolean;
 }
@@ -44,30 +44,30 @@ interface ReadingExperienceProps {
 }
 
 const fontFamilies = [
-  { name: 'Inter', value: 'font-sans', label: 'Sans Serif' },
-  { name: 'Georgia', value: 'font-serif', label: 'Serif' },
-  { name: 'JetBrains Mono', value: 'font-mono', label: 'Monospace' },
+  { name: "Inter", value: "font-sans", label: "Sans Serif" },
+  { name: "Georgia", value: "font-serif", label: "Serif" },
+  { name: "JetBrains Mono", value: "font-mono", label: "Monospace" },
 ];
 
 const widthOptions = [
-  { name: 'narrow', label: 'Narrow', maxWidth: '65ch' },
-  { name: 'normal', label: 'Normal', maxWidth: '75ch' },
-  { name: 'wide', label: 'Wide', maxWidth: '100ch' },
+  { name: "narrow", label: "Narrow", maxWidth: "65ch" },
+  { name: "normal", label: "Normal", maxWidth: "75ch" },
+  { name: "wide", label: "Wide", maxWidth: "100ch" },
 ] as const;
 
-export function ReadingExperience({ 
+export function ReadingExperience({
   articleId,
-  className 
+  className,
 }: ReadingExperienceProps): React.ReactElement {
   const [preferences, setPreferences] = useState<ReadingPreferences>({
     fontSize: 16,
     lineHeight: 1.6,
-    fontFamily: 'font-sans',
-    readingWidth: 'normal',
+    fontFamily: "font-sans",
+    readingWidth: "normal",
     readingMode: false,
     dyslexicFont: false,
   });
-  
+
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [isPreferencesOpen, setIsPreferencesOpen] = useState(false);
   const [speechSupported, setSpeechSupported] = useState(false);
@@ -76,53 +76,68 @@ export function ReadingExperience({
   // Load preferences from localStorage on mount
   useEffect(() => {
     try {
-      const saved = localStorage.getItem('reading-preferences');
+      const saved = localStorage.getItem("reading-preferences");
       if (saved) {
         const parsed = JSON.parse(saved);
-        setPreferences(prev => ({ ...prev, ...parsed }));
+        setPreferences((prev) => ({ ...prev, ...parsed }));
       }
     } catch (error) {
-      console.warn('Failed to load reading preferences:', error);
+      console.warn("Failed to load reading preferences:", error);
     }
 
     // Check speech synthesis support
-    setSpeechSupported('speechSynthesis' in window);
+    setSpeechSupported("speechSynthesis" in window);
   }, []);
 
   // Save preferences to localStorage
-  const updatePreferences = useCallback((updates: Partial<ReadingPreferences>) => {
-    const newPreferences = { ...preferences, ...updates };
-    setPreferences(newPreferences);
-    
-    try {
-      localStorage.setItem('reading-preferences', JSON.stringify(newPreferences));
-    } catch (error) {
-      console.warn('Failed to save reading preferences:', error);
-    }
-  }, [preferences]);
+  const updatePreferences = useCallback(
+    (updates: Partial<ReadingPreferences>) => {
+      const newPreferences = { ...preferences, ...updates };
+      setPreferences(newPreferences);
+
+      try {
+        localStorage.setItem(
+          "reading-preferences",
+          JSON.stringify(newPreferences),
+        );
+      } catch (error) {
+        console.warn("Failed to save reading preferences:", error);
+      }
+    },
+    [preferences],
+  );
 
   // Apply CSS custom properties for reading preferences
   useEffect(() => {
     const root = document.documentElement;
-    
-    root.style.setProperty('--reading-font-size', `${preferences.fontSize}px`);
-    root.style.setProperty('--reading-line-height', `${preferences.lineHeight}`);
-    root.style.setProperty('--reading-width', widthOptions.find(w => w.name === preferences.readingWidth)?.maxWidth || '75ch');
-    
+
+    root.style.setProperty("--reading-font-size", `${preferences.fontSize}px`);
+    root.style.setProperty(
+      "--reading-line-height",
+      `${preferences.lineHeight}`,
+    );
+    root.style.setProperty(
+      "--reading-width",
+      widthOptions.find((w) => w.name === preferences.readingWidth)?.maxWidth ||
+        "75ch",
+    );
+
     // Toggle reading mode class
     if (preferences.readingMode) {
-      document.body.classList.add('reading-mode');
+      document.body.classList.add("reading-mode");
     } else {
-      document.body.classList.remove('reading-mode');
+      document.body.classList.remove("reading-mode");
     }
-    
+
     // Apply font family to article content
-    const articleContent = articleId ? document.getElementById(articleId) : null;
+    const articleContent = articleId
+      ? document.getElementById(articleId)
+      : null;
     if (articleContent) {
       articleContent.className = cn(
         articleContent.className,
         preferences.fontFamily,
-        preferences.dyslexicFont && 'dyslexic-font'
+        preferences.dyslexicFont && "dyslexic-font",
       );
     }
   }, [preferences, articleId]);
@@ -137,16 +152,17 @@ export function ReadingExperience({
       return;
     }
 
-    const content = articleId 
+    const content = articleId
       ? document.getElementById(articleId)?.textContent
-      : document.querySelector('article')?.textContent || document.querySelector('main')?.textContent;
-    
+      : document.querySelector("article")?.textContent ||
+        document.querySelector("main")?.textContent;
+
     if (!content) return;
 
     const utterance = new SpeechSynthesisUtterance(content);
     utterance.rate = 0.9;
     utterance.pitch = 1;
-    
+
     utterance.onstart = () => setIsSpeaking(true);
     utterance.onend = () => setIsSpeaking(false);
     utterance.onerror = () => setIsSpeaking(false);
@@ -157,23 +173,25 @@ export function ReadingExperience({
   // Print functionality
   const handlePrint = useCallback(() => {
     // Apply print-friendly styles temporarily
-    document.body.classList.add('print-mode');
-    
+    document.body.classList.add("print-mode");
+
     setTimeout(() => {
       window.print();
-      document.body.classList.remove('print-mode');
+      document.body.classList.remove("print-mode");
     }, 100);
   }, []);
 
   // Export functionality (simplified - could be enhanced for different formats)
   const handleExport = useCallback(() => {
-    const content = articleId 
+    const content = articleId
       ? document.getElementById(articleId)?.innerHTML
-      : document.querySelector('article')?.innerHTML || '';
-    
+      : document.querySelector("article")?.innerHTML || "";
+
     if (!content) return;
 
-    const blob = new Blob([`
+    const blob = new Blob(
+      [
+        `
       <!DOCTYPE html>
       <html>
         <head>
@@ -190,12 +208,15 @@ export function ReadingExperience({
           ${content}
         </body>
       </html>
-    `], { type: 'text/html' });
-    
+    `,
+      ],
+      { type: "text/html" },
+    );
+
     const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
+    const a = document.createElement("a");
     a.href = url;
-    a.download = 'article.html';
+    a.download = "article.html";
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -211,10 +232,12 @@ export function ReadingExperience({
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => updatePreferences({ readingMode: !preferences.readingMode })}
+              onClick={() =>
+                updatePreferences({ readingMode: !preferences.readingMode })
+              }
               className={cn(
                 "h-8 w-8 p-0",
-                preferences.readingMode && "bg-accent"
+                preferences.readingMode && "bg-accent",
               )}
               aria-label="Toggle reading mode"
             >
@@ -226,7 +249,9 @@ export function ReadingExperience({
             </Button>
           </TooltipTrigger>
           <TooltipContent>
-            {preferences.readingMode ? "Exit reading mode" : "Enter reading mode"}
+            {preferences.readingMode
+              ? "Exit reading mode"
+              : "Enter reading mode"}
           </TooltipContent>
         </Tooltip>
 
@@ -238,10 +263,7 @@ export function ReadingExperience({
                 variant="ghost"
                 size="sm"
                 onClick={handleTextToSpeech}
-                className={cn(
-                  "h-8 w-8 p-0",
-                  isSpeaking && "bg-accent"
-                )}
+                className={cn("h-8 w-8 p-0", isSpeaking && "bg-accent")}
                 aria-label={isSpeaking ? "Stop reading" : "Read aloud"}
               >
                 {isSpeaking ? (
@@ -313,16 +335,22 @@ export function ReadingExperience({
                 Reading Preferences
               </SheetTitle>
             </SheetHeader>
-            
+
             <div className="mt-6 space-y-6">
               {/* Font Size */}
               <div>
-                <label className="text-sm font-medium mb-3 block">Font Size</label>
+                <label className="text-sm font-medium mb-3 block">
+                  Font Size
+                </label>
                 <div className="flex items-center gap-3">
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => updatePreferences({ fontSize: Math.max(12, preferences.fontSize - 2) })}
+                    onClick={() =>
+                      updatePreferences({
+                        fontSize: Math.max(12, preferences.fontSize - 2),
+                      })
+                    }
                     disabled={preferences.fontSize <= 12}
                     className="h-8 w-8 p-0"
                   >
@@ -334,7 +362,11 @@ export function ReadingExperience({
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => updatePreferences({ fontSize: Math.min(24, preferences.fontSize + 2) })}
+                    onClick={() =>
+                      updatePreferences({
+                        fontSize: Math.min(24, preferences.fontSize + 2),
+                      })
+                    }
                     disabled={preferences.fontSize >= 24}
                     className="h-8 w-8 p-0"
                   >
@@ -345,12 +377,18 @@ export function ReadingExperience({
 
               {/* Line Height */}
               <div>
-                <label className="text-sm font-medium mb-3 block">Line Height</label>
+                <label className="text-sm font-medium mb-3 block">
+                  Line Height
+                </label>
                 <div className="flex items-center gap-3">
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => updatePreferences({ lineHeight: Math.max(1.2, preferences.lineHeight - 0.1) })}
+                    onClick={() =>
+                      updatePreferences({
+                        lineHeight: Math.max(1.2, preferences.lineHeight - 0.1),
+                      })
+                    }
                     disabled={preferences.lineHeight <= 1.2}
                     className="h-8 w-8 p-0"
                   >
@@ -362,7 +400,11 @@ export function ReadingExperience({
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => updatePreferences({ lineHeight: Math.min(2.0, preferences.lineHeight + 0.1) })}
+                    onClick={() =>
+                      updatePreferences({
+                        lineHeight: Math.min(2.0, preferences.lineHeight + 0.1),
+                      })
+                    }
                     disabled={preferences.lineHeight >= 2.0}
                     className="h-8 w-8 p-0"
                   >
@@ -373,14 +415,22 @@ export function ReadingExperience({
 
               {/* Font Family */}
               <div>
-                <label className="text-sm font-medium mb-3 block">Font Family</label>
+                <label className="text-sm font-medium mb-3 block">
+                  Font Family
+                </label>
                 <div className="grid grid-cols-1 gap-2">
-                  {fontFamilies.map(font => (
+                  {fontFamilies.map((font) => (
                     <Button
                       key={font.value}
-                      variant={preferences.fontFamily === font.value ? "default" : "outline"}
+                      variant={
+                        preferences.fontFamily === font.value
+                          ? "default"
+                          : "outline"
+                      }
                       size="sm"
-                      onClick={() => updatePreferences({ fontFamily: font.value })}
+                      onClick={() =>
+                        updatePreferences({ fontFamily: font.value })
+                      }
                       className="justify-start"
                     >
                       <Type className="h-4 w-4 mr-2" />
@@ -392,14 +442,22 @@ export function ReadingExperience({
 
               {/* Reading Width */}
               <div>
-                <label className="text-sm font-medium mb-3 block">Reading Width</label>
+                <label className="text-sm font-medium mb-3 block">
+                  Reading Width
+                </label>
                 <div className="grid grid-cols-1 gap-2">
-                  {widthOptions.map(width => (
+                  {widthOptions.map((width) => (
                     <Button
                       key={width.name}
-                      variant={preferences.readingWidth === width.name ? "default" : "outline"}
+                      variant={
+                        preferences.readingWidth === width.name
+                          ? "default"
+                          : "outline"
+                      }
                       size="sm"
-                      onClick={() => updatePreferences({ readingWidth: width.name })}
+                      onClick={() =>
+                        updatePreferences({ readingWidth: width.name })
+                      }
                       className="justify-start"
                     >
                       {width.label}
@@ -411,14 +469,16 @@ export function ReadingExperience({
               {/* Reset to Defaults */}
               <Button
                 variant="outline"
-                onClick={() => updatePreferences({
-                  fontSize: 16,
-                  lineHeight: 1.6,
-                  fontFamily: 'font-sans',
-                  readingWidth: 'normal',
-                  readingMode: false,
-                  dyslexicFont: false,
-                })}
+                onClick={() =>
+                  updatePreferences({
+                    fontSize: 16,
+                    lineHeight: 1.6,
+                    fontFamily: "font-sans",
+                    readingWidth: "normal",
+                    readingMode: false,
+                    dyslexicFont: false,
+                  })
+                }
                 className="w-full"
               >
                 Reset to Defaults
@@ -432,32 +492,34 @@ export function ReadingExperience({
       <style jsx global>{`
         .reading-mode {
           --tw-bg-opacity: 1 !important;
-          background-color: ${resolvedTheme === 'dark' ? '#1a1a1a' : '#fafafa'} !important;
+          background-color: ${resolvedTheme === "dark"
+            ? "#1a1a1a"
+            : "#fafafa"} !important;
         }
-        
+
         .reading-mode .navbar,
         .reading-mode .sidebar,
         .reading-mode .footer,
         .reading-mode .reading-mode-hide {
           display: none !important;
         }
-        
+
         .reading-mode main {
           max-width: var(--reading-width) !important;
           margin: 0 auto !important;
           padding: 2rem !important;
         }
-        
+
         .reading-mode article {
           font-size: var(--reading-font-size) !important;
           line-height: var(--reading-line-height) !important;
         }
-        
+
         .print-mode * {
           color: black !important;
           background: white !important;
         }
-        
+
         .print-mode .navbar,
         .print-mode .sidebar,
         .print-mode .footer,

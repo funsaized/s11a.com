@@ -1,7 +1,24 @@
-"use client"
+"use client";
 
 import React, { useState, useEffect, useCallback } from "react";
 import { useStaticQuery, graphql, navigate } from "gatsby";
+import {
+  Search,
+  FileText,
+  FolderOpen,
+  Tag,
+  Home,
+  User,
+  Palette,
+  History,
+  Bookmark,
+  Settings,
+  Sun,
+  Moon,
+  Monitor,
+  Clock,
+  Star,
+} from "lucide-react";
 import { useTheme } from "../../context/ThemeContext";
 import {
   CommandDialog,
@@ -12,23 +29,6 @@ import {
   CommandItem,
   CommandShortcut,
 } from "@/components/ui/command";
-import { 
-  Search, 
-  FileText, 
-  FolderOpen, 
-  Tag, 
-  Home, 
-  User, 
-  Palette, 
-  History, 
-  Bookmark, 
-  Settings,
-  Sun,
-  Moon,
-  Monitor,
-  Clock,
-  Star
-} from "lucide-react";
 
 interface SearchResult {
   type: "post" | "category" | "tag" | "action" | "recent" | "bookmark";
@@ -47,7 +47,10 @@ interface SearchDialogProps {
   onOpenChange: (open: boolean) => void;
 }
 
-function SearchDialog({ open, onOpenChange }: SearchDialogProps): React.ReactElement {
+function SearchDialog({
+  open,
+  onOpenChange,
+}: SearchDialogProps): React.ReactElement {
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredResults, setFilteredResults] = useState<SearchResult[]>([]);
   const { theme, setTheme } = useTheme();
@@ -102,7 +105,7 @@ function SearchDialog({ open, onOpenChange }: SearchDialogProps): React.ReactEle
         action: () => navigate("/"),
       },
       {
-        type: "action", 
+        type: "action",
         title: "View About",
         slug: "/about",
         icon: <User className="h-4 w-4" />,
@@ -111,7 +114,7 @@ function SearchDialog({ open, onOpenChange }: SearchDialogProps): React.ReactEle
       {
         type: "action",
         title: "Browse Blog",
-        slug: "/blog", 
+        slug: "/blog",
         icon: <FileText className="h-4 w-4" />,
         action: () => navigate("/blog"),
       },
@@ -125,7 +128,7 @@ function SearchDialog({ open, onOpenChange }: SearchDialogProps): React.ReactEle
       },
       {
         type: "action",
-        title: "Switch to Dark Theme", 
+        title: "Switch to Dark Theme",
         slug: "",
         icon: <Moon className="h-4 w-4" />,
         action: () => setTheme("dark"),
@@ -199,7 +202,7 @@ function SearchDialog({ open, onOpenChange }: SearchDialogProps): React.ReactEle
     if (!searchTerm.trim()) {
       // Show quick actions and recent posts when no search term
       const quickActionsAndRecent = searchData.filter(
-        (item) => item.type === "action" || item.type === "recent"
+        (item) => item.type === "action" || item.type === "recent",
       );
       setFilteredResults(quickActionsAndRecent.slice(0, 15));
       return;
@@ -216,28 +219,38 @@ function SearchDialog({ open, onOpenChange }: SearchDialogProps): React.ReactEle
 
     // Sort results: actions first, then recent, posts, categories, tags
     const sorted = filtered.sort((a, b) => {
-      const typeOrder = { action: 0, recent: 1, post: 2, category: 3, tag: 4, bookmark: 5 };
+      const typeOrder = {
+        action: 0,
+        recent: 1,
+        post: 2,
+        category: 3,
+        tag: 4,
+        bookmark: 5,
+      };
       return typeOrder[a.type] - typeOrder[b.type];
     });
 
     setFilteredResults(sorted.slice(0, 20)); // Limit to 20 results
   }, [searchTerm, searchData]);
 
-  const handleSelect = useCallback((result: SearchResult) => {
-    onOpenChange(false);
-    setSearchTerm("");
-    
-    if (result.action) {
-      result.action();
-    } else if (result.slug) {
-      navigate(result.slug);
-    }
-  }, [onOpenChange]);
+  const handleSelect = useCallback(
+    (result: SearchResult) => {
+      onOpenChange(false);
+      setSearchTerm("");
+
+      if (result.action) {
+        result.action();
+      } else if (result.slug) {
+        navigate(result.slug);
+      }
+    },
+    [onOpenChange],
+  );
 
   const getIcon = (type: SearchResult["type"], item?: SearchResult) => {
     // Use custom icon if provided
     if (item?.icon) return item.icon;
-    
+
     switch (type) {
       case "post":
         return <FileText className="h-4 w-4" />;
@@ -272,13 +285,16 @@ function SearchDialog({ open, onOpenChange }: SearchDialogProps): React.ReactEle
   };
 
   // Group results by type
-  const groupedResults = filteredResults.reduce((acc, item) => {
-    if (!acc[item.type]) {
-      acc[item.type] = [];
-    }
-    acc[item.type].push(item);
-    return acc;
-  }, {} as Record<SearchResult["type"], SearchResult[]>);
+  const groupedResults = filteredResults.reduce(
+    (acc, item) => {
+      if (!acc[item.type]) {
+        acc[item.type] = [];
+      }
+      acc[item.type].push(item);
+      return acc;
+    },
+    {} as Record<SearchResult["type"], SearchResult[]>,
+  );
 
   // Handle keyboard shortcuts
   useEffect(() => {
@@ -312,10 +328,14 @@ function SearchDialog({ open, onOpenChange }: SearchDialogProps): React.ReactEle
       />
       <CommandList>
         <CommandEmpty>
-          {searchTerm ? `No results found for "${searchTerm}".` : "Start typing to search..."}
+          {searchTerm
+            ? `No results found for "${searchTerm}".`
+            : "Start typing to search..."}
         </CommandEmpty>
-        
-        {(["action", "recent", "post", "category", "tag", "bookmark"] as const).map((type) => {
+
+        {(
+          ["action", "recent", "post", "category", "tag", "bookmark"] as const
+        ).map((type) => {
           const items = groupedResults[type];
           if (!items || items.length === 0) return null;
 
@@ -338,11 +358,12 @@ function SearchDialog({ open, onOpenChange }: SearchDialogProps): React.ReactEle
                     )}
                   </div>
                   <div className="flex items-center gap-2">
-                    {(item.type === "post" || item.type === "recent") && item.category && (
-                      <div className="text-xs text-muted-foreground">
-                        {item.category}
-                      </div>
-                    )}
+                    {(item.type === "post" || item.type === "recent") &&
+                      item.category && (
+                        <div className="text-xs text-muted-foreground">
+                          {item.category}
+                        </div>
+                      )}
                     {item.shortcut && (
                       <CommandShortcut>{item.shortcut}</CommandShortcut>
                     )}
@@ -353,7 +374,7 @@ function SearchDialog({ open, onOpenChange }: SearchDialogProps): React.ReactEle
           );
         })}
       </CommandList>
-      
+
       <div className="border-t border-border p-2 text-xs text-muted-foreground">
         <div className="flex items-center justify-between">
           <span>Use ↑ ↓ to navigate</span>

@@ -1,15 +1,9 @@
 import React, { useMemo } from "react";
-import { 
-  Sparkles,
-  Clock,
-  TrendingUp,
-  Archive,
-  ArrowRight
-} from "lucide-react";
+import { Sparkles, Clock, TrendingUp, Archive, ArrowRight } from "lucide-react";
+import { useStaticQuery, graphql, navigate } from "gatsby";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
-import { useStaticQuery, graphql, navigate } from "gatsby";
 
 interface RelatedContentSidebarProps {
   currentPost?: {
@@ -20,9 +14,9 @@ interface RelatedContentSidebarProps {
   className?: string;
 }
 
-export function RelatedContentSidebar({ 
+export function RelatedContentSidebar({
   currentPost,
-  className 
+  className,
 }: RelatedContentSidebarProps): React.ReactElement {
   const data = useStaticQuery(graphql`
     query RelatedContentQuery {
@@ -61,40 +55,41 @@ export function RelatedContentSidebar({
       let score = 0;
 
       // Category match (high weight)
-      if (post.frontmatter.category && post.frontmatter.category === currentPost.category) {
+      if (
+        post.frontmatter.category &&
+        post.frontmatter.category === currentPost.category
+      ) {
         score += 10;
       }
 
       // Tag matches (medium weight)
-      const commonTags = post.frontmatter.tags?.filter((tag: string) => 
-        currentPost.tags.includes(tag)
-      ) || [];
+      const commonTags =
+        post.frontmatter.tags?.filter((tag: string) =>
+          currentPost.tags.includes(tag),
+        ) || [];
       score += commonTags.length * 5;
 
       // Recency boost (low weight)
       const daysSincePost = Math.floor(
-        (Date.now() - new Date(post.fields.date).getTime()) / (1000 * 60 * 60 * 24)
+        (Date.now() - new Date(post.fields.date).getTime()) /
+          (1000 * 60 * 60 * 24),
       );
       score += Math.max(0, 30 - daysSincePost) * 0.1;
 
       return { ...post, score };
     });
 
-    return postsWithScores
-      .sort((a, b) => b.score - a.score)
-      .slice(0, 5);
+    return postsWithScores.sort((a, b) => b.score - a.score).slice(0, 5);
   }, [data, currentPost]);
 
-  const recentPosts = useMemo(() => {
-    return data.posts.edges
+  const recentPosts = useMemo(() => data.posts.edges
       .map(({ node }: any) => node)
       .filter((post: any) => post.fields.slug !== currentPost?.slug)
-      .slice(0, 5);
-  }, [data, currentPost]);
+      .slice(0, 5), [data, currentPost]);
 
   const trendingTags = useMemo(() => {
     const tagCounts: Record<string, number> = {};
-    
+
     data.posts.edges.forEach(({ node }: any) => {
       node.frontmatter.tags?.forEach((tag: string) => {
         tagCounts[tag] = (tagCounts[tag] || 0) + 1;
@@ -102,7 +97,7 @@ export function RelatedContentSidebar({
     });
 
     return Object.entries(tagCounts)
-      .sort(([,a], [,b]) => b - a)
+      .sort(([, a], [, b]) => b - a)
       .slice(0, 10)
       .map(([tag, count]) => ({ tag, count }));
   }, [data]);
@@ -130,9 +125,9 @@ export function RelatedContentSidebar({
                   <Clock className="h-3 w-3" />
                   {post.timeToRead} min read
                   <span>•</span>
-                  {new Date(post.fields.date).toLocaleDateString('en-US', {
-                    month: 'short',
-                    day: 'numeric'
+                  {new Date(post.fields.date).toLocaleDateString("en-US", {
+                    month: "short",
+                    day: "numeric",
                   })}
                 </div>
               </div>
@@ -161,9 +156,9 @@ export function RelatedContentSidebar({
                 <Clock className="h-3 w-3" />
                 {post.timeToRead} min read
                 <span>•</span>
-                {new Date(post.fields.date).toLocaleDateString('en-US', {
-                  month: 'short',
-                  day: 'numeric'
+                {new Date(post.fields.date).toLocaleDateString("en-US", {
+                  month: "short",
+                  day: "numeric",
                 })}
               </div>
             </div>
@@ -183,7 +178,9 @@ export function RelatedContentSidebar({
               key={tag}
               variant="secondary"
               className="cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors"
-              onClick={() => navigate(`/tags/${tag.toLowerCase().replace(/\s+/g, '-')}`)}
+              onClick={() =>
+                navigate(`/tags/${tag.toLowerCase().replace(/\s+/g, "-")}`)
+              }
             >
               {tag} {count}
             </Badge>
@@ -200,7 +197,7 @@ export function RelatedContentSidebar({
         <Button
           variant="outline"
           size="sm"
-          onClick={() => navigate('/blog')}
+          onClick={() => navigate("/blog")}
           className="w-full justify-between"
         >
           View All Posts

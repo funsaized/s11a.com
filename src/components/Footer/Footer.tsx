@@ -6,8 +6,8 @@ function Footer(): React.ReactElement {
     <footer className="bg-background border-t border-border">
       <div className="container-custom py-6">
         <div className="flex justify-center items-center gap-6">
-          <a 
-            href="https://github.com/funsaized" 
+          <a
+            href="https://github.com/funsaized"
             title="Contribute on GitHub"
             className="opacity-70 hover:opacity-100 transition-opacity duration-200"
           >
@@ -20,8 +20,8 @@ function Footer(): React.ReactElement {
               placeholder="blurred"
             />
           </a>
-          <a 
-            href="https://www.netlify.com/" 
+          <a
+            href="https://www.netlify.com/"
             title="Hosted by Netlify"
             className="opacity-70 hover:opacity-100 transition-opacity duration-200"
           >
@@ -34,8 +34,8 @@ function Footer(): React.ReactElement {
               placeholder="blurred"
             />
           </a>
-          <a 
-            href="https://www.gatsbyjs.org/" 
+          <a
+            href="https://www.gatsbyjs.org/"
             title="Built with Gatsby"
             className="opacity-70 hover:opacity-100 transition-opacity duration-200"
           >

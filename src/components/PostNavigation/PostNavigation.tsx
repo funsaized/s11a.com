@@ -5,10 +5,10 @@ import { Button } from "../ui/button";
 import { Card, CardContent } from "../ui/card";
 import { PostNavigationProps } from "../../models";
 
-function PostNavigation({ 
-  previous, 
-  next, 
-  className 
+function PostNavigation({
+  previous,
+  next,
+  className,
 }: PostNavigationProps): React.ReactElement | null {
   if (!previous && !next) {
     return null;
@@ -52,7 +52,7 @@ function PostNavigation({
             </Card>
           </Link>
         ) : (
-          <div></div> // Empty div to maintain grid layout
+          <div /> // Empty div to maintain grid layout
         )}
       </div>
 
@@ -92,7 +92,7 @@ function PostNavigation({
             </Card>
           </Link>
         ) : (
-          <div></div> // Empty div to maintain grid layout
+          <div /> // Empty div to maintain grid layout
         )}
       </div>
     </nav>

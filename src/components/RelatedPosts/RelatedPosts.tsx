@@ -2,10 +2,20 @@ import React, { useMemo } from "react";
 import { Link } from "gatsby";
 import { GatsbyImage, getImage } from "gatsby-plugin-image";
 import { cn } from "../../lib/utils";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "../ui/card";
 import { Badge } from "../ui/badge";
 import { RelatedPostsProps } from "../../models";
-import { findRelatedPosts, formatReadingTime, formatRelativeDate } from "../../services/relatedPostsUtils";
+import {
+  findRelatedPosts,
+  formatReadingTime,
+  formatRelativeDate,
+} from "../../services/relatedPostsUtils";
 
 function RelatedPosts({
   currentPost,
@@ -13,9 +23,7 @@ function RelatedPosts({
   limit = 4,
   className,
 }: RelatedPostsProps): React.ReactElement | null {
-  const relatedPosts = useMemo(() => {
-    return findRelatedPosts(currentPost, allPosts, limit);
-  }, [currentPost, allPosts, limit]);
+  const relatedPosts = useMemo(() => findRelatedPosts(currentPost, allPosts, limit), [currentPost, allPosts, limit]);
 
   if (relatedPosts.length === 0) {
     return null;
@@ -29,11 +37,11 @@ function RelatedPosts({
           Discover more content you might find interesting
         </p>
       </div>
-      
+
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
         {relatedPosts.map((post) => {
           const thumbnail = post.thumbnail ? getImage(post.thumbnail) : null;
-          
+
           return (
             <Link
               key={post.slug}
@@ -51,11 +59,13 @@ function RelatedPosts({
                       />
                     ) : (
                       <div className="w-16 h-16 bg-muted rounded-lg flex items-center justify-center">
-                        <span className="text-muted-foreground text-lg">📄</span>
+                        <span className="text-muted-foreground text-lg">
+                          📄
+                        </span>
                       </div>
                     )}
                   </div>
-                  
+
                   <div className="flex-1 min-w-0">
                     <CardHeader className="p-0 space-y-1">
                       <CardTitle className="text-sm font-semibold line-clamp-2 hover:text-primary transition-colors">
@@ -68,19 +78,22 @@ function RelatedPosts({
                         {post.similarity > 0 && (
                           <>
                             <span>•</span>
-                            <Badge variant="secondary" className="h-4 px-1 text-xs">
+                            <Badge
+                              variant="secondary"
+                              className="h-4 px-1 text-xs"
+                            >
                               {Math.round(post.similarity * 100)}% match
                             </Badge>
                           </>
                         )}
                       </div>
                     </CardHeader>
-                    
+
                     <CardContent className="p-0 mt-2">
                       <CardDescription className="text-xs line-clamp-2">
                         {post.excerpt}
                       </CardDescription>
-                      
+
                       {post.tags.length > 0 && (
                         <div className="flex flex-wrap gap-1 mt-2">
                           {post.tags.slice(0, 2).map((tag) => (
@@ -93,7 +106,10 @@ function RelatedPosts({
                             </Badge>
                           ))}
                           {post.tags.length > 2 && (
-                            <Badge variant="outline" className="h-4 px-1 text-xs">
+                            <Badge
+                              variant="outline"
+                              className="h-4 px-1 text-xs"
+                            >
                               +{post.tags.length - 2}
                             </Badge>
                           )}

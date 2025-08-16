@@ -1,5 +1,5 @@
-import * as React from "react"
-import { Link } from "gatsby"
+import * as React from "react";
+import { Link } from "gatsby";
 import {
   Github,
   MessageCircle,
@@ -10,7 +10,7 @@ import {
   Dumbbell,
   Plane,
   Music,
-} from "lucide-react"
+} from "lucide-react";
 
 import {
   Sidebar,
@@ -24,16 +24,17 @@ import {
   SidebarMenuItem,
   SidebarRail,
   SidebarSeparator,
-} from "../ui/sidebar"
-import SearchTrigger from "../SearchTrigger/SearchTrigger"
-import SearchDialog from "../SearchDialog/SearchDialog"
+} from "../ui/sidebar";
+import SearchTrigger from "../SearchTrigger/SearchTrigger";
+import SearchDialog from "../SearchDialog/SearchDialog";
 
 // Sample data structure
 const data = {
   about: {
     title: "About Me",
-    description: "I'm Sai, software engineer and open-source creator. Software is my hobby 🎮",
-    emoji: "🎮"
+    description:
+      "I'm Sai, software engineer and open-source creator. Software is my hobby 🎮",
+    emoji: "🎮",
   },
   navMain: [
     {
@@ -46,7 +47,7 @@ const data = {
           isExternal: true,
         },
         {
-          title: "Threads", 
+          title: "Threads",
           url: "https://www.threads.com/@funsaized",
           icon: MessageCircle,
           isExternal: true,
@@ -81,7 +82,7 @@ const data = {
         },
         {
           title: "Cooking Experiments",
-          url: "/lifestyle/cooking", 
+          url: "/lifestyle/cooking",
           icon: ChefHat,
           isExternal: false,
         },
@@ -106,10 +107,10 @@ const data = {
       ],
     },
   ],
-}
+};
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const [searchOpen, setSearchOpen] = React.useState(false)
+  const [searchOpen, setSearchOpen] = React.useState(false);
 
   return (
     <>
@@ -125,7 +126,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             </SidebarGroupContent>
           </SidebarGroup>
         </SidebarHeader>
-        
+
         <SidebarContent>
           {/* About Me Section */}
           <SidebarGroup>
@@ -176,14 +177,14 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             </SidebarGroup>
           ))}
         </SidebarContent>
-        
+
         <SidebarRail />
       </Sidebar>
 
       {/* Search Dialog */}
       <SearchDialog open={searchOpen} onOpenChange={setSearchOpen} />
     </>
-  )
+  );
 }
 
-export default AppSidebar
+export default AppSidebar;
