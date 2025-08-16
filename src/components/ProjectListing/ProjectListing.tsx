@@ -1,7 +1,14 @@
 import React from "react";
 import GitHubButton from "../GitHubButton/GitHubButton";
 import { Project } from "../../models";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "../ui/card";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+  CardFooter,
+} from "../ui/card";
 
 interface ProjectListingProps {
   projects: Project[];

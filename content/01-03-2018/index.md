@@ -2,10 +2,10 @@
 title: "Luigi: An open source ETL tool..."
 slug: luigi-an-open-source-etl-tool
 cover: "https://unsplash.it/400/300/?random?AngelsofMist"
-category: "test3"
+category: "Development"
 categories:
-  - Data
-  - Code
+- Data
+- Code
 date: "01/03/2018"
 thumbnail: '../thumbnails/luigi.png'
 tags:

@@ -10,20 +10,15 @@ interface GitHubButtonProps {
   size?: "default" | "sm" | "lg" | "icon";
 }
 
-function GitHubButton({ 
-  href, 
-  children, 
+function GitHubButton({
+  href,
+  children,
   className = "",
   variant = "outline",
-  size = "default"
+  size = "default",
 }: GitHubButtonProps): React.ReactElement {
   return (
-    <Button
-      variant={variant}
-      size={size}
-      className={className}
-      asChild
-    >
+    <Button variant={variant} size={size} className={className} asChild>
       <a
         href={href}
         target="_blank"

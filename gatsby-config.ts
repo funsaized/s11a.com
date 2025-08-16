@@ -18,10 +18,18 @@ const gatsbyConfig: GatsbyConfig = {
       copyright: config.copyright,
     },
   },
+  // Enhanced performance optimizations
+  flags: {
+    DEV_SSR: false,
+  },
   headers: [
     {
       source: `/static/*`,
       headers: [
+        {
+          key: `Cache-Control`,
+          value: `public, max-age=31536000, immutable`,
+        },
         {
           key: `X-Frame-Options`,
           value: `SAMEORIGIN`,
@@ -36,9 +44,170 @@ const gatsbyConfig: GatsbyConfig = {
         },
       ],
     },
+    {
+      source: `**/*.{js,jsx,ts,tsx,css,woff,woff2,ttf,otf}`,
+      headers: [
+        {
+          key: `Cache-Control`,
+          value: `public, max-age=31536000, immutable`,
+        },
+      ],
+    },
+    {
+      source: `**/*.{jpg,jpeg,png,gif,ico,svg,webp,avif}`,
+      headers: [
+        {
+          key: `Cache-Control`,
+          value: `public, max-age=31536000, immutable`,
+        },
+      ],
+    },
   ],
   plugins: [
-    "gatsby-plugin-sitemap",
+    // Bundle analyzer for development insights
+    ...(process.env.ANALYZE
+      ? [
+          {
+            resolve: "gatsby-plugin-webpack-bundle-analyser-v2",
+            options: {
+              analyzerMode: "server",
+              analyzerPort: 8080,
+              openAnalyzer: true,
+            },
+          },
+        ]
+      : []),
+    {
+      resolve: "gatsby-plugin-sitemap",
+      options: {
+        excludes: [
+          "/dev-404-page/",
+          "/404/",
+          "/404.html",
+          "/offline-plugin-app-shell-fallback/",
+        ],
+        query: `
+          {
+            site {
+              siteMetadata {
+                siteUrl
+              }
+            }
+            allSitePage {
+              nodes {
+                path
+                pageContext
+              }
+            }
+            allMarkdownRemark {
+              nodes {
+                fields {
+                  slug
+                  date
+                }
+                frontmatter {
+                  date
+                  title
+                }
+                parent {
+                  ... on File {
+                    modifiedTime(formatString: "YYYY-MM-DD")
+                  }
+                }
+              }
+            }
+          }
+        `,
+        resolveSiteUrl: () => config.siteUrl,
+        resolvePages: ({
+          allSitePage: { nodes: allPages },
+          allMarkdownRemark: { nodes: allPosts },
+        }: any) => {
+          // Create a map of blog post data by slug for quick lookup
+          const postDataMap = allPosts.reduce((acc: any, post: any) => {
+            if (post.fields?.slug) {
+              // Ensure the slug matches the URL path format
+              const slug = post.fields.slug.endsWith("/")
+                ? post.fields.slug
+                : `${post.fields.slug}/`;
+              acc[slug] = {
+                modifiedTime: post.parent?.modifiedTime,
+                date: post.frontmatter?.date || post.fields?.date,
+              };
+            }
+            return acc;
+          }, {});
+
+          // Map all pages with their metadata
+          return allPages.map((page: any) => {
+            // Get the blog post data if this is a blog post page
+            const postData = postDataMap[page.path];
+
+            // Determine if this is a blog post (not a tag, category, or static page)
+            const isBlogPost =
+              postData &&
+              !page.path.includes("/tags/") &&
+              !page.path.includes("/categories/") &&
+              page.path !== "/" &&
+              page.path !== "/blog/" &&
+              page.path !== "/about/";
+
+            return {
+              path: page.path,
+              // Use modified time if available, otherwise use post date for blog posts
+              lastmod: isBlogPost
+                ? postData.modifiedTime || postData.date
+                : undefined,
+              // Set changefreq based on page type
+              changefreq: (() => {
+                if (page.path === "/") return "daily";
+                if (page.path === "/blog/") return "weekly";
+                if (page.path.includes("/tags/")) return "monthly";
+                if (page.path.includes("/categories/")) return "monthly";
+                if (isBlogPost) return "monthly";
+                return "weekly";
+              })(),
+              // Set priority based on page importance
+              priority: (() => {
+                if (page.path === "/") return 1.0;
+                if (page.path === "/blog/") return 0.9;
+                if (page.path === "/about/") return 0.8;
+                if (isBlogPost) return 0.7;
+                if (page.path.includes("/tags/")) return 0.5;
+                if (page.path.includes("/categories/")) return 0.5;
+                return 0.6;
+              })(),
+            };
+          });
+        },
+        serialize: (page: any) => ({
+          url: page.path,
+          lastmod: page.lastmod,
+          changefreq: page.changefreq,
+          priority: page.priority,
+        }),
+      },
+    },
+    {
+      resolve: "gatsby-plugin-robots-txt",
+      options: {
+        host: config.siteUrl,
+        sitemap: `${config.siteUrl}/sitemap.xml`,
+        policy: [
+          {
+            userAgent: "*",
+            allow: "/",
+            disallow: [
+              "/dev-404-page/",
+              "/404/",
+              "/404.html",
+              "/offline-plugin-app-shell-fallback/",
+            ],
+            crawlDelay: 2,
+          },
+        ],
+      },
+    },
     "gatsby-disable-404",
     "gatsby-plugin-postcss", // Add PostCSS plugin for Tailwind
     "gatsby-plugin-react-helmet",
@@ -63,13 +232,15 @@ const gatsbyConfig: GatsbyConfig = {
           {
             resolve: "gatsby-remark-images",
             options: {
-              maxWidth: 690,
-              quality: 90,
+              maxWidth: 1200,
+              quality: 85,
               withWebp: true,
+              withAvif: true,
               loading: "lazy",
               linkImagesToOriginal: false,
               showCaptions: false,
               backgroundColor: "transparent",
+              srcSetBreakpoints: [200, 340, 520, 890, 1200],
             },
           },
           {
@@ -116,8 +287,50 @@ const gatsbyConfig: GatsbyConfig = {
         color: config.themeColor,
       },
     },
-    "gatsby-plugin-image",
-    "gatsby-plugin-sharp",
+    {
+      resolve: "gatsby-plugin-image",
+      options: {
+        defaults: {
+          formats: ["auto", "webp", "avif"],
+          quality: 85,
+          loading: "lazy",
+          placeholder: "blurred",
+          breakpoints: [750, 1080, 1366, 1920],
+        },
+      },
+    },
+    {
+      resolve: "gatsby-plugin-sharp",
+      options: {
+        defaults: {
+          formats: ["auto", "webp", "avif"],
+          quality: 85,
+          placeholder: "blurred",
+          breakpoints: [750, 1080, 1366, 1920],
+        },
+        // Enhanced AVIF encoding
+        avifOptions: {
+          quality: 75,
+          lossless: false,
+          effort: 4,
+        },
+        // Optimized WebP encoding
+        webpOptions: {
+          quality: 85,
+          lossless: false,
+        },
+        // JPEG optimization
+        jpgOptions: {
+          quality: 85,
+          progressive: true,
+        },
+        // PNG optimization
+        pngOptions: {
+          quality: 90,
+          compressionSpeed: 4,
+        },
+      },
+    },
     "gatsby-transformer-sharp",
     "gatsby-plugin-catch-links",
     {
@@ -143,9 +356,23 @@ const gatsbyConfig: GatsbyConfig = {
         precachePages: ["/", "/blog/*", "/about/"],
         workboxConfig: {
           globPatterns: [
-            "**/*.{js,jpg,png,gif,html,css,webp,woff,woff2,ttf,svg,ico}",
+            "**/*.{js,jpg,png,gif,html,css,webp,avif,woff,woff2,ttf,svg,ico}",
           ],
-          maximumFileSizeToCacheInBytes: 5 * 1024 * 1024, // 5MB
+          maximumFileSizeToCacheInBytes: 8 * 1024 * 1024, // 8MB for modern formats
+          runtimeCaching: [
+            {
+              urlPattern: /^https?:.*\/page-data\/.*\.json$/,
+              handler: "CacheFirst",
+            },
+            {
+              urlPattern: /^https?:.*\.(png|jpg|jpeg|webp|avif|svg|gif|tiff)$/i,
+              handler: "CacheFirst",
+            },
+            {
+              urlPattern: /^https?:.*\.(woff|woff2|ttf|otf)$/i,
+              handler: "CacheFirst",
+            },
+          ],
         },
       },
     },

@@ -2,7 +2,7 @@
 title: "T.I.G: JavaScript push to the beginning of an array"
 slug: javascript-push-to-the-beginning-of-an-array
 cover: "https://unsplash.it/400/300/?random?AngelsofMist"
-category: "test3"
+category: "Development"
 categories:
   - ThingsIGoogled
   - Code

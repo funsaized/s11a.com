@@ -2,7 +2,7 @@
 title: "A CSS snippet for a responsive list of items"
 slug: a-css-snippet-for-a-responsive-list-of-items
 cover: "https://unsplash.it/400/300/?random?AngelsofMist"
-category: "test3"
+category: "Frontend"
 categories:
   - Code
   - Frontend

@@ -33,4 +33,9 @@ export interface Config {
   copyright: string; // Copyright string for the footer of the website and RSS feed.
   themeColor: string; // Used for setting manifest and progress theme colors.
   backgroundColor: string; // Used for setting manifest background color.
+  // SEO enhancements
+  siteFBAppID?: string; // Facebook App ID for Open Graph
+  siteLanguage?: string; // Website language
+  siteLocale?: string; // Website locale
+  twitterHandle?: string; // Twitter handle with @
 }

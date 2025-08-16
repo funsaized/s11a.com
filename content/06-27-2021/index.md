@@ -2,13 +2,14 @@
 title: "Building a github bot with Go"
 slug: creating-a-github-bot-with-go
 cover: "../thumbnails/octocat.jpg"
-category: "test3"
+category: "Development"
 categories:
-  - Code
+  - Development
   - Backend
-  - Cloud
+  - Automation
 date: "06/27/2021"
 thumbnail: "../thumbnails/octocat.jpg"
+description: "Build a GitHub bot using Go programming language. Step-by-step tutorial covering API integration and webhook handling."
 tags:
   - go
   - automation

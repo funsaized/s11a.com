@@ -2,7 +2,7 @@
 title: "A Spring Batch quickstarter"
 slug: a-spring-batch-quickstarter
 cover: "https://unsplash.it/400/300/?random?AngelsofMist"
-category: "test3"
+category: "Development"
 categories:
     - Code
     - Backend

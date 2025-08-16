@@ -1,6 +1,6 @@
-import { onCLS, onINP, onLCP, onFCP, onTTFB } from 'web-vitals';
-import React from 'react';
-import { ThemeProvider } from './src/context/ThemeContext';
+import { onCLS, onINP, onLCP, onFCP, onTTFB } from "web-vitals";
+import React from "react";
+import { ThemeProvider } from "./src/context/ThemeContext";
 
 // Lazy load images that are not in viewport & Initialize Web Vitals
 export const onClientEntry = () => {
@@ -8,19 +8,24 @@ export const onClientEntry = () => {
   if (typeof window !== "undefined" && !window.IntersectionObserver) {
     import("intersection-observer");
   }
-  
+
   // Web Vitals monitoring
   if (typeof window !== "undefined") {
     const sendToAnalytics = (metric) => {
       // Log to console in development
       if (process.env.NODE_ENV === "development") {
-        console.log(`[Web Vitals] ${metric.name}:`, metric.value.toFixed(2), metric.rating || 'N/A');
+        // eslint-disable-next-line no-console
+        console.log(
+          `[Web Vitals] ${metric.name}:`,
+          metric.value.toFixed(2),
+          metric.rating || "N/A",
+        );
       }
-      
+
       // You can send to your analytics service here
       // Example: window.gtag('event', metric.name, { value: metric.value, rating: metric.rating });
     };
-    
+
     onCLS(sendToAnalytics);
     onINP(sendToAnalytics); // INP replaced FID in web-vitals v5
     onLCP(sendToAnalytics);
@@ -33,6 +38,7 @@ export const onClientEntry = () => {
 export const onRouteUpdate = ({ location, prevLocation }) => {
   if (process.env.NODE_ENV === "production" && typeof window !== "undefined") {
     // Track page views if needed
+    // eslint-disable-next-line no-console
     console.log("Route changed from", prevLocation, "to", location);
   }
 };
@@ -52,6 +58,7 @@ export const onPrefetchPathname = ({ pathname }) => {
 
 // Service worker updates
 export const onServiceWorkerUpdateReady = () => {
+  // eslint-disable-next-line no-alert
   const answer = window.confirm(
     "This application has been updated. Reload to display the latest version?",
   );
@@ -61,10 +68,6 @@ export const onServiceWorkerUpdateReady = () => {
 };
 
 // Wrap root element with theme provider
-export const wrapRootElement = ({ element }) => {
-  return (
-    <ThemeProvider defaultTheme="system">
-      {element}
-    </ThemeProvider>
-  );
-};
+export const wrapRootElement = ({ element }) => (
+  <ThemeProvider defaultTheme="system">{element}</ThemeProvider>
+);

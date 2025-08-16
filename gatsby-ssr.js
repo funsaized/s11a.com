@@ -1,14 +1,10 @@
-import React from 'react';
-import { ThemeProvider } from './src/context/ThemeContext';
+import React from "react";
+import { ThemeProvider } from "./src/context/ThemeContext";
 
 // Wrap root element with theme provider for SSR
-export const wrapRootElement = ({ element }) => {
-  return (
-    <ThemeProvider defaultTheme="system">
-      {element}
-    </ThemeProvider>
-  );
-};
+export const wrapRootElement = ({ element }) => (
+  <ThemeProvider defaultTheme="system">{element}</ThemeProvider>
+);
 
 // Inject initial theme script to prevent FOUC (Flash of Unstyled Content)
 export const onRenderBody = ({ setHeadComponents }) => {
@@ -43,9 +39,6 @@ export const onRenderBody = ({ setHeadComponents }) => {
   `;
 
   setHeadComponents([
-    <script
-      key="theme-init"
-      dangerouslySetInnerHTML={{ __html: script }}
-    />
+    <script key="theme-init" dangerouslySetInnerHTML={{ __html: script }} />,
   ]);
 };

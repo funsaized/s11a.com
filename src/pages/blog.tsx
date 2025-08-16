@@ -111,6 +111,7 @@ function BlogPage({ data }: BlogPageProps): React.ReactElement {
               return (
                 <button
                   key={category.fieldValue}
+                  type="button"
                   className={`px-3 py-1 rounded-full text-sm transition-colors ${
                     active
                       ? "bg-primary text-primary-foreground"

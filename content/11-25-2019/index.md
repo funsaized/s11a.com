@@ -2,7 +2,7 @@
 title: "Speedy, secured site hosting made easy on AWS"
 slug: speedy-secured-site-hosting-made-easy-on-aws
 cover: "https://unsplash.it/400/300/?random?AngelsofMist"
-category: "test3"
+category: "Cloud"
 categories:
   - Cloud
   - Code

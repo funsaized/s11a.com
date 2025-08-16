@@ -2,7 +2,7 @@
 title: "Building a batch pipeline with Java #1: crash course in Spring Batch"
 slug: building-a-batch-pipeline-01-crash-course-in-spring-batch
 cover: "https://unsplash.it/400/300/?random?AngelsofMist"
-category: "test3"
+category: "Development"
 categories:
     - Code
     - Backend

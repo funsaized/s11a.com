@@ -14,7 +14,8 @@ const projects: Project[] = [
     title: "OctoAgenda",
     path: "https://octoagenda.s11a.com",
     source: "https://github.com/funsaized/OctoAgenda",
-    description: "Scrape events from any source on the web and export to iCal (.ics)",
+    description:
+      "Scrape events from any source on the web and export to iCal (.ics)",
   },
   {
     icon: "☕",
@@ -51,7 +52,8 @@ const projects: Project[] = [
     title: "Reactive Snakes",
     path: "https://ng-reactive-snakes.s11a.com",
     source: "https://github.com/funsaized/ng-reactive-snake",
-    description: "The classic game of snake! Built as a reference implementation of thinking reactively with RxJS",
+    description:
+      "The classic game of snake! Built as a reference implementation of thinking reactively with RxJS",
   },
   {
     icon: "🚧",

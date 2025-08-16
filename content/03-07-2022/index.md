@@ -2,7 +2,7 @@
 title: "Building a batch pipeline with Java #2: writing the job"
 slug: bilding-a-batch-pipeline-with-java-2-writing-the-job
 cover: "../thumbnails/batchprocessing.png"
-category: "test3"
+category: "Development"
 categories:
   - Code
   - Backend

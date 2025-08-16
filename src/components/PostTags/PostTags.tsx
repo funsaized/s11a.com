@@ -17,8 +17,8 @@ function PostTags({ tags }: PostTagsProps): React.ReactElement {
             to={`/tags/${kebabCase(tag)}`}
             className="no-underline"
           >
-            <Badge 
-              variant="secondary" 
+            <Badge
+              variant="secondary"
               className="hover:bg-primary hover:text-primary-foreground transition-colors cursor-pointer"
             >
               {tag}
