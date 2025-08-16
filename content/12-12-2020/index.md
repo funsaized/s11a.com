@@ -2,7 +2,7 @@
 title: "Rapid development & accessible dropdowns with Downshift"
 slug: rapid-development-and-accessible-dropdowns-with-downshit
 cover: "https://unsplash.it/400/300/?random?AngelsofMist"
-category: "test3"
+category: "Development"
 categories:
     - Code
     - Frontend

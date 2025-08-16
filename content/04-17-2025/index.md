@@ -2,7 +2,7 @@
 title: "Testing Routes Secured with OAuth 2.0 and Passport.js"
 slug: testing-routes-secured-with-oauth2-and-passportjs
 cover: "../thumbnails/nodejs.png"
-category: "test3"
+category: "Development"
 categories:
   - Code
   - Backend

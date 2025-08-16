@@ -2,7 +2,7 @@
 title: "Migrating my hosting to Netlify"
 slug: migrating-my-hosting-to-netlify
 cover: "https://unsplash.it/400/300/?random?AngelsofMist"
-category: "test3"
+category: "Cloud"
 categories:
   - Cloud
   - Personal

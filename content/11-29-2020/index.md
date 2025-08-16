@@ -2,7 +2,7 @@
 title: "Speeding up my Postman workflow with scripts"
 slug: speeding-up-my-postman-workflow-with-scripts
 cover: "https://unsplash.it/400/300/?random?AngelsofMist"
-category: "test3"
+category: "Development"
 categories:
   - Data
   - ThingsIGoogled
