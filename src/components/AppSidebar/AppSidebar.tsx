@@ -5,7 +5,7 @@ import {
   MessageCircle,
   Rss,
   StickyNote,
-  Briefcase,
+  // Briefcase,
   ChefHat,
   Dumbbell,
   Plane,
@@ -44,19 +44,16 @@ const data = {
           title: "GitHub",
           url: "https://github.com/funsaized",
           icon: Github,
-          isExternal: true,
         },
         {
           title: "Threads",
           url: "https://www.threads.com/@funsaized",
           icon: MessageCircle,
-          isExternal: true,
         },
         {
           title: "RSS Feed",
           url: "/rss.xml",
           icon: Rss,
-          isExternal: false,
         },
       ],
     },
@@ -67,7 +64,6 @@ const data = {
           title: "Notes",
           url: "/notes",
           icon: StickyNote,
-          isExternal: false,
         },
       ],
     },
@@ -75,46 +71,42 @@ const data = {
       title: "Lifestyle (coming soon...)",
       items: [
         {
-          title: "Productivity & Workflows",
-          url: "/lifestyle/productivity",
-          icon: Briefcase,
-          isExternal: false,
-        },
-        {
-          title: "Cooking Experiments",
-          url: "/lifestyle/cooking",
-          icon: ChefHat,
-          isExternal: false,
-        },
-        {
-          title: "Fitness Journey",
+          title: "Fitness",
           url: "/lifestyle/fitness",
           icon: Dumbbell,
-          isExternal: false,
         },
+        // {
+        //   title: "Productivity & Workflows",
+        //   url: "/lifestyle/productivity",
+        //   icon: Briefcase,
+        // },
+        {
+          title: "Cooking, Grocery, etc",
+          url: "/lifestyle/cooking",
+          icon: ChefHat,
+        },
+
         {
           title: "Travel Adventures",
           url: "/lifestyle/travel",
           icon: Plane,
-          isExternal: false,
         },
         {
           title: "Music & Playlists",
           url: "/lifestyle/music",
           icon: Music,
-          isExternal: false,
         },
       ],
     },
   ],
 };
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+function AppSidebar() {
   const [searchOpen, setSearchOpen] = React.useState(false);
 
   return (
     <>
-      <Sidebar collapsible="icon" {...props}>
+      <Sidebar collapsible="icon">
         <SidebarHeader>
           <SidebarGroup>
             <SidebarGroupContent>
@@ -154,21 +146,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   {section.items.map((item) => (
                     <SidebarMenuItem key={item.title}>
                       <SidebarMenuButton asChild tooltip={item.title}>
-                        {item.isExternal ? (
-                          <a
-                            href={item.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                          >
-                            <item.icon />
-                            <span>{item.title}</span>
-                          </a>
-                        ) : (
-                          <Link to={item.url}>
-                            <item.icon />
-                            <span>{item.title}</span>
-                          </Link>
-                        )}
+                        <Link to={item.url}>
+                          <item.icon />
+                          <span>{item.title}</span>
+                        </Link>
                       </SidebarMenuButton>
                     </SidebarMenuItem>
                   ))}
