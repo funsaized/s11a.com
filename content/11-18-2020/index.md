@@ -15,6 +15,7 @@ tags:
   - Set
 time: "2 min"
 type: "post"
+description: "Quick JavaScript tip: Use unshift() to add elements to the beginning of an array, improving UX in admin interfaces and data tables."
 ---
 
 ## Things I googled ...

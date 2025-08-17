@@ -15,6 +15,7 @@ tags:
     - Tools
 time: "5 min"
 type: "post"
+description: "Automate API workflows with Postman's Node.js scripting environment, using pre-request scripts to handle authentication tokens dynamically."
 ---
 
 

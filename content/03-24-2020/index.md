@@ -14,6 +14,7 @@ tags:
   - Flexbox
 time: "3 min"
 type: "post"
+description: "Create responsive item lists with CSS Grid using auto-fit and minmax for flexible, maintainable layouts that adapt to any screen size."
 ---
 
 ## Starting a collection ...

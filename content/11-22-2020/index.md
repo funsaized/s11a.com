@@ -14,6 +14,7 @@ tags:
   - responsive
 time: "5 min"
 type: "post"
+description: "Recreate Discord's login form using styled-components, exploring CSS-in-JS patterns, prop-based styling, and responsive design techniques."
 ---
 
 ## [styled-components](https://styled-components.com/) 

@@ -14,6 +14,7 @@ tags:
     - openshift
 time: "15 min"
 type: "post"
+description: "Learn how to serve static content using NGINX with persistent volumes on OpenShift, featuring Kubernetes objects configuration and deployment patterns."
 ---
 # Serving static content simplified
 

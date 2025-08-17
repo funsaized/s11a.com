@@ -16,6 +16,7 @@ tags:
     - Java
 time: "3 min"
 type: "post"
+description: "A flexible Spring Batch project template with Spring Cloud Dataflow integration, offering modern Java-based batch processing patterns."
 ---
 
 ## What's the deal with Spring Batch?

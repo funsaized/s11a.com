@@ -9,13 +9,13 @@ const config: Config = {
   repo: "https://github.com/funsaized/s11a.com",
   pathPrefix: "", // Prefixes all links. For cases when deployed to example.github.io/gatsby-advanced-starter/.
   siteDescription:
-    "Personal blog by Sai Nimmagadda focusing on software development, cloud architecture, and modern web technologies. Explore tutorials, insights, and code examples.", // Website description used for RSS feeds/meta description tag.
+    "Personal blog by Sai Nimmagadda focusing on software development & the modern web, cloud architecture, and lifestyle. Explore tutorials, insights, and workflows.", // Website description used for RSS feeds/meta description tag.
   siteRss: "/rss.xml", // Path to the RSS file.
   postDefaultCategoryID: "Tech", // Default category for posts.
   dateFromFormat: "MM-DD-YYYY", // Date format used in the frontmatter.
   dateFormat: "MMMM Do, YYYY", // Date format for display.
-  userName: "Sai N/ Nimmagadda", // Username to display in the author segment.
-  userEmail: "saiguy@me.com", // Email used for RSS feed's author segment
+  userName: "Sai N. Nimmagadda", // Username to display in the author segment.
+  userEmail: "saiguy@icloud.com", // Email used for RSS feed's author segment
   userTwitter: "Funsaized", // Optionally renders "Follow Me" in the UserInfo segment.
   userLocation: "NC, USA", // User location to display in the author segment.
   userAvatar: "https://api.adorable.io/avatars/150/test.png", // User avatar to display in the author segment.
@@ -48,7 +48,7 @@ const config: Config = {
       link: "/blog/",
     },
   ],
-  copyright: "Copyright © 2024. Sai Nimmagadda", // Copyright string for the footer of the website and RSS feed.
+  copyright: "Copyright © 2025. Sai Nimmagadda", // Copyright string for the footer of the website and RSS feed.
   themeColor: "#9dd4cf", // Used for setting manifest and progress theme colors.
   backgroundColor: "#e0e0e0", // Used for setting manifest background color.
   // SEO enhancements

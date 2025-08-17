@@ -13,6 +13,7 @@ tags:
     - other
 time: "10 min"
 type: "post"
+description: "Explore Luigi, a Python workflow management system from Spotify, for building production-ready data pipelines with dependency management and error recovery."
 ---
 
 ## The "Problem"

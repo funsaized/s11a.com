@@ -1,5 +1,5 @@
 ---
-title: "Building a batch pipeline with Java #1: crash course in Spring Batch"
+title: "Batch pipeline with Java #1: Spring Batch crash course"
 slug: building-a-batch-pipeline-01-crash-course-in-spring-batch
 cover: "https://unsplash.it/400/300/?random?AngelsofMist"
 category: "Development"
@@ -16,6 +16,7 @@ tags:
     - Java
 time: "20 min"
 type: "post"
+description: "Master Spring Batch fundamentals with practical examples, building a multi-threaded pipeline to process Stack Exchange data dumps into MySQL."
 ---
 
 The last post took look at a Spring Batch project template to get off the ground quickly. In this series we're going to take it a step further and use the starter to build out a batch job. We won't focus too much here on the implementation of the framework itself ([docs do a good job of that](https://docs.spring.io/spring-batch/docs/4.3.x/reference/html/domain.html#domainLanguageOfBatch)), but rather practical descriptions and use-cases to quickly enable yourself to build robust batch jobs for enterprise apps.

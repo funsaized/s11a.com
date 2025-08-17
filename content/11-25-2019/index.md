@@ -15,6 +15,7 @@ tags:
     - Route53
 time: "7 min"
 type: "post"
+description: "Host a secure static website on AWS free tier using S3, CloudFront, Route53, and Certificate Manager for custom domains and HTTPS."
 ---
 
 I recently migrated this site's hosting to AWS and was pleasantly surprised to find that you can host a static, secure website with a custom domain on the AWS free tier (not including the cost of the domain). Hosting on AWS can be done with a number of services but for this example we'll be using the following:

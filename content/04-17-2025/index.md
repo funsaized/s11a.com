@@ -16,6 +16,7 @@ tags:
   - Testing
 time: "5 min"
 type: "post"
+description: "Test OAuth 2.0 protected routes in Node.js using a custom Passport.js strategy, avoiding HTTP requests to authentication providers during testing."
 ---
 
 I recently started poking at the developer experience of the Node.js world. As a Java dev by day, I wanted to learn the JS community patterns on a lower level. I went through the exercise of standing up an Express.js + Passport.js server for a project

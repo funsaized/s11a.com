@@ -15,6 +15,7 @@ tags:
     - react
 time: "7 min"
 type: "post"
+description: "Build accessible, searchable dropdowns with Downshift's render props pattern, providing flexible control and keyboard navigation out of the box."
 ---
 
 ## Flexible and fast development

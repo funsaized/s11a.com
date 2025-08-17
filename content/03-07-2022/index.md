@@ -16,6 +16,7 @@ tags:
   - Java
 time: "15 min"
 type: "post"
+description: "Build a complete Spring Batch pipeline to ingest Stack Exchange data dumps into MySQL, demonstrating real-world batch processing patterns."
 ---
 
 The [first post in this series](https://s11a.com/building-a-batch-pipeline-01-crash-course-in-spring-batch) went over some fundamental concepts and interfaces you will encounter as a developer using Spring Batch. Now, let's build on those ideas to construct a full batch pipeline. Hopefully this can serve as a reference for how quickly a Java developer can build batch jobs.

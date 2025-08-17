@@ -14,6 +14,7 @@ tags:
     - Route53
 time: "10 min"
 type: "post"
+description: "Migrate from AWS S3 and CloudFront to Netlify for automated CI/CD, free hosting, and built-in deployment pipelines for Gatsby sites."
 ---
 
 ##### TL;DR: ~~Cloudfront~~ + ~~S3~~ + Route53 -> Netlify DNS
