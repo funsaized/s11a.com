@@ -7,10 +7,8 @@ import config from "../../data/SiteConfig";
 function AboutPage(): React.ReactElement {
   return (
     <Layout>
-      <div className="about container">
-        <Helmet title={`About | ${config.siteTitle}`} />
-        <About />
-      </div>
+      <Helmet title={`About | ${config.siteTitle}`} />
+      <About />
     </Layout>
   );
 }

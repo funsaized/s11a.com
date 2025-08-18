@@ -40,6 +40,7 @@ const gatsbyConfig: GatsbyConfig = {
   plugins: [
     "gatsby-plugin-sitemap",
     "gatsby-disable-404",
+    "gatsby-plugin-postcss", // Add PostCSS plugin for Tailwind
     {
       resolve: "gatsby-plugin-sass",
       options: {

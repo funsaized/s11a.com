@@ -4,6 +4,7 @@ import { graphql } from "gatsby";
 import Layout from "../layout";
 import PostListing from "../components/PostListing/PostListing";
 import SEO from "../components/SEO/SEO";
+import { Badge } from "../components/ui/badge";
 import config from "../../data/SiteConfig";
 
 interface BlogPageProps {
@@ -100,38 +101,53 @@ function BlogPage({ data }: BlogPageProps): React.ReactElement {
     <Layout>
       <Helmet title={`Articles – ${config.siteTitle}`} />
       <SEO />
-      <div className="container">
-        <h1>Articles</h1>
-        <div className="category-container">
+      <div className="container mx-auto px-4 py-8 max-w-4xl">
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-8">Articles</h1>
+        
+        {/* Category Filter Badges */}
+        <div className="flex flex-wrap gap-2 mb-6">
           {categories.map((category) => {
             const active = currentCategories.includes(category.fieldValue);
 
             return (
-              <div
-                className={`category-filter ${active ? "active" : ""}`}
+              <Badge
                 key={category.fieldValue}
+                variant={active ? "default" : "outline"}
+                className={`cursor-pointer transition-colors ${
+                  active 
+                    ? "bg-blue-500 hover:bg-blue-600 text-white border-blue-500" 
+                    : "hover:bg-blue-50 hover:border-blue-200 hover:text-blue-600 dark:hover:bg-blue-900 dark:hover:border-blue-800"
+                }`}
                 role="button"
                 tabIndex={0}
                 onClick={() => handleCategoryClick(category.fieldValue)}
                 onKeyDown={(event) => handleKeyDown(event, category.fieldValue)}
               >
                 {category.fieldValue}
-              </div>
+              </Badge>
             );
           })}
         </div>
-        <div className="search-container">
-          <input
-            className="search"
-            type="text"
-            name="searchTerm"
-            value={searchTerm}
-            placeholder="Type here to filter posts..."
-            onChange={handleChange}
-          />
-          <div className="filter-count">{filterCount}</div>
+
+        {/* Search Bar with Count */}
+        <div className="relative mb-8">
+          <div className="flex items-center gap-4">
+            <input
+              className="flex-1 px-4 py-3 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              type="text"
+              name="searchTerm"
+              value={searchTerm}
+              placeholder="Type here to filter posts..."
+              onChange={handleChange}
+            />
+            <div className="text-2xl font-bold text-blue-500 min-w-[2ch]">
+              {filterCount}
+            </div>
+          </div>
         </div>
-        <PostListing postEdges={filteredPosts} expanded />
+
+        {/* Articles List */}
+        <PostListing postEdges={filteredPosts} simple={true} />
       </div>
     </Layout>
   );

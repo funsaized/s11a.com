@@ -4,4 +4,5 @@ export interface Project {
   path: string;
   source: string;
   description: string;
+  technologies?: string[];
 }
