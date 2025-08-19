@@ -223,6 +223,7 @@ const ArticlesPage: React.FC<PageProps<ArticlesPageData>> = ({ data }) => {
           {/* Page Header */}
           <div className="mb-8">
             <h1 className="mb-4 text-3xl font-bold tracking-tight md:text-4xl">
+              <span className="text-sm italic text-accent">(mostly)</span>{" "}
               Technical Articles
             </h1>
             <p className="text-lg text-muted-foreground">

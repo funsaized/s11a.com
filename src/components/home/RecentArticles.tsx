@@ -118,7 +118,8 @@ export function RecentArticles({ articles }: RecentArticlesProps) {
             </h2>
             <p className="mx-auto max-w-2xl text-lg text-muted-foreground">
               Insights on healthcare technology, scalable systems, and developer
-              experience. From FHIR implementations to performance optimization.
+              experience. From FHIR implementations and AI to rapid prototyping
+              and UX..
             </p>
           </div>
 
