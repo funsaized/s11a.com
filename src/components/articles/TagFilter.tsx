@@ -1,16 +1,36 @@
-import React from 'react';
-import { Badge } from '../ui/badge';
-import { Button } from '../ui/button';
+import React from "react";
+import { Badge } from "../ui/badge";
+import { Button } from "../ui/button";
 
 const TagIcon = () => (
-  <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.99 1.99 0 013 12V7a4 4 0 014-4z" />
+  <svg
+    className="h-3 w-3"
+    fill="none"
+    stroke="currentColor"
+    viewBox="0 0 24 24"
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={2}
+      d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.99 1.99 0 013 12V7a4 4 0 014-4z"
+    />
   </svg>
 );
 
 const ClearIcon = () => (
-  <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+  <svg
+    className="h-3 w-3"
+    fill="none"
+    stroke="currentColor"
+    viewBox="0 0 24 24"
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={2}
+      d="M6 18L18 6M6 6l12 12"
+    />
   </svg>
 );
 
@@ -22,15 +42,17 @@ interface TagFilterProps {
   className?: string;
 }
 
-export function TagFilter({ 
-  selectedTags = [], 
-  onTagToggle, 
-  onClearTags, 
-  availableTags = [], 
-  className = "" 
+export function TagFilter({
+  selectedTags = [],
+  onTagToggle,
+  onClearTags,
+  availableTags = [],
+  className = "",
 }: TagFilterProps) {
   // Show only unselected tags in the available list
-  const unselectedTags = availableTags.filter(tag => !selectedTags.includes(tag));
+  const unselectedTags = availableTags.filter(
+    (tag) => !selectedTags.includes(tag),
+  );
 
   return (
     <div className={`space-y-3 ${className}`}>
@@ -94,9 +116,7 @@ export function TagFilter({
       )}
 
       {selectedTags.length === 0 && unselectedTags.length === 0 && (
-        <div className="text-sm text-muted-foreground">
-          No tags available
-        </div>
+        <div className="text-sm text-muted-foreground">No tags available</div>
       )}
     </div>
   );

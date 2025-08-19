@@ -1,15 +1,35 @@
-import React from 'react';
-import { Button } from '../ui/button';
+import React from "react";
+import { Button } from "../ui/button";
 
 const ChevronLeftIcon = () => (
-  <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+  <svg
+    className="h-4 w-4"
+    fill="none"
+    stroke="currentColor"
+    viewBox="0 0 24 24"
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={2}
+      d="M15 19l-7-7 7-7"
+    />
   </svg>
 );
 
 const ChevronRightIcon = () => (
-  <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+  <svg
+    className="h-4 w-4"
+    fill="none"
+    stroke="currentColor"
+    viewBox="0 0 24 24"
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={2}
+      d="M9 5l7 7-7 7"
+    />
   </svg>
 );
 
@@ -20,12 +40,17 @@ interface PaginationProps {
   className?: string;
 }
 
-export function Pagination({ currentPage, totalPages, onPageChange, className = "" }: PaginationProps) {
+export function Pagination({
+  currentPage,
+  totalPages,
+  onPageChange,
+  className = "",
+}: PaginationProps) {
   // Don't render if there's only one page or no pages
   if (totalPages <= 1) return null;
 
   const generatePageNumbers = () => {
-    const pages: (number | 'ellipsis')[] = [];
+    const pages: (number | "ellipsis")[] = [];
     const showEllipsis = totalPages > 7;
 
     if (!showEllipsis) {
@@ -41,7 +66,7 @@ export function Pagination({ currentPage, totalPages, onPageChange, className = 
         // Current page is near the beginning
         pages.push(2, 3, 4);
         if (totalPages > 5) {
-          pages.push('ellipsis');
+          pages.push("ellipsis");
         }
         if (totalPages > 4) {
           pages.push(totalPages);
@@ -49,16 +74,16 @@ export function Pagination({ currentPage, totalPages, onPageChange, className = 
       } else if (currentPage >= totalPages - 2) {
         // Current page is near the end
         if (totalPages > 4) {
-          pages.push('ellipsis');
+          pages.push("ellipsis");
         }
         for (let i = Math.max(2, totalPages - 3); i <= totalPages; i++) {
           pages.push(i);
         }
       } else {
         // Current page is in the middle
-        pages.push('ellipsis');
+        pages.push("ellipsis");
         pages.push(currentPage - 1, currentPage, currentPage + 1);
-        pages.push('ellipsis');
+        pages.push("ellipsis");
         pages.push(totalPages);
       }
     }
@@ -84,9 +109,12 @@ export function Pagination({ currentPage, totalPages, onPageChange, className = 
 
       {/* Page Numbers */}
       {pages.map((page, index) => {
-        if (page === 'ellipsis') {
+        if (page === "ellipsis") {
           return (
-            <span key={`ellipsis-${index}`} className="px-2 text-muted-foreground">
+            <span
+              key={`ellipsis-${index}`}
+              className="px-2 text-muted-foreground"
+            >
               ...
             </span>
           );

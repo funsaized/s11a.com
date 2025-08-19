@@ -1,4 +1,4 @@
-const path = require('path');
+const path = require("path");
 
 exports.createPages = async ({ graphql, actions, reporter }) => {
   const { createPage } = actions;
@@ -7,7 +7,9 @@ exports.createPages = async ({ graphql, actions, reporter }) => {
   const result = await graphql(`
     query {
       allMdx(
-        filter: { internal: { contentFilePath: { regex: "/content/articles/" } } }
+        filter: {
+          internal: { contentFilePath: { regex: "/content/articles/" } }
+        }
       ) {
         nodes {
           id
@@ -23,18 +25,18 @@ exports.createPages = async ({ graphql, actions, reporter }) => {
   `);
 
   if (result.errors) {
-    reporter.panicOnBuild('Error loading MDX result', result.errors);
+    reporter.panicOnBuild("Error loading MDX result", result.errors);
   }
 
   // Create article pages
   const articles = result.data.allMdx.nodes;
-  
+
   articles.forEach((article) => {
     const slug = article.frontmatter.slug;
-    
+
     createPage({
       path: `/articles/${slug}`,
-      component: `${path.resolve('./src/templates/article.tsx')}?__contentFilePath=${article.internal.contentFilePath}`,
+      component: `${path.resolve("./src/templates/article.tsx")}?__contentFilePath=${article.internal.contentFilePath}`,
       context: {
         id: article.id,
       },

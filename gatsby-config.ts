@@ -1,4 +1,4 @@
-import type { GatsbyConfig } from "gatsby"
+import type { GatsbyConfig } from "gatsby";
 
 const config: GatsbyConfig = {
   siteMetadata: {
@@ -87,15 +87,15 @@ const config: GatsbyConfig = {
         theme_color: `#000000`,
         display: `minimal-ui`,
         icon: `static/images/me.jpg`,
-        cache_busting_mode: 'none',
+        cache_busting_mode: "none",
       },
     },
     {
       resolve: `gatsby-plugin-webpack-bundle-analyser-v2`,
       options: {
         devMode: false,
-        analyzerMode: 'static',
-        reportFilename: 'bundle-analyzer-report.html',
+        analyzerMode: "static",
+        reportFilename: "bundle-analyzer-report.html",
       },
     },
     {
@@ -113,6 +113,6 @@ const config: GatsbyConfig = {
     },
     `gatsby-plugin-offline`,
   ],
-}
+};
 
-export default config
+export default config;

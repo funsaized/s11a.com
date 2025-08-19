@@ -1,10 +1,10 @@
-import React from 'react';
-import type { HeadFC, PageProps } from 'gatsby';
-import { graphql } from 'gatsby';
-import { Layout } from '../components/layout/Layout';
-import { Hero } from '../components/home/Hero';
-import { RecentArticles } from '../components/home/RecentArticles';
-import { Projects } from '../components/home/Projects';
+import React from "react";
+import type { HeadFC, PageProps } from "gatsby";
+import { graphql } from "gatsby";
+import { Layout } from "../components/layout/Layout";
+import { Hero } from "../components/home/Hero";
+import { RecentArticles } from "../components/home/RecentArticles";
+import { Projects } from "../components/home/Projects";
 
 interface ArticleNode {
   id: string;
@@ -28,21 +28,21 @@ interface IndexPageData {
 
 const IndexPage: React.FC<PageProps<IndexPageData>> = ({ data }) => {
   // Transform the GraphQL data to match the Article interface
-  const articles = data.allMdx.nodes.map(node => ({
+  const articles = data.allMdx.nodes.map((node) => ({
     id: node.id,
     title: node.frontmatter.title,
     slug: node.frontmatter.slug,
-    excerpt: node.frontmatter.excerpt || '',
+    excerpt: node.frontmatter.excerpt || "",
     date: node.frontmatter.date,
     category: node.frontmatter.category,
     tags: node.frontmatter.tags || [],
     readingTime: node.frontmatter.readingTime,
     featured: node.frontmatter.featured || false,
-    author: 'Sai Nimmagadda'
+    author: "Sai Nimmagadda",
   }));
 
   return (
-    <Layout 
+    <Layout
       title="Full-Stack Engineer • Healthcare Tech"
       description="Full-stack engineer focused on healthcare, developer experience, and scalable systems. Building technology that improves patient outcomes."
     >
@@ -57,10 +57,7 @@ export default IndexPage;
 
 export const query = graphql`
   query {
-    allMdx(
-      sort: { frontmatter: { date: DESC } }
-      limit: 4
-    ) {
+    allMdx(sort: { frontmatter: { date: DESC } }, limit: 4) {
       nodes {
         id
         frontmatter {
@@ -81,22 +78,28 @@ export const query = graphql`
 export const Head: HeadFC = () => (
   <>
     <title>Sai Nimmagadda - Full-Stack Engineer • Healthcare Tech</title>
-    <meta 
-      name="description" 
-      content="Full-stack engineer focused on healthcare, developer experience, and scalable systems. Building technology that improves patient outcomes." 
+    <meta
+      name="description"
+      content="Full-stack engineer focused on healthcare, developer experience, and scalable systems. Building technology that improves patient outcomes."
     />
     <meta property="og:type" content="website" />
-    <meta property="og:title" content="Sai Nimmagadda - Full-Stack Engineer • Healthcare Tech" />
-    <meta 
-      property="og:description" 
-      content="Full-stack engineer focused on healthcare, developer experience, and scalable systems. Building technology that improves patient outcomes." 
+    <meta
+      property="og:title"
+      content="Sai Nimmagadda - Full-Stack Engineer • Healthcare Tech"
+    />
+    <meta
+      property="og:description"
+      content="Full-stack engineer focused on healthcare, developer experience, and scalable systems. Building technology that improves patient outcomes."
     />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:creator" content="@FunSaized" />
-    <meta name="twitter:title" content="Sai Nimmagadda - Full-Stack Engineer • Healthcare Tech" />
-    <meta 
-      name="twitter:description" 
-      content="Full-stack engineer focused on healthcare, developer experience, and scalable systems. Building technology that improves patient outcomes." 
+    <meta
+      name="twitter:title"
+      content="Sai Nimmagadda - Full-Stack Engineer • Healthcare Tech"
+    />
+    <meta
+      name="twitter:description"
+      content="Full-stack engineer focused on healthcare, developer experience, and scalable systems. Building technology that improves patient outcomes."
     />
   </>
 );

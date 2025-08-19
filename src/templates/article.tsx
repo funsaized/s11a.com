@@ -1,29 +1,59 @@
-import React from 'react';
-import { graphql, Link } from 'gatsby';
-import { Layout } from '../components/layout/Layout';
-import { Badge } from '../components/ui/badge';
-import { Button } from '../components/ui/button';
-import { TableOfContents } from '../components/article/TableOfContents';
-import { SharingComponent } from '../components/article/SharingComponent';
-import { categoryIcons } from '../data/sampleData';
-import { MDXProvider } from '@mdx-js/react';
-import { headingComponents } from '../components/mdx/HeadingComponents';
+import React from "react";
+import { graphql, Link } from "gatsby";
+import { Layout } from "../components/layout/Layout";
+import { Badge } from "../components/ui/badge";
+import { Button } from "../components/ui/button";
+import { TableOfContents } from "../components/article/TableOfContents";
+import { SharingComponent } from "../components/article/SharingComponent";
+import { categoryIcons } from "../data/sampleData";
+import { MDXProvider } from "@mdx-js/react";
+import { headingComponents } from "../components/mdx/HeadingComponents";
 
 const BackArrowIcon = () => (
-  <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+  <svg
+    className="h-4 w-4"
+    fill="none"
+    stroke="currentColor"
+    viewBox="0 0 24 24"
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={2}
+      d="M15 19l-7-7 7-7"
+    />
   </svg>
 );
 
 const ClockIcon = () => (
-  <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+  <svg
+    className="h-4 w-4"
+    fill="none"
+    stroke="currentColor"
+    viewBox="0 0 24 24"
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={2}
+      d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+    />
   </svg>
 );
 
 const CalendarIcon = () => (
-  <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+  <svg
+    className="h-4 w-4"
+    fill="none"
+    stroke="currentColor"
+    viewBox="0 0 24 24"
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={2}
+      d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+    />
   </svg>
 );
 
@@ -57,10 +87,14 @@ interface ArticleTemplateProps {
   children: React.ReactNode;
 }
 
-const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ data, location, children }) => {
+const ArticleTemplate: React.FC<ArticleTemplateProps> = ({
+  data,
+  location,
+  children,
+}) => {
   const { mdx } = data;
   const { frontmatter } = mdx;
-  const categoryIcon = categoryIcons[frontmatter.category] || '📝';
+  const categoryIcon = categoryIcons[frontmatter.category] || "📝";
 
   const articleUrl = `https://s11a.com${location.pathname}`;
 
@@ -99,9 +133,7 @@ const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ data, location, child
               <header className="mb-8">
                 <div className="flex items-center gap-2 mb-4">
                   <span className="text-xl">{categoryIcon}</span>
-                  <Badge variant="secondary">
-                    {frontmatter.category}
-                  </Badge>
+                  <Badge variant="secondary">{frontmatter.category}</Badge>
                 </div>
 
                 <h1 className="text-4xl lg:text-5xl font-bold mb-4 leading-tight">
@@ -117,22 +149,20 @@ const ArticleTemplate: React.FC<ArticleTemplateProps> = ({ data, location, child
                   <div className="flex items-center gap-1">
                     <CalendarIcon />
                     <time dateTime={frontmatter.date}>
-                      {new Date(frontmatter.date).toLocaleDateString('en-US', {
-                        month: 'long',
-                        day: 'numeric',
-                        year: 'numeric'
+                      {new Date(frontmatter.date).toLocaleDateString("en-US", {
+                        month: "long",
+                        day: "numeric",
+                        year: "numeric",
                       })}
                     </time>
                   </div>
-                  
+
                   <div className="flex items-center gap-1">
                     <ClockIcon />
                     <span>{frontmatter.readingTime}</span>
                   </div>
 
-                  <div>
-                    By {frontmatter.author}
-                  </div>
+                  <div>By {frontmatter.author}</div>
                 </div>
 
                 {/* Tags */}

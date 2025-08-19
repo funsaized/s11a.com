@@ -1,6 +1,6 @@
-import React from 'react';
-import { Button } from '../ui/button';
-import { useTheme } from '../../hooks/useTheme';
+import React from "react";
+import { Button } from "../ui/button";
+import { useTheme } from "../../hooks/useTheme";
 
 const SunIcon = () => (
   <svg
@@ -55,19 +55,27 @@ export function ThemeToggle() {
 
   const getIcon = () => {
     switch (theme) {
-      case 'light': return <SunIcon />;
-      case 'dark': return <MoonIcon />;
-      case 'system': return <SystemIcon />;
-      default: return <SystemIcon />;
+      case "light":
+        return <SunIcon />;
+      case "dark":
+        return <MoonIcon />;
+      case "system":
+        return <SystemIcon />;
+      default:
+        return <SystemIcon />;
     }
   };
 
   const getLabel = () => {
     switch (theme) {
-      case 'light': return 'Switch to dark mode';
-      case 'dark': return 'Switch to system mode';
-      case 'system': return 'Switch to light mode';
-      default: return 'Toggle theme';
+      case "light":
+        return "Switch to dark mode";
+      case "dark":
+        return "Switch to system mode";
+      case "system":
+        return "Switch to light mode";
+      default:
+        return "Toggle theme";
     }
   };
 

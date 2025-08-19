@@ -1,4 +1,4 @@
-const React = require("react")
+const React = require("react");
 
 // Prevent theme flashing on load
 exports.onRenderBody = ({ setPreBodyComponents }) => {
@@ -16,5 +16,5 @@ exports.onRenderBody = ({ setPreBodyComponents }) => {
         `,
       },
     }),
-  ])
-}
+  ]);
+};

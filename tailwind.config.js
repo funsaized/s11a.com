@@ -10,18 +10,18 @@ module.exports = {
       typography: (theme) => ({
         DEFAULT: {
           css: {
-            maxWidth: '720px',
-            color: theme('colors.gray.700'),
-            lineHeight: '1.7',
-            fontSize: '18px',
-            'h1, h2, h3, h4': {
-              fontWeight: '600',
+            maxWidth: "720px",
+            color: theme("colors.gray.700"),
+            lineHeight: "1.7",
+            fontSize: "18px",
+            "h1, h2, h3, h4": {
+              fontWeight: "600",
             },
-            'code': {
-              backgroundColor: theme('colors.gray.100'),
-              padding: '0.25rem 0.375rem',
-              borderRadius: '0.25rem',
-              fontSize: '0.875em',
+            code: {
+              backgroundColor: theme("colors.gray.100"),
+              padding: "0.25rem 0.375rem",
+              borderRadius: "0.25rem",
+              fontSize: "0.875em",
             },
           },
         },
@@ -68,8 +68,5 @@ module.exports = {
       },
     },
   },
-  plugins: [
-    require('@tailwindcss/typography'),
-  ],
-}
-
+  plugins: [require("@tailwindcss/typography")],
+};

@@ -1,9 +1,9 @@
-import React from 'react';
-import { Header } from './Header';
-import { Footer } from './Footer';
-import { SEO } from './SEO';
-import '../../styles/globals.css';
-import '../../styles/prism-theme.css';
+import React from "react";
+import { Header } from "./Header";
+import { Footer } from "./Footer";
+import { SEO } from "./SEO";
+import "../../styles/globals.css";
+import "../../styles/prism-theme.css";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -17,20 +17,20 @@ interface LayoutProps {
   tags?: string[];
 }
 
-export function Layout({ 
-  children, 
-  title, 
-  description, 
-  image, 
-  article, 
+export function Layout({
+  children,
+  title,
+  description,
+  image,
+  article,
   pathname,
   datePublished,
   dateModified,
-  tags
+  tags,
 }: LayoutProps) {
   return (
     <div className="min-h-screen flex flex-col bg-background text-foreground">
-      <SEO 
+      <SEO
         title={title}
         description={description}
         image={image}
@@ -40,13 +40,11 @@ export function Layout({
         dateModified={dateModified}
         tags={tags}
       />
-      
+
       <Header />
-      
-      <main className="flex-1">
-        {children}
-      </main>
-      
+
+      <main className="flex-1">{children}</main>
+
       <Footer />
     </div>
   );

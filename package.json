@@ -9,6 +9,7 @@
     "serve": "gatsby serve",
     "clean": "gatsby clean",
     "lint": "ESLINT_USE_FLAT_CONFIG=false eslint .",
+    "format:js": "prettier '**/*.{js,jsx,ts,tsx}' --write",
     "typecheck": "tsc --noEmit",
     "test": "echo \"Error: no test specified\" && exit 1",
     "lighthouse": "node scripts/performance/lighthouse-test.js",

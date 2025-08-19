@@ -1,6 +1,12 @@
-import React from 'react';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
-import { categoryIcons } from '../../data/sampleData';
+import React from "react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../ui/select";
+import { categoryIcons } from "../../data/sampleData";
 
 interface CategoryFilterProps {
   value: string;
@@ -9,7 +15,12 @@ interface CategoryFilterProps {
   className?: string;
 }
 
-export function CategoryFilter({ value, onChange, categories, className = "" }: CategoryFilterProps) {
+export function CategoryFilter({
+  value,
+  onChange,
+  categories,
+  className = "",
+}: CategoryFilterProps) {
   const handleValueChange = (newValue: string) => {
     // Convert "all" back to empty string for our filtering logic
     onChange(newValue === "all" ? "" : newValue);
@@ -32,7 +43,7 @@ export function CategoryFilter({ value, onChange, categories, className = "" }: 
             </span>
           </SelectItem>
           {categories.map((category) => {
-            const icon = categoryIcons[category] || '📝';
+            const icon = categoryIcons[category] || "📝";
             return (
               <SelectItem key={category} value={category}>
                 <span className="flex items-center gap-2">

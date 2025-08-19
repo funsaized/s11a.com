@@ -1,26 +1,46 @@
-import React from 'react';
-import { Link } from 'gatsby';
-import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
-import { Badge } from '../ui/badge';
-import { Button } from '../ui/button';
-import { categoryIcons } from '../../data/sampleData';
-import type { Article } from '../../data/sampleData';
+import React from "react";
+import { Link } from "gatsby";
+import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
+import { Badge } from "../ui/badge";
+import { Button } from "../ui/button";
+import { categoryIcons } from "../../data/sampleData";
+import type { Article } from "../../data/sampleData";
 
 const ClockIcon = () => (
-  <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+  <svg
+    className="h-4 w-4"
+    fill="none"
+    stroke="currentColor"
+    viewBox="0 0 24 24"
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={2}
+      d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+    />
   </svg>
 );
 
 const ArrowRightIcon = () => (
-  <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+  <svg
+    className="h-4 w-4"
+    fill="none"
+    stroke="currentColor"
+    viewBox="0 0 24 24"
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={2}
+      d="M9 5l7 7-7 7"
+    />
   </svg>
 );
 
 function ArticleCard({ article }: { article: Article }) {
-  const categoryIcon = categoryIcons[article.category] || '📝';
-  
+  const categoryIcon = categoryIcons[article.category] || "📝";
+
   return (
     <Card className="group transition-all duration-200 hover:shadow-lg hover:-translate-y-1">
       <CardHeader>
@@ -46,7 +66,7 @@ function ArticleCard({ article }: { article: Article }) {
         <p className="text-muted-foreground text-sm mb-4 line-clamp-3">
           {article.excerpt}
         </p>
-        
+
         <div className="flex flex-wrap gap-1 mb-4">
           {article.tags.slice(0, 3).map((tag) => (
             <Badge key={tag} variant="outline" className="text-xs">
@@ -59,17 +79,17 @@ function ArticleCard({ article }: { article: Article }) {
             </Badge>
           )}
         </div>
-        
+
         <div className="flex items-center justify-between">
           <time className="text-xs text-muted-foreground">
-            {new Date(article.date).toLocaleDateString('en-US', {
-              month: 'short',
-              day: 'numeric',
-              year: 'numeric'
+            {new Date(article.date).toLocaleDateString("en-US", {
+              month: "short",
+              day: "numeric",
+              year: "numeric",
             })}
           </time>
-          
-          <Link 
+
+          <Link
             to={`/articles/${article.slug}`}
             className="inline-flex items-center gap-1 text-sm text-primary hover:gap-2 transition-all"
           >
@@ -97,8 +117,8 @@ export function RecentArticles({ articles }: RecentArticlesProps) {
               Recent Articles
             </h2>
             <p className="mx-auto max-w-2xl text-lg text-muted-foreground">
-              Insights on healthcare technology, scalable systems, and developer experience.
-              From FHIR implementations to performance optimization.
+              Insights on healthcare technology, scalable systems, and developer
+              experience. From FHIR implementations to performance optimization.
             </p>
           </div>
 

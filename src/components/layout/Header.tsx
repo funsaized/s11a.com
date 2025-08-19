@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
-import { Link } from 'gatsby';
-import { Button } from '../ui/button';
-import { ThemeToggle } from './ThemeToggle';
-import { cn } from '../../utils/cn';
+import React, { useState } from "react";
+import { Link } from "gatsby";
+import { Button } from "../ui/button";
+import { ThemeToggle } from "./ThemeToggle";
+import { cn } from "../../utils/cn";
 
 const MenuIcon = () => (
   <svg
@@ -12,7 +12,12 @@ const MenuIcon = () => (
     viewBox="0 0 24 24"
     xmlns="http://www.w3.org/2000/svg"
   >
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={2}
+      d="M4 6h16M4 12h16M4 18h16"
+    />
   </svg>
 );
 
@@ -24,14 +29,19 @@ const CloseIcon = () => (
     viewBox="0 0 24 24"
     xmlns="http://www.w3.org/2000/svg"
   >
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={2}
+      d="M6 18L18 6M6 6l12 12"
+    />
   </svg>
 );
 
 const navigation = [
-  { name: 'Home', href: '/' },
-  { name: 'Articles', href: '/articles' },
-  { name: 'About', href: '/about' },
+  { name: "Home", href: "/" },
+  { name: "Articles", href: "/articles" },
+  { name: "About", href: "/about" },
 ];
 
 export function Header() {
@@ -43,10 +53,7 @@ export function Header() {
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center justify-between px-4 mx-auto">
         {/* Logo */}
-        <Link
-          to="/"
-          className="flex items-center space-x-2 text-xl font-bold"
-        >
+        <Link to="/" className="flex items-center space-x-2 text-xl font-bold">
           <span className="text-2xl">🙂</span>
           <span>s11a</span>
         </Link>
@@ -68,7 +75,7 @@ export function Header() {
         {/* Right side - Theme toggle + Mobile menu button */}
         <div className="flex items-center space-x-2">
           <ThemeToggle />
-          
+
           {/* Mobile menu button */}
           <div className="md:hidden">
             <Button
