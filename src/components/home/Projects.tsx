@@ -162,7 +162,7 @@ export function Projects() {
   const featuredProjects = sampleProjects.filter((project) => project.featured);
 
   return (
-    <section className="py-12 md:py-18 bg-muted/30">
+    <section className="py-12 md:py-18">
       <div className="container mx-auto px-4">
         <div className="mx-auto max-w-6xl">
           {/* Section Header */}
