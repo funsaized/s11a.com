@@ -64,7 +64,7 @@ export function Footer() {
         <div className="flex flex-col items-center space-y-4 md:flex-row md:justify-between md:space-y-0">
           {/* Copyright */}
           <div className="text-center text-sm text-muted-foreground md:text-left">
-            © 2024 Sai Nimmagadda. All rights reserved.
+            © 2025 Sai Nimmagadda. All rights reserved.
           </div>
 
           {/* Social Links */}

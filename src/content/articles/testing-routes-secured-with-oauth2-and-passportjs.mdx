@@ -108,7 +108,7 @@ This is good and simple. But, if we try to test the business logic behind a prot
 ## Providing a mocked strategy
 
 Strategies are classes that implement an authentication mechanism via the `authenticate` function. In this case, `passport-github2` implements the authorization code flow.
-With respect to functional tests, we aren't interested in testing this behavior. We are primarily interested in testing the business logic. 
+With respect to functional tests, we aren't interested in testing this behavior. We are primarily interested in testing the business logic.
 
 So, let's 'short-circuit' the authentication process by implementing a mocked strategy class for our test environment. Adhering to the contract of the `Strategy` class from `passport-strategy`[^2], the `MockGHStrategy` simply implements the `authenticate`
  function by calling the callback and returning a mocked profile (based on the response from the Github /user resource). It doesn't do anything else:

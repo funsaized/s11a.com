@@ -6,7 +6,7 @@ excerpt: >-
   but site hosting in buckets just doesn't have that "shiny" new feel. My
   CI/CD...
 date: '2019-12-10'
-category: Backend
+category: Cloud
 tags:
   - AWS
   - Netlify
@@ -33,7 +33,7 @@ I chose to follow the `New site from Git` track to quickly get a version of my s
   ```
 
 Netlify then kicked off the build (since I had committed the file to master) and my site was live at http://s11a.netlify.com. CI/CD with no effort is the best kind!
-  
+
 Peeking at Netlify's settings, I saw it had some Git integrations enabled by default. I immediately enabled them all and created a PR to test. Deploy comment's and checks! Ooh ahh CI/CD:
 
 ![](/images/articles/netlifyPR.png)
@@ -42,7 +42,7 @@ Peeking at Netlify's settings, I saw it had some Git integrations enabled by def
 Next I wanted to have Netlify host my site at my custom domain. After taking down my Cloudfront deployment and S3 buckets, it was time to transfer my DNS.
 
 ## Route53 -> Netlify DNS
-I think parts of Netlify's docs are a perfect example of when minimal is too minimal, but their [migration docs](https://docs.netlify.com/domains-https/netlify-dns/) do a decent enough job explaining the process for a number of migration methods. In my case, I wanted to keep AWS as my registrar but use Netlify's DNS service. From reading  some of their suggested migration strategies, this seemed the easiest way to get started hosting. 
+I think parts of Netlify's docs are a perfect example of when minimal is too minimal, but their [migration docs](https://docs.netlify.com/domains-https/netlify-dns/) do a decent enough job explaining the process for a number of migration methods. In my case, I wanted to keep AWS as my registrar but use Netlify's DNS service. From reading  some of their suggested migration strategies, this seemed the easiest way to get started hosting.
 
 I started with [Netlify DNS](https://www.netlify.com/blog/2017/12/19/an-easier-way-to-manage-domains-and-dns-on-netlify/) (still in beta), so there was really only a few steps to get the site up at a custom domain:
 
@@ -52,14 +52,14 @@ I started with [Netlify DNS](https://www.netlify.com/blog/2017/12/19/an-easier-w
 
 ##### Adding the domain to Netlify
 
-The Domains section of Netlify has a wizard for adding a domain. Using it is pretty straightforward. Notably, in step 2 I had to make sure to transfer all important DNS records from my hosted zone in Route53 to avoid downtime (i.e email, subdomains). 
+The Domains section of Netlify has a wizard for adding a domain. Using it is pretty straightforward. Notably, in step 2 I had to make sure to transfer all important DNS records from my hosted zone in Route53 to avoid downtime (i.e email, subdomains).
 
 ##### Update the Route53 hosted zone (NS, SOA)
 
 After the wizard was finished, I was presented with four of Netlify's nameservers. At this point it was time to transfer control of my domain's DNS to Netlify. In the Route53 console I performed the following steps to change my domain's DNS to Netlify DNS created in step 1:
 
 * Replaced the existing NS value with the four Netlify hostnames
-* Updated the SOA record: 
+* Updated the SOA record:
   * Changed the "authority-domain" value to the first DNS server Netlify listed: `dns1.p08.nsone.net.`
   * Changed the "hostmaster-email-address" value to `hostmaster@nsone.net.`
   * left the remaining values as is and clicked "Save Record Set"
@@ -71,7 +71,7 @@ After switching around the Route53 configuration, I had an externally registered
 
 ![](/images/articles/netlifySiteDomain.png)
 
-The final step was to enable HTTPS via Let's Encrypt on Netlify. In order to do this, I had to wait for DNS propagation and verification to finish on Netlify's end. I found this step to be a bit glitchy in Netlify's UI, as it would switch back and forth between a verified and unverified state. I waited a while and [flushed my DNS cache](https://developers.google.com/speed/public-dns/cache) and was finally able to provision a cert: 
+The final step was to enable HTTPS via Let's Encrypt on Netlify. In order to do this, I had to wait for DNS propagation and verification to finish on Netlify's end. I found this step to be a bit glitchy in Netlify's UI, as it would switch back and forth between a verified and unverified state. I waited a while and [flushed my DNS cache](https://developers.google.com/speed/public-dns/cache) and was finally able to provision a cert:
 
 ![](/images/articles/netlifyCert.png)
 
