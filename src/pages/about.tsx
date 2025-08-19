@@ -18,7 +18,7 @@ const AboutPage: React.FC<PageProps> = () => {
     },
     {
       category: "Frontend",
-      items: ["Angular", "React", "Next.js", "Gatsby"],
+      items: ["Angular", "React", "Next.js", "Gatsby", "Local-First"],
     },
     {
       category: "Backend",
@@ -30,6 +30,8 @@ const AboutPage: React.FC<PageProps> = () => {
         "REST APIs",
         "RPC",
         "Microservices",
+        "Data Engineering",
+        "Data Science",
       ],
     },
     {
@@ -58,7 +60,7 @@ const AboutPage: React.FC<PageProps> = () => {
     },
     {
       category: "Tools",
-      items: ["Git", "Linux", "Bash", "AI Agents"],
+      items: ["Git", "Linux", "Bash", "Bootstrap", "Jupyter", "AI Agents"],
     },
   ];
 
