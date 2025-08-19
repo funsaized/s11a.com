@@ -119,7 +119,7 @@ const ArticleTemplate: React.FC<ArticleTemplateProps> = ({
             </Button>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-6 gap-8">
             {/* Table of Contents - Hidden on mobile, shows on desktop */}
             <aside className="hidden lg:block lg:col-span-1">
               <div className="sticky top-8">
@@ -128,7 +128,7 @@ const ArticleTemplate: React.FC<ArticleTemplateProps> = ({
             </aside>
 
             {/* Main Content */}
-            <main className="lg:col-span-3">
+            <main className="lg:col-span-4">
               {/* Article Header */}
               <header className="mb-8">
                 <div className="flex items-center gap-2 mb-4">

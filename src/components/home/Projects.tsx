@@ -67,8 +67,19 @@ function getStatusText(status: Project["status"]) {
 
 
 function ProjectCard({ project }: { project: Project }) {
+  const handleCardClick = (e: React.MouseEvent) => {
+    // Don't navigate if clicking on buttons or links
+    if ((e.target as HTMLElement).closest('button') || (e.target as HTMLElement).closest('a')) {
+      return;
+    }
+    window.open(project.path, '_blank', 'noopener,noreferrer');
+  };
+
   return (
-    <Card className="group transition-all duration-200 hover:shadow-lg hover:-translate-y-1">
+    <Card 
+      className="group transition-all duration-200 hover:shadow-lg hover:-translate-y-1 cursor-pointer"
+      onClick={handleCardClick}
+    >
       <CardHeader>
         <div className="flex items-start justify-between gap-3">
           <div className="flex items-center gap-3">
@@ -87,30 +98,30 @@ function ProjectCard({ project }: { project: Project }) {
               </div>
             </div>
           </div>
+          
+          {/* GitHub Stats - Top Right */}
+          {(project.stars !== undefined || project.forks !== undefined) && (
+            <div className="flex items-center gap-3 text-xs text-muted-foreground">
+              {project.stars !== undefined && (
+                <div className="flex items-center gap-1">
+                  <StarIcon />
+                  <span>{project.stars}</span>
+                </div>
+              )}
+              {project.forks !== undefined && (
+                <div className="flex items-center gap-1">
+                  <ForkIcon />
+                  <span>{project.forks}</span>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </CardHeader>
       <CardContent>
         <p className="text-muted-foreground text-sm mb-4 line-clamp-3">
           {project.description}
         </p>
-
-        {/* GitHub Stats */}
-        {(project.stars || project.forks) && (
-          <div className="flex items-center gap-4 mb-4 text-sm text-muted-foreground">
-            {project.stars && (
-              <div className="flex items-center gap-1">
-                <StarIcon />
-                <span>{project.stars}</span>
-              </div>
-            )}
-            {project.forks && (
-              <div className="flex items-center gap-1">
-                <ForkIcon />
-                <span>{project.forks}</span>
-              </div>
-            )}
-          </div>
-        )}
 
         {/* Action Buttons */}
         <div className="flex items-center gap-2">
