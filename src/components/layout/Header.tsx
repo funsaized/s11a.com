@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Link } from "gatsby";
+import { StaticImage } from "gatsby-plugin-image";
 import { Button } from "../ui/button";
 import { ThemeToggle } from "./ThemeToggle";
 import { cn } from "../../utils/cn";
@@ -54,7 +55,15 @@ export function Header() {
       <div className="container flex h-16 items-center justify-between px-4 mx-auto">
         {/* Logo */}
         <Link to="/" className="flex items-center space-x-2 text-xl font-bold">
-          <span className="text-2xl">🙂</span>
+          <StaticImage
+            src="../../assets/images/face.png"
+            alt="Face"
+            placeholder="blurred"
+            layout="fixed"
+            width={32}
+            height={32}
+            className="w-8 h-8"
+          />
           <span>s11a</span>
         </Link>
 
