@@ -110,11 +110,11 @@ export const pageQuery = graphql`
 ```scss
 .component {
   // Mobile-first base styles
-  
+
   @include small-breakpoint {
     // Tablet styles
   }
-  
+
   @include large-breakpoint {
     // Desktop styles
   }
