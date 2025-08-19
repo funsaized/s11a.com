@@ -2,7 +2,7 @@ import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
-import { sampleProjects } from "../../data/sampleData";
+import { projects } from "../../data/sampleData";
 import type { Project } from "../../data/sampleData";
 
 const GitHubIcon = () => (
@@ -65,6 +65,7 @@ function getStatusText(status: Project["status"]) {
   }
 }
 
+
 function ProjectCard({ project }: { project: Project }) {
   return (
     <Card className="group transition-all duration-200 hover:shadow-lg hover:-translate-y-1">
@@ -93,19 +94,6 @@ function ProjectCard({ project }: { project: Project }) {
           {project.description}
         </p>
 
-        <div className="flex flex-wrap gap-1 mb-4">
-          {project.technologies.slice(0, 4).map((tech) => (
-            <Badge key={tech} variant="outline" className="text-xs">
-              {tech}
-            </Badge>
-          ))}
-          {project.technologies.length > 4 && (
-            <Badge variant="outline" className="text-xs">
-              +{project.technologies.length - 4}
-            </Badge>
-          )}
-        </div>
-
         {/* GitHub Stats */}
         {(project.stars || project.forks) && (
           <div className="flex items-center gap-4 mb-4 text-sm text-muted-foreground">
@@ -128,29 +116,27 @@ function ProjectCard({ project }: { project: Project }) {
         <div className="flex items-center gap-2">
           <Button variant="outline" size="sm" asChild className="flex-1">
             <a
-              href={project.github}
+              href={project.source}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center justify-center gap-2"
             >
               <GitHubIcon />
-              Code
+              Source
             </a>
           </Button>
 
-          {project.demo && (
-            <Button variant="outline" size="sm" asChild className="flex-1">
-              <a
-                href={project.demo}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center justify-center gap-2"
-              >
-                <ExternalLinkIcon />
-                Demo
-              </a>
-            </Button>
-          )}
+          <Button variant="outline" size="sm" asChild className="flex-1">
+            <a
+              href={project.path}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center gap-2"
+            >
+              <ExternalLinkIcon />
+              View
+            </a>
+          </Button>
         </div>
       </CardContent>
     </Card>
@@ -158,9 +144,6 @@ function ProjectCard({ project }: { project: Project }) {
 }
 
 export function Projects() {
-  // Get featured projects for the home page
-  const featuredProjects = sampleProjects.filter((project) => project.featured);
-
   return (
     <section className="py-12 md:py-18">
       <div className="container mx-auto px-4">
@@ -178,8 +161,8 @@ export function Projects() {
 
           {/* Projects Grid */}
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 mb-12">
-            {featuredProjects.map((project) => (
-              <ProjectCard key={project.id} project={project} />
+            {projects.map((project, index) => (
+              <ProjectCard key={index} project={project} />
             ))}
           </div>
 
