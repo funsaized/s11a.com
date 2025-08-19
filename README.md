@@ -33,7 +33,7 @@ src/
 
 ### Prerequisites
 
-- Node.js 18+ 
+- Node.js 18+
 - npm 9+
 
 ### Setup
@@ -93,7 +93,7 @@ author: 'Sai Nimmagadda'
 ### Supported Categories
 
 - Backend
-- Frontend  
+- Frontend
 - Healthcare
 - Architecture
 - DevOps
@@ -206,7 +206,7 @@ The site includes performance monitoring setup for:
 ### Key Configuration Files
 
 - `gatsby-config.ts` - Gatsby configuration and plugins
-- `tailwind.config.js` - Tailwind CSS configuration  
+- `tailwind.config.js` - Tailwind CSS configuration
 - `netlify.toml` - Netlify deployment configuration
 - `tsconfig.json` - TypeScript configuration
 
@@ -267,7 +267,7 @@ MIT License - see LICENSE file for details
 ## 🔗 Links
 
 - **Live Site**: [s11a.com](https://s11a.com)
-- **GitHub**: [Repository](https://github.com/snimmagadda1/s11a-new)
+- **GitHub**: [Repository](https://github.com/snimmagadda1/s11a.com)
 - **Author**: [Sai Nimmagadda](https://github.com/snimmagadda1)
 
 ---
