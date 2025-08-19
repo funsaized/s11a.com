@@ -1,0 +1,272 @@
+{
+  "timestamp": "2025-08-19T00:39:35.463Z",
+  "summary": {
+    "totalArticles": 17,
+    "successful": 17,
+    "failed": 0,
+    "categories": [
+      "Backend"
+    ],
+    "tags": [
+      "JavaScript",
+      "Node.js",
+      "API",
+      "Testing",
+      "CSS",
+      "Tools",
+      "Azure",
+      "Cosmos",
+      "Data",
+      "Java",
+      "Spring",
+      "Batch",
+      "pipeline",
+      "AWS",
+      "CloudWatch",
+      "EventBridge",
+      "Lambda",
+      "Serverless",
+      "go",
+      "automation",
+      "github",
+      "gitops",
+      "styled-components",
+      "downshift",
+      "React",
+      "Postman",
+      "responsive",
+      "ES6",
+      "Spread",
+      "Set",
+      "Grid",
+      "Flexbox",
+      "Netlify",
+      "Route53",
+      "S3",
+      "Cloudfront",
+      "kubernetes",
+      "nginx",
+      "openshift",
+      "OSE",
+      "other"
+    ]
+  },
+  "articles": [
+    {
+      "title": "Testing Routes Secured with OAuth 2.0 and Passport.js",
+      "slug": "testing-routes-secured-with-oauth2-and-passportjs",
+      "date": "2025-04-17",
+      "category": "Backend",
+      "tags": [
+        "JavaScript",
+        "Node.js",
+        "API",
+        "Testing"
+      ],
+      "sourceDir": "04-17-2025"
+    },
+    {
+      "title": "My custom Operator Mono VSCode styles",
+      "slug": "my-custom-operator-mono-vscode-setup",
+      "date": "2024-07-13",
+      "category": "Backend",
+      "tags": [
+        "CSS",
+        "JavaScript",
+        "Tools"
+      ],
+      "sourceDir": "07-13-2024"
+    },
+    {
+      "title": "Writing a Cosmos DB stored procedure with continuation",
+      "slug": "writing-a-cosmos-db-stored-procedure-with-continuation",
+      "date": "2023-03-11",
+      "category": "Backend",
+      "tags": [
+        "Azure",
+        "Cosmos",
+        "Data",
+        "Java",
+        "JavaScript"
+      ],
+      "sourceDir": "03-11-2023"
+    },
+    {
+      "title": "Building a batch pipeline with Java #2: writing the job",
+      "slug": "bilding-a-batch-pipeline-with-java-2-writing-the-job",
+      "date": "2022-03-07",
+      "category": "Backend",
+      "tags": [
+        "Spring",
+        "Batch",
+        "pipeline",
+        "Java"
+      ],
+      "sourceDir": "03-07-2022"
+    },
+    {
+      "title": "Making garlic bot more random with a self scheduling serverless function",
+      "slug": "making-garlic-bot-more-random-with-a-self-scheduling-serverless-function",
+      "date": "2022-01-26",
+      "category": "Backend",
+      "tags": [
+        "AWS",
+        "CloudWatch",
+        "EventBridge",
+        "Lambda",
+        "Serverless"
+      ],
+      "sourceDir": "01-26-2022"
+    },
+    {
+      "title": "Building a github bot with Go",
+      "slug": "creating-a-github-bot-with-go",
+      "date": "2021-06-27",
+      "category": "Backend",
+      "tags": [
+        "go",
+        "automation",
+        "github",
+        "gitops"
+      ],
+      "sourceDir": "06-27-2021"
+    },
+    {
+      "title": "Building a batch pipeline with Java #1: crash course in Spring Batch",
+      "slug": "building-a-batch-pipeline-01-crash-course-in-spring-batch",
+      "date": "2021-06-04",
+      "category": "Backend",
+      "tags": [
+        "Spring",
+        "Batch",
+        "pipeline",
+        "Java"
+      ],
+      "sourceDir": "06-04-2021"
+    },
+    {
+      "title": "A Spring Batch quickstarter",
+      "slug": "a-spring-batch-quickstarter",
+      "date": "2021-01-03",
+      "category": "Backend",
+      "tags": [
+        "Spring",
+        "Batch",
+        "pipeline",
+        "Java"
+      ],
+      "sourceDir": "01-03-2021"
+    },
+    {
+      "title": "Rapid development & accessible dropdowns with Downshift",
+      "slug": "rapid-development-and-accessible-dropdowns-with-downshit",
+      "date": "2020-12-12",
+      "category": "Backend",
+      "tags": [
+        "JavaScript",
+        "styled-components",
+        "downshift",
+        "React"
+      ],
+      "sourceDir": "12-12-2020"
+    },
+    {
+      "title": "Speeding up my Postman workflow with scripts",
+      "slug": "speeding-up-my-postman-workflow-with-scripts",
+      "date": "2020-11-29",
+      "category": "Backend",
+      "tags": [
+        "Postman",
+        "API",
+        "JavaScript",
+        "Tools"
+      ],
+      "sourceDir": "11-29-2020"
+    },
+    {
+      "title": "Cloning Discord's login form to mess with styled-components",
+      "slug": "cloning-discords-login-form-to-mess-with-styled-components",
+      "date": "2020-11-22",
+      "category": "Backend",
+      "tags": [
+        "JavaScript",
+        "styled-components",
+        "responsive"
+      ],
+      "sourceDir": "11-22-2020"
+    },
+    {
+      "title": "T.I.G: JavaScript push to the beginning of an array",
+      "slug": "javascript-push-to-the-beginning-of-an-array",
+      "date": "2020-11-18",
+      "category": "Backend",
+      "tags": [
+        "JavaScript",
+        "ES6",
+        "Spread",
+        "Set"
+      ],
+      "sourceDir": "11-18-2020"
+    },
+    {
+      "title": "A CSS snippet for a responsive list of items",
+      "slug": "a-css-snippet-for-a-responsive-list-of-items",
+      "date": "2020-03-24",
+      "category": "Backend",
+      "tags": [
+        "CSS",
+        "Grid",
+        "Flexbox"
+      ],
+      "sourceDir": "03-24-2020"
+    },
+    {
+      "title": "Migrating my hosting to Netlify",
+      "slug": "migrating-my-hosting-to-netlify",
+      "date": "2019-12-10",
+      "category": "Backend",
+      "tags": [
+        "AWS",
+        "Netlify",
+        "Route53"
+      ],
+      "sourceDir": "12-10-2019"
+    },
+    {
+      "title": "Speedy, secured site hosting made easy on AWS",
+      "slug": "speedy-secured-site-hosting-made-easy-on-aws",
+      "date": "2019-11-25",
+      "category": "Backend",
+      "tags": [
+        "AWS",
+        "S3",
+        "Cloudfront",
+        "Route53"
+      ],
+      "sourceDir": "11-25-2019"
+    },
+    {
+      "title": "Persistent volumes on Openshift",
+      "slug": "persistent-volumes-on-openshift",
+      "date": "2019-03-17",
+      "category": "Backend",
+      "tags": [
+        "kubernetes",
+        "nginx",
+        "openshift"
+      ],
+      "sourceDir": "03-17-2019"
+    },
+    {
+      "title": "Luigi: An open source ETL tool...",
+      "slug": "luigi-an-open-source-etl-tool",
+      "date": "2018-01-03",
+      "category": "Backend",
+      "tags": [
+        "OSE",
+        "other"
+      ],
+      "sourceDir": "01-03-2018"
+    }
+  ]
+}

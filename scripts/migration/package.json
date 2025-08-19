@@ -1,0 +1,35 @@
+{
+  "name": "s11a-content-migration",
+  "version": "1.0.0",
+  "description": "Content migration tools for s11a.com blog",
+  "main": "migrate-content.js",
+  "scripts": {
+    "migrate": "node migrate-content.js",
+    "migrate:dry-run": "node migrate-content.js --dry-run",
+    "migrate:verbose": "node migrate-content.js --verbose",
+    "validate": "node validate-content.js",
+    "extract-images": "node extract-images.js",
+    "map-categories": "node map-categories.js"
+  },
+  "dependencies": {
+    "axios": "^1.5.0",
+    "cheerio": "^1.0.0-rc.12",
+    "slugify": "^1.6.6",
+    "marked": "^9.0.0",
+    "turndown": "^7.1.2",
+    "sharp": "^0.32.0",
+    "js-yaml": "^4.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0"
+  },
+  "keywords": [
+    "gatsby",
+    "mdx",
+    "migration",
+    "content",
+    "blog"
+  ],
+  "author": "Sai Nimmagadda",
+  "license": "MIT"
+}

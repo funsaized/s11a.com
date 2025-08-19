@@ -1,0 +1,324 @@
+/* Prism.js theme for syntax highlighting */
+/* Based on VS Code Dark+ theme */
+
+code[class*="language-"],
+pre[class*="language-"] {
+  color: #d4d4d4;
+  background: none;
+  font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+  font-size: 1em;
+  text-align: left;
+  white-space: pre;
+  word-spacing: normal;
+  word-break: normal;
+  word-wrap: normal;
+  line-height: 1.5;
+  -moz-tab-size: 4;
+  -o-tab-size: 4;
+  tab-size: 4;
+  -webkit-hyphens: none;
+  -moz-hyphens: none;
+  -ms-hyphens: none;
+  hyphens: none;
+}
+
+pre[class*="language-"]::-moz-selection,
+pre[class*="language-"] ::-moz-selection,
+code[class*="language-"]::-moz-selection,
+code[class*="language-"] ::-moz-selection {
+  text-shadow: none;
+  background: rgba(29, 59, 83, 0.99);
+}
+
+pre[class*="language-"]::selection,
+pre[class*="language-"] ::selection,
+code[class*="language-"]::selection,
+code[class*="language-"] ::selection {
+  text-shadow: none;
+  background: rgba(29, 59, 83, 0.99);
+}
+
+@media print {
+  code[class*="language-"],
+  pre[class*="language-"] {
+    text-shadow: none;
+  }
+}
+
+/* Code blocks */
+pre[class*="language-"] {
+  padding: 1.5em;
+  margin: 1.5em 0;
+  overflow: auto;
+  border-radius: 0.5rem;
+  background: #1e1e1e;
+  border: 1px solid #333;
+}
+
+:not(pre) > code[class*="language-"],
+pre[class*="language-"] {
+  background: #1e1e1e;
+}
+
+/* Inline code */
+:not(pre) > code[class*="language-"] {
+  padding: 0.1em 0.3em;
+  border-radius: 0.3em;
+  white-space: normal;
+  background: rgba(135, 131, 120, 0.15);
+  color: #eb5757;
+}
+
+.token.comment,
+.token.prolog,
+.token.doctype,
+.token.cdata {
+  color: #6a9955;
+  font-style: italic;
+}
+
+.token.punctuation {
+  color: #d4d4d4;
+}
+
+.namespace {
+  opacity: 0.7;
+}
+
+.token.property,
+.token.tag,
+.token.constant,
+.token.symbol,
+.token.deleted {
+  color: #f92672;
+}
+
+.token.boolean,
+.token.number {
+  color: #ae81ff;
+}
+
+.token.selector,
+.token.attr-name,
+.token.string,
+.token.char,
+.token.builtin,
+.token.inserted {
+  color: #a6e22e;
+}
+
+.token.operator,
+.token.entity,
+.token.url,
+.language-css .token.string,
+.style .token.string,
+.token.variable {
+  color: #f8f8f2;
+}
+
+.token.atrule,
+.token.attr-value,
+.token.function,
+.token.class-name {
+  color: #e6db74;
+}
+
+.token.keyword {
+  color: #66d9ef;
+}
+
+.token.regex,
+.token.important {
+  color: #fd971f;
+}
+
+.token.important,
+.token.bold {
+  font-weight: bold;
+}
+
+.token.italic {
+  font-style: italic;
+}
+
+.token.entity {
+  cursor: help;
+}
+
+/* Language-specific colors */
+.language-javascript .token.keyword,
+.language-typescript .token.keyword {
+  color: #569cd6;
+}
+
+.language-javascript .token.string,
+.language-typescript .token.string {
+  color: #ce9178;
+}
+
+.language-javascript .token.function,
+.language-typescript .token.function {
+  color: #dcdcaa;
+}
+
+.language-css .token.property {
+  color: #9cdcfe;
+}
+
+.language-css .token.selector {
+  color: #d7ba7d;
+}
+
+.language-html .token.tag {
+  color: #569cd6;
+}
+
+.language-html .token.attr-name {
+  color: #9cdcfe;
+}
+
+.language-html .token.attr-value {
+  color: #ce9178;
+}
+
+.language-json .token.property {
+  color: #9cdcfe;
+}
+
+.language-json .token.string {
+  color: #ce9178;
+}
+
+.language-bash .token.function {
+  color: #569cd6;
+}
+
+.language-bash .token.keyword {
+  color: #569cd6;
+}
+
+/* Dark mode enhancements */
+@media (prefers-color-scheme: dark) {
+  pre[class*="language-"] {
+    background: #0d1117;
+    border-color: #30363d;
+  }
+}
+
+/* Custom scrollbar for code blocks */
+pre[class*="language-"]::-webkit-scrollbar {
+  height: 8px;
+}
+
+pre[class*="language-"]::-webkit-scrollbar-track {
+  background: #2d2d2d;
+  border-radius: 4px;
+}
+
+pre[class*="language-"]::-webkit-scrollbar-thumb {
+  background: #555;
+  border-radius: 4px;
+}
+
+pre[class*="language-"]::-webkit-scrollbar-thumb:hover {
+  background: #777;
+}
+
+/* Line numbers */
+.gatsby-highlight-code-line {
+  background-color: #2d3748;
+  display: block;
+  margin-right: -1.5em;
+  margin-left: -1.5em;
+  padding-right: 1.5em;
+  padding-left: 1.25em;
+  border-left: 0.25em solid #4299e1;
+}
+
+.gatsby-highlight {
+  background-color: #1e1e1e;
+  border-radius: 0.5rem;
+  margin: 1.5em 0;
+  padding: 0;
+  overflow: auto;
+  border: 1px solid #333;
+}
+
+.gatsby-highlight pre[class*="language-"] {
+  background-color: transparent;
+  margin: 0;
+  padding: 1.5em;
+  overflow: initial;
+  float: left;
+  min-width: 100%;
+  border: none;
+}
+
+/* Line numbers plugin */
+.line-numbers .line-numbers-rows {
+  position: absolute;
+  pointer-events: none;
+  top: 0;
+  left: -3.8em;
+  width: 3em;
+  letter-spacing: -1px;
+  border-right: 1px solid #4a5568;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.line-numbers .line-numbers-rows > span {
+  pointer-events: none;
+  display: block;
+  counter-increment: linenumber;
+}
+
+.line-numbers .line-numbers-rows > span:before {
+  content: counter(linenumber);
+  color: #718096;
+  display: block;
+  padding-right: 0.8em;
+  text-align: right;
+}
+
+.line-numbers-rows {
+  position: absolute;
+  pointer-events: none;
+  top: 0;
+  left: -3.8em;
+  width: 3em;
+  letter-spacing: -1px;
+  border-right: 1px solid #4a5568;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.line-numbers-rows > span {
+  pointer-events: none;
+  display: block;
+  counter-increment: linenumber;
+}
+
+.line-numbers-rows > span:before {
+  content: counter(linenumber);
+  color: #718096;
+  display: block;
+  padding-right: 0.8em;
+  text-align: right;
+}
+
+/* Add line numbers styles */
+pre.line-numbers {
+  position: relative;
+  padding-left: 3.8em;
+  counter-reset: linenumber;
+}
+
+pre.line-numbers > code {
+  position: relative;
+  white-space: inherit;
+}

@@ -1,0 +1,29 @@
+# Content Taxonomy Analysis Report
+
+Generated: 2025-08-19T00:33:22.749Z
+
+## Summary
+- Total Articles: 1
+- Total Categories: 1
+- Total Tags: 4
+- Recommendations: 2
+
+## Category Distribution
+- Backend: 1 articles (100.0%)
+
+## Top Tags
+- node.js: 1 uses
+- healthcare: 1 uses
+- api: 1 uses
+- hipaa: 1 uses
+
+## Recommendations
+1. **TAG CONSOLIDATION**: 4 tags are used only once - consider consolidation
+   Tags: node.js, healthcare, api, hipaa
+
+2. **CATEGORY CONSOLIDATION**: 1 categories have fewer than 3 articles
+   Categories: Backend
+
+## Potential Tag Duplicates
+- "node.js" (1) ↔ "healthcare" (1)
+

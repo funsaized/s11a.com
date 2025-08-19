@@ -1,120 +1,102 @@
-import React from "react";
-import Helmet from "react-helmet";
-import { graphql } from "gatsby";
-import GitHubButton from "../components/GitHubButton/GitHubButton";
-import Layout from "../layout";
-import PostListing from "../components/PostListing/PostListing";
-import ProjectListing from "../components/ProjectListing/ProjectListing";
-import SEO from "../components/SEO/SEO";
-import config from "../../data/SiteConfig";
-import projects from "../../data/projects";
+import React from 'react';
+import type { HeadFC, PageProps } from 'gatsby';
+import { graphql } from 'gatsby';
+import { Layout } from '../components/layout/Layout';
+import { Hero } from '../components/home/Hero';
+import { RecentArticles } from '../components/home/RecentArticles';
+import { Projects } from '../components/home/Projects';
 
-interface IndexPageProps {
-  data: {
-    allMarkdownRemark: {
-      edges: Array<{
-        node: {
-          fields: {
-            slug: string;
-            date: string;
-          };
-          excerpt: string;
-          timeToRead: number;
-          frontmatter: {
-            title: string;
-            tags: string[];
-            cover?: string;
-            date: string;
-            thumbnail?: {
-              childImageSharp: {
-                gatsbyImageData: any;
-              };
-            };
-          };
-        };
-      }>;
-    };
+interface ArticleNode {
+  id: string;
+  frontmatter: {
+    title: string;
+    slug: string;
+    excerpt: string;
+    date: string;
+    category: string;
+    tags: string[];
+    readingTime: string;
+    featured: boolean;
   };
 }
 
-function Index({ data }: IndexPageProps): React.ReactElement {
-  const { edges: postEdges } = data.allMarkdownRemark;
-
-  return (
-    <Layout>
-      <div className="index-container">
-        <Helmet title={config.siteTitle} />
-        <SEO />
-        <div className="container">
-          <div className="lead">
-            <h1>Hi, I&apos;m Sai</h1>
-            <p>
-              I&apos;m a full stack software engineer focused on using tech to
-              find novel solutions to today&apos;s problems. My day to day focus
-              is largely in the healthcare sphere. I build things, contribute to
-              open source, and love a good challenge.
-            </p>
-            <div className="social-buttons">
-              <div>
-                <GitHubButton
-                  href="https://github.com/funsaized"
-                  data-size="large"
-                  data-show-count="true"
-                  aria-label="Follow @funsaized on GitHub"
-                >
-                  Follow
-                </GitHubButton>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div className="container front-page">
-          <section className="posts">
-            <h2>Articles</h2>
-            <PostListing simple postEdges={postEdges} />
-          </section>
-
-          <section className="section">
-            <h2>OSS & Projects</h2>
-            <ProjectListing projects={projects} />
-          </section>
-        </div>
-      </div>
-    </Layout>
-  );
+interface IndexPageData {
+  allMdx: {
+    nodes: ArticleNode[];
+  };
 }
 
-export default Index;
+const IndexPage: React.FC<PageProps<IndexPageData>> = ({ data }) => {
+  // Transform the GraphQL data to match the Article interface
+  const articles = data.allMdx.nodes.map(node => ({
+    id: node.id,
+    title: node.frontmatter.title,
+    slug: node.frontmatter.slug,
+    excerpt: node.frontmatter.excerpt || '',
+    date: node.frontmatter.date,
+    category: node.frontmatter.category,
+    tags: node.frontmatter.tags || [],
+    readingTime: node.frontmatter.readingTime,
+    featured: node.frontmatter.featured || false,
+    author: 'Sai Nimmagadda'
+  }));
 
-/* eslint no-undef: "off" */
-export const pageQuery = graphql`
-  query IndexQuery {
-    allMarkdownRemark(
-      limit: 2000
-      sort: { fields: { date: DESC } }
-      filter: { frontmatter: { type: { eq: "post" } } }
+  return (
+    <Layout 
+      title="Full-Stack Engineer • Healthcare Tech"
+      description="Full-stack engineer focused on healthcare, developer experience, and scalable systems. Building technology that improves patient outcomes."
+    >
+      <Hero />
+      <RecentArticles articles={articles} />
+      <Projects />
+    </Layout>
+  );
+};
+
+export default IndexPage;
+
+export const query = graphql`
+  query {
+    allMdx(
+      sort: { frontmatter: { date: DESC } }
+      limit: 4
     ) {
-      edges {
-        node {
-          fields {
-            slug
-            date
-          }
+      nodes {
+        id
+        frontmatter {
+          title
+          slug
           excerpt
-          timeToRead
-          frontmatter {
-            title
-            tags
-            cover
-            date
-            thumbnail {
-              childImageSharp {
-                gatsbyImageData(layout: FIXED, width: 50, height: 50)
-              }
-            }
-          }
+          date
+          category
+          tags
+          readingTime
+          featured
         }
       }
     }
   }
 `;
+
+export const Head: HeadFC = () => (
+  <>
+    <title>Sai Nimmagadda - Full-Stack Engineer • Healthcare Tech</title>
+    <meta 
+      name="description" 
+      content="Full-stack engineer focused on healthcare, developer experience, and scalable systems. Building technology that improves patient outcomes." 
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Sai Nimmagadda - Full-Stack Engineer • Healthcare Tech" />
+    <meta 
+      property="og:description" 
+      content="Full-stack engineer focused on healthcare, developer experience, and scalable systems. Building technology that improves patient outcomes." 
+    />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:creator" content="@FunSaized" />
+    <meta name="twitter:title" content="Sai Nimmagadda - Full-Stack Engineer • Healthcare Tech" />
+    <meta 
+      name="twitter:description" 
+      content="Full-stack engineer focused on healthcare, developer experience, and scalable systems. Building technology that improves patient outcomes." 
+    />
+  </>
+);
