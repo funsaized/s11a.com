@@ -38,6 +38,15 @@ const socialLinks = [
     ),
   },
   {
+    name: "Threads",
+    href: "https://www.threads.com/@funsaized",
+    icon: (
+      <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 192 192">
+        <path d="M141.537 88.9883C140.71 88.5919 139.87 88.2104 139.019 87.8451C137.537 60.5382 122.616 44.905 97.5619 44.745C97.4484 44.7443 97.3355 44.7443 97.222 44.7443C82.2364 44.7443 69.7731 51.1409 62.102 62.7807L75.881 72.2328C81.6116 63.5383 90.6052 61.6848 97.2286 61.6848C97.3051 61.6848 97.3819 61.6848 97.4576 61.6855C105.707 61.7381 111.932 64.1366 115.961 68.814C118.893 72.2193 120.854 76.925 121.825 82.8638C114.511 81.6207 106.601 81.2385 98.145 81.7233C74.3247 83.0954 59.0111 96.9879 60.0396 116.292C60.5615 126.084 65.4397 134.508 73.775 140.011C80.8224 144.663 89.899 146.938 99.3323 146.423C111.79 145.74 121.563 140.987 128.381 132.296C133.559 125.696 136.834 117.143 138.28 106.366C144.217 109.949 148.617 114.664 150.047 120.332C151.179 124.836 150.42 129.172 147.953 133.798C144.227 140.873 137.23 145.793 127.227 148.649C116.926 151.614 104.322 152.138 92.5668 150.088C78.5955 147.506 66.8372 142.172 58.0266 134.611C49.1642 126.999 43.3777 117.296 41.1078 106.183C38.5555 93.6521 40.2636 79.6659 45.9536 67.4318C51.6124 55.2687 61.0768 45.0166 72.9565 38.2049C84.9366 31.3393 98.8173 28.2143 112.916 29.1098C123.312 29.7784 133.431 32.1778 142.803 36.2067C151.597 39.9812 159.581 45.0832 166.435 51.2937L154.501 62.5499C149.494 58.3646 143.909 54.8222 137.786 52.0174C128.685 47.899 118.576 45.6418 108.209 45.2687C106.524 45.2083 104.836 45.1889 103.152 45.2077C72.2579 45.6267 45.3797 63.2701 36.3488 89.2721C27.0748 115.971 35.2753 145.6 57.2938 161.316C67.2306 168.697 79.1125 173.849 92.1975 176.352C117.66 181.17 143.445 176.263 160.965 162.328C174.835 151.305 182.028 136.775 181.506 120.855C180.912 102.778 169.219 91.8364 141.537 88.9883ZM99.7259 130.533C88.2276 131.24 78.1725 125.255 77.6142 116.698C77.2102 110.615 80.3922 105.553 85.6981 102.13C90.3864 99.1108 96.2432 97.4873 102.756 97.1094C109.332 96.7275 116.391 97.2647 123.556 98.682C122.391 116.671 113.599 129.758 99.7259 130.533Z" />
+      </svg>
+    ),
+  },
+  {
     name: "Twitter",
     href: "https://twitter.com/FunSaized",
     icon: (
@@ -50,7 +59,7 @@ const socialLinks = [
 
 export function Hero() {
   return (
-    <section className="relative py-16 md:py-24 lg:py-32">
+    <section className="relative py-12 md:py-18 lg:py-32">
       <div className="container mx-auto px-4">
         <div className="mx-auto max-w-4xl text-center">
           {/* Main Hero Content */}
@@ -58,18 +67,19 @@ export function Hero() {
             <h1 className="mb-6 text-4xl font-bold tracking-tight md:text-6xl lg:text-7xl">
               Hi, I'm{" "}
               <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                Sai Nimmagadda
+                Sai
               </span>
             </h1>
 
             <p className="mb-4 text-xl md:text-2xl text-muted-foreground">
-              Full-Stack Engineer • Healthcare Tech
+              Engineer • Healthcare • AI • Lifestyle
             </p>
 
             <p className="mx-auto max-w-2xl text-lg text-muted-foreground mb-8">
-              Building scalable healthcare systems and developer tools.
-              Passionate about creating technology that improves patient
-              outcomes and enhances developer experience.
+              I'm a full stack software engineer focused on using tech to find
+              novel solutions. I build things, contribute to open source, and
+              love a good challenge. Passionate about creating technology that
+              improves outcomes and enhances developer experience.
             </p>
           </div>
 
@@ -109,7 +119,7 @@ export function Hero() {
           </div>
 
           {/* Quick Stats */}
-          <div className="mt-16 grid grid-cols-1 gap-8 sm:grid-cols-3">
+          {/*<div className="mt-16 grid grid-cols-1 gap-8 sm:grid-cols-3">
             <div className="text-center">
               <div className="text-3xl font-bold">74+</div>
               <div className="text-sm text-muted-foreground">
@@ -128,7 +138,7 @@ export function Hero() {
                 Years Experience
               </div>
             </div>
-          </div>
+          </div>*/}
         </div>
       </div>
     </section>
