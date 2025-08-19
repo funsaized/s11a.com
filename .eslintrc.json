@@ -1,9 +1,9 @@
 {
   "extends": ["airbnb", "prettier"],
-  "plugins": ["react", "jsx-a11y", "import", "@typescript-eslint"],
+  "plugins": ["react", "jsx-a11y", "import-x", "@typescript-eslint"],
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
-    "ecmaVersion": 2020,
+    "ecmaVersion": "latest",
     "sourceType": "module",
     "ecmaFeatures": {
       "jsx": true
@@ -36,7 +36,6 @@
       "files": ["*.ts", "*.tsx"],
       "extends": [
         "airbnb",
-        "airbnb-typescript",
         "prettier"
       ],
       "parserOptions": {
