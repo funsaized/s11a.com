@@ -47,12 +47,12 @@ const socialLinks = [
   },
   {
     name: "LinkedIn",
-    href: "https://linkedin.com/in/sai-nimmagadda",
+    href: "https://www.linkedin.com/in/sainimmagadda",
     icon: LinkedInIcon,
   },
   {
     name: "Email",
-    href: "mailto:saiguy@me.com",
+    href: "mailto:saiguy@icloud.com",
     icon: EmailIcon,
   },
 ];

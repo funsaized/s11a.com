@@ -204,7 +204,7 @@ const AboutPage: React.FC<PageProps> = () => {
             <div className="flex flex-wrap justify-center gap-4">
               <Button asChild variant="outline">
                 <a
-                  href="https://github.com/snimmagadda1"
+                  href="https://github.com/funsaized"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-2"

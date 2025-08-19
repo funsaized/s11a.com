@@ -50,8 +50,8 @@ export function SEO({
       name: "Sai Nimmagadda",
       url: defaultMeta.siteUrl,
       sameAs: [
-        "https://github.com/snimmagadda1",
-        "https://linkedin.com/in/snimmagadda",
+        "https://github.com/funsaized",
+        "https://www.linkedin.com/in/sainimmagadda",
         "https://twitter.com/FunSaized",
       ],
     },

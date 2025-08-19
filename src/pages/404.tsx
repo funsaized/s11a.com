@@ -76,7 +76,7 @@ const NotFoundPage: React.FC<PageProps> = () => {
 
                 <Button asChild variant="outline" className="h-auto p-4">
                   <a
-                    href="https://github.com/snimmagadda1"
+                    href="https://github.com/funsaized"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex flex-col items-center gap-2"
@@ -96,7 +96,7 @@ const NotFoundPage: React.FC<PageProps> = () => {
             <p>
               If you think this is a mistake, please{" "}
               <a
-                href="https://github.com/snimmagadda1/s11a.com/issues"
+                href="https://github.com/funsaized/s11a.com/issues"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-primary hover:underline"

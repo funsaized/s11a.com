@@ -267,8 +267,8 @@ MIT License - see LICENSE file for details
 ## 🔗 Links
 
 - **Live Site**: [s11a.com](https://s11a.com)
-- **GitHub**: [Repository](https://github.com/snimmagadda1/s11a.com)
-- **Author**: [Sai Nimmagadda](https://github.com/snimmagadda1)
+- **GitHub**: [Repository](https://github.com/funsaized/s11a.com)
+- **Author**: [Sai Nimmagadda](https://github.com/funsaized)
 
 ---
 
