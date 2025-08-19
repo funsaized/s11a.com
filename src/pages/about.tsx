@@ -14,27 +14,51 @@ const AboutPage: React.FC<PageProps> = () => {
   const skills = [
     {
       category: "Languages",
-      items: ["JavaScript", "TypeScript", "Go", "Python", "Java", "C++"],
+      items: ["Java", "JavaScript", "TypeScript", "Python", "Go", "Scala"],
     },
     {
       category: "Frontend",
-      items: ["React", "Vue", "Next.js", "Gatsby", "Tailwind CSS"],
+      items: ["Angular", "React", "Next.js", "Gatsby"],
     },
     {
       category: "Backend",
-      items: ["Node.js", "Express", "GraphQL", "REST APIs", "Microservices"],
+      items: [
+        "Spring",
+        "Spring Boot",
+        "Node.js",
+        "GraphQL",
+        "REST APIs",
+        "RPC",
+        "Microservices",
+      ],
     },
     {
       category: "Cloud & DevOps",
-      items: ["AWS", "Azure", "Docker", "Kubernetes", "Terraform"],
+      items: [
+        "Azure",
+        "AWS",
+        "Kubernetes",
+        "DataBricks",
+        "Terraform",
+        "Jenkins",
+        "Github",
+        "Docker",
+      ],
     },
     {
-      category: "Databases",
-      items: ["PostgreSQL", "MongoDB", "Redis", "InfluxDB"],
+      category: "Datastores",
+      items: [
+        "MySQL",
+        "PostgreSQL",
+        "CosmosDB",
+        "Redis",
+        "Memcached",
+        "Elasticsearch",
+      ],
     },
     {
       category: "Tools",
-      items: ["Git", "Linux", "CI/CD", "Monitoring", "Testing"],
+      items: ["Git", "Linux", "Bash", "AI Agents"],
     },
   ];
 
@@ -91,11 +115,11 @@ const AboutPage: React.FC<PageProps> = () => {
             </CardHeader>
             <CardContent className="prose prose-lg max-w-none">
               <p className="text-muted-foreground leading-relaxed">
-                I'm a full-stack software engineer with a Bachelor of Science in
-                Electrical and Computer Engineering and Biomedical Engineering
-                from <strong>Duke University</strong>. I'm passionate about
-                building scalable systems, exploring new technologies, and
-                contributing to open-source software.
+                I'm a full-stack software engineer with a BSE in Electrical and
+                Computer Engineering and Biomedical Engineering from{" "}
+                <strong>Duke University</strong>. I'm passionate about building
+                scalable systems, exploring new technologies, and contributing
+                to open-source software.
               </p>
               <p className="text-muted-foreground leading-relaxed">
                 I believe the best way to learn is through collaboration with
@@ -165,7 +189,7 @@ const AboutPage: React.FC<PageProps> = () => {
                 others"
               </blockquote>
               <p className="text-muted-foreground mt-4 text-center">
-                This philosophy drives my commitment to open-source
+                Sharing is caring ❤️ and drives my commitment to open-source
                 contributions, knowledge sharing, and building meaningful
                 connections in the tech community.
               </p>
