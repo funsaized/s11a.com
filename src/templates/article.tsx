@@ -176,7 +176,7 @@ const ArticleTemplate: React.FC<ArticleTemplateProps> = ({
               </header>
 
               {/* Article Content */}
-              <div className="prose prose-lg max-w-none dark:prose-invert prose-headings:scroll-mt-8 prose-pre:bg-[#1e1e1e] prose-pre:border prose-pre:text-sm prose-pre:leading-relaxed prose-pre:overflow-x-auto prose-code:bg-muted prose-code:px-1.5 prose-code:py-1 prose-code:rounded prose-code:text-sm prose-code:before:content-none prose-code:after:content-none prose-img:rounded-lg prose-img:shadow-md">
+              <div className="prose prose-lg max-w-none prose-headings:scroll-mt-8 prose-pre:bg-muted prose-pre:border prose-pre:border-border prose-pre:text-sm prose-pre:leading-relaxed prose-pre:overflow-x-auto prose-code:bg-muted prose-code:px-1.5 prose-code:py-1 prose-code:rounded prose-code:text-sm prose-code:before:content-none prose-code:after:content-none prose-img:rounded-lg prose-img:shadow-md">
                 <MDXProvider components={headingComponents}>
                   {children}
                 </MDXProvider>

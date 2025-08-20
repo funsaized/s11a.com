@@ -1,5 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
+  darkMode: "class",
   content: [
     "./src/pages/**/*.{js,jsx,ts,tsx}",
     "./src/components/**/*.{js,jsx,ts,tsx}",
@@ -11,17 +12,85 @@ module.exports = {
         DEFAULT: {
           css: {
             maxWidth: "720px",
-            color: theme("colors.gray.700"),
+            color: theme("colors.foreground"),
             lineHeight: "1.7",
             fontSize: "18px",
             "h1, h2, h3, h4": {
               fontWeight: "600",
+              color: theme("colors.foreground"),
+            },
+            h1: {
+              color: theme("colors.foreground"),
+            },
+            h2: {
+              color: theme("colors.foreground"),
+            },
+            h3: {
+              color: theme("colors.foreground"),
+            },
+            h4: {
+              color: theme("colors.foreground"),
+            },
+            p: {
+              color: theme("colors.foreground"),
+            },
+            a: {
+              color: theme("colors.primary.DEFAULT"),
+              "&:hover": {
+                color: theme("colors.primary.DEFAULT"),
+                opacity: "0.8",
+              },
+            },
+            strong: {
+              color: theme("colors.foreground"),
+            },
+            blockquote: {
+              color: theme("colors.muted.foreground"),
+              borderLeftColor: theme("colors.border"),
             },
             code: {
-              backgroundColor: theme("colors.gray.100"),
+              backgroundColor: theme("colors.muted.DEFAULT"),
+              color: theme("colors.foreground"),
               padding: "0.25rem 0.375rem",
               borderRadius: "0.25rem",
               fontSize: "0.875em",
+            },
+            "code::before": {
+              content: '""',
+            },
+            "code::after": {
+              content: '""',
+            },
+            pre: {
+              backgroundColor: theme("colors.muted.DEFAULT"),
+              color: theme("colors.foreground"),
+            },
+            thead: {
+              borderBottomColor: theme("colors.border"),
+            },
+            "thead th": {
+              color: theme("colors.foreground"),
+            },
+            "tbody tr": {
+              borderBottomColor: theme("colors.border"),
+            },
+            "tbody td": {
+              color: theme("colors.foreground"),
+            },
+            hr: {
+              borderColor: theme("colors.border"),
+            },
+            "ol > li::marker": {
+              color: theme("colors.muted.foreground"),
+            },
+            "ul > li::marker": {
+              color: theme("colors.muted.foreground"),
+            },
+            "li::marker": {
+              color: theme("colors.muted.foreground"),
+            },
+            figcaption: {
+              color: theme("colors.muted.foreground"),
             },
           },
         },
