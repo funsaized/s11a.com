@@ -221,7 +221,7 @@ const AboutPage: React.FC<PageProps> = () => {
               </Button>
               <Button asChild variant="outline">
                 <a
-                  href="https://linkedin.com/in/snimmagadda"
+                  href="https://linkedin.com/in/sainimmagadda"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-2"
