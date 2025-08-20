@@ -3,10 +3,10 @@ const path = require("path");
 exports.createPages = async ({ graphql, actions, reporter }) => {
   const { createPage } = actions;
 
-  // Query for all MDX articles
+  // Query for all MDX content (articles and notes)
   const result = await graphql(`
     query {
-      allMdx(
+      articles: allMdx(
         filter: {
           internal: { contentFilePath: { regex: "/content/articles/" } }
         }
@@ -21,6 +21,22 @@ exports.createPages = async ({ graphql, actions, reporter }) => {
           }
         }
       }
+      notes: allMdx(
+        filter: {
+          internal: { contentFilePath: { regex: "/content/notes/" } }
+        }
+      ) {
+        nodes {
+          id
+          frontmatter {
+            slug
+            title
+          }
+          internal {
+            contentFilePath
+          }
+        }
+      }
     }
   `);
 
@@ -29,7 +45,7 @@ exports.createPages = async ({ graphql, actions, reporter }) => {
   }
 
   // Create article pages
-  const articles = result.data.allMdx.nodes;
+  const articles = result.data.articles.nodes;
 
   articles.forEach((article) => {
     const slug = article.frontmatter.slug;
@@ -39,6 +55,24 @@ exports.createPages = async ({ graphql, actions, reporter }) => {
       component: `${path.resolve("./src/templates/article.tsx")}?__contentFilePath=${article.internal.contentFilePath}`,
       context: {
         id: article.id,
+      },
+    });
+  });
+
+  // Create note pages
+  const notes = result.data.notes.nodes;
+
+  notes.forEach((note) => {
+    // Generate slug from title if not provided, or from file path
+    const slug = note.frontmatter.slug || 
+                 note.frontmatter.title?.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') ||
+                 path.basename(note.internal.contentFilePath, '.mdx').toLowerCase();
+
+    createPage({
+      path: `/notes/${slug}`,
+      component: `${path.resolve("./src/templates/note.tsx")}?__contentFilePath=${note.internal.contentFilePath}`,
+      context: {
+        id: note.id,
       },
     });
   });
