@@ -351,7 +351,12 @@ export default ArticlesPage;
 
 export const query = graphql`
   query {
-    allMdx(sort: { frontmatter: { date: DESC } }) {
+    allMdx(
+      filter: {
+        internal: { contentFilePath: { regex: "/content/articles/" } }
+      }
+      sort: { frontmatter: { date: DESC } }
+    ) {
       nodes {
         id
         frontmatter {

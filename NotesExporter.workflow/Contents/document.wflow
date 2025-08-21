@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>AMApplicationBuild</key>
+	<string>528</string>
+	<key>AMApplicationVersion</key>
+	<string>2.10</string>
+	<key>AMDocumentVersion</key>
+	<string>2</string>
+	<key>actions</key>
+	<array>
+		<dict>
+			<key>action</key>
+			<dict>
+				<key>AMAccepts</key>
+				<dict>
+					<key>Container</key>
+					<string>List</string>
+					<key>Optional</key>
+					<true/>
+					<key>Types</key>
+					<array>
+						<string>com.apple.applescript.object</string>
+					</array>
+				</dict>
+				<key>AMActionVersion</key>
+				<string>1.0.2</string>
+				<key>AMApplication</key>
+				<array>
+					<string>Automator</string>
+				</array>
+				<key>AMParameterProperties</key>
+				<dict>
+					<key>source</key>
+					<dict/>
+				</dict>
+				<key>AMProvides</key>
+				<dict>
+					<key>Container</key>
+					<string>List</string>
+					<key>Types</key>
+					<array>
+						<string>com.apple.applescript.object</string>
+					</array>
+				</dict>
+				<key>ActionBundlePath</key>
+				<string>/System/Library/Automator/Run AppleScript.action</string>
+				<key>ActionName</key>
+				<string>Run AppleScript</string>
+				<key>ActionParameters</key>
+				<dict>
+					<key>source</key>
+					<string>set exportFolder to (choose folder) as string-- Simple text replacingon replaceText(find, replace, subject)	set prevTIDs to text item delimiters of AppleScript	set text item delimiters of AppleScript to find	set subject to text items of subject		set text item delimiters of AppleScript to replace	set subject to "" &amp; subject	set text item delimiters of AppleScript to prevTIDs		return subjectend replaceText-- Get an HTML file to save the note in.  We have to escape-- the colons or AppleScript gets upset.on noteNameToFilePath(noteName)	global exportFolder	set strLength to the length of noteName		if strLength &gt; 250 then		set noteName to text 1 thru 250 of noteName	end if		set fileName to (exportFolder &amp; replaceText(":", "_", noteName) &amp; ".html")	return fileNameend noteNameToFilePathtell application "Notes"		repeat with theNote in notes of default account				--repeat with theNote in notes in folder "New Folder" of default account		set noteLocked to password protected of theNote as boolean		set modDate to modification date of theNote as date		set creDate to creation date of theNote as date				set noteID to id of theNote as string		set oldDelimiters to AppleScript's text item delimiters		set AppleScript's text item delimiters to "/"		set theArray to every text item of noteID		set AppleScript's text item delimiters to oldDelimiters				if length of theArray &gt; 4 then			-- the last part of the string should contain the ID			-- e.g. x-coredata://39376962-AA58-4676-9F0E-6376C665FDB6/ICNote/p599			set noteID to item 5 of theArray		else			set noteID to ""		end if				if not noteLocked then						-- file name composed by id and note title to overcome overwriting files			set fileName to ("[" &amp; noteID &amp; "] " &amp; (name of theNote as string)) as string			set filepath to noteNameToFilePath(fileName) of me			set noteFile to open for access filepath with write permission			set theText to body of theNote as string			set theContainer to container of theNote						-- export the folder containing the notes as tag in bear			-- the try catch overcome a 10.15.7 bug with some folders			try				if theContainer is not missing value then					set tag to name of theContainer					set theText to ("" &amp; theText &amp; "#" &amp; tag &amp; "#") as string				end if			end try						write theText to noteFile as «class utf8»			close access noteFile						tell application "Finder"				set modification date of file (filepath) to modDate			end tell		end if			end repeat	end tell</string>
+				</dict>
+				<key>BundleIdentifier</key>
+				<string>com.apple.Automator.RunScript</string>
+				<key>CFBundleVersion</key>
+				<string>1.0.2</string>
+				<key>CanShowSelectedItemsWhenRun</key>
+				<false/>
+				<key>CanShowWhenRun</key>
+				<true/>
+				<key>Category</key>
+				<array>
+					<string>AMCategoryUtilities</string>
+				</array>
+				<key>Class Name</key>
+				<string>RunScriptAction</string>
+				<key>InputUUID</key>
+				<string>B4A92798-F642-486A-91C5-2A974836FCE9</string>
+				<key>Keywords</key>
+				<array>
+					<string>Run</string>
+				</array>
+				<key>OutputUUID</key>
+				<string>E486C576-056F-49C7-8155-B8161608FD51</string>
+				<key>UUID</key>
+				<string>21447369-499C-479F-A69B-967B06A98B8E</string>
+				<key>UnlocalizedApplications</key>
+				<array>
+					<string>Automator</string>
+				</array>
+				<key>arguments</key>
+				<dict>
+					<key>0</key>
+					<dict>
+						<key>default value</key>
+						<string>on run {input, parameters}
+	
+	(* Your script goes here *)
+	
+	return input
+end run</string>
+						<key>name</key>
+						<string>source</string>
+						<key>required</key>
+						<string>0</string>
+						<key>type</key>
+						<string>0</string>
+						<key>uuid</key>
+						<string>0</string>
+					</dict>
+				</dict>
+				<key>isViewVisible</key>
+				<true/>
+				<key>location</key>
+				<string>309.000000:247.000000</string>
+				<key>nibPath</key>
+				<string>/System/Library/Automator/Run AppleScript.action/Contents/Resources/Base.lproj/main.nib</string>
+			</dict>
+			<key>isViewVisible</key>
+			<true/>
+		</dict>
+	</array>
+	<key>connectors</key>
+	<dict/>
+	<key>workflowMetaData</key>
+	<dict>
+		<key>workflowTypeIdentifier</key>
+		<string>com.apple.Automator.workflow</string>
+	</dict>
+</dict>
+</plist>

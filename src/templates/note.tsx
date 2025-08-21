@@ -113,7 +113,8 @@ const NoteTemplate: React.FC<NoteTemplateProps> = ({
                 role="alert"
               >
                 <span className="font-medium">Psst!</span> Images are currently
-                being optimized and may not display properly.
+                being optimized and may not display properly... blame Apple for
+                not supporting Markdown
               </div>
 
               {/* Note Header */}
