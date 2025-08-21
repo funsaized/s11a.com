@@ -15,21 +15,30 @@
     "react/prop-types": "off",
     "react/no-danger": "off",
     "react/jsx-filename-extension": [1, { "extensions": [".js", ".jsx", ".ts", ".tsx"] }],
-    "import/extensions": [
+    "react/function-component-definition": [
       "error",
-      "ignorePackages",
       {
-        "js": "never",
-        "jsx": "never",
-        "ts": "never",
-        "tsx": "never"
+        "namedComponents": ["function-declaration", "arrow-function"],
+        "unnamedComponents": "arrow-function"
       }
     ],
+    "import/extensions": "off",
     "jsx-a11y/anchor-is-valid": [ "error", {
       "components": [ "Link" ],
       "specialLink": [ "hrefLeft", "hrefRight", "to" ],
       "aspects": [ "noHref", "invalidHref", "preferButton" ]
-    }]
+    }],
+    "import/prefer-default-export": "off",
+    "no-unused-vars": ["error", { "argsIgnorePattern": "^_", "varsIgnorePattern": "^_" }],
+    "@typescript-eslint/no-unused-vars": ["error", { "argsIgnorePattern": "^_", "varsIgnorePattern": "^_" }],
+    "import/order": "off",
+    "react/jsx-boolean-value": "off",
+    "no-nested-ternary": "off",
+    "no-console": ["warn", { "allow": ["warn", "error"] }],
+    "react/no-array-index-key": "warn",
+    "arrow-body-style": "off",
+    "react/button-has-type": "off",
+    "spaced-comment": ["error", "always", { "markers": ["/"], "exceptions": ["*"] }]
   },
   "overrides": [
     {
@@ -46,7 +55,26 @@
         "@typescript-eslint/no-use-before-define": ["error"],
         "no-shadow": "off",
         "@typescript-eslint/no-shadow": ["error"],
-        "react/require-default-props": "off"
+        "react/require-default-props": "off",
+        "import/extensions": "off",
+        "import/prefer-default-export": "off",
+        "react/function-component-definition": [
+          "error",
+          {
+            "namedComponents": ["function-declaration", "arrow-function"],
+            "unnamedComponents": "arrow-function"
+          }
+        ],
+        "react/jsx-filename-extension": [1, { "extensions": [".ts", ".tsx"] }]
+      }
+    },
+    {
+      "files": ["*.js"],
+      "parser": "@babel/eslint-parser",
+      "parserOptions": {
+        "requireConfigFile": false,
+        "ecmaVersion": "latest",
+        "sourceType": "module"
       }
     }
   ],

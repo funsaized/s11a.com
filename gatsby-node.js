@@ -48,7 +48,7 @@ exports.createPages = async ({ graphql, actions, reporter }) => {
   const articles = result.data.articles.nodes;
 
   articles.forEach((article) => {
-    const slug = article.frontmatter.slug;
+    const { slug } = article.frontmatter;
 
     createPage({
       path: `/articles/${slug}`,
