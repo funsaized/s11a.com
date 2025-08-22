@@ -65,18 +65,20 @@ function getStatusText(status: Project["status"]) {
   }
 }
 
-
 function ProjectCard({ project }: { project: Project }) {
   const handleCardClick = (e: React.MouseEvent) => {
     // Don't navigate if clicking on buttons or links
-    if ((e.target as HTMLElement).closest('button') || (e.target as HTMLElement).closest('a')) {
+    if (
+      (e.target as HTMLElement).closest("button") ||
+      (e.target as HTMLElement).closest("a")
+    ) {
       return;
     }
-    window.open(project.path, '_blank', 'noopener,noreferrer');
+    window.open(project.path, "_blank", "noopener,noreferrer");
   };
 
   return (
-    <Card 
+    <Card
       className="group transition-all duration-200 hover:shadow-lg hover:-translate-y-1 cursor-pointer"
       onClick={handleCardClick}
     >
@@ -98,7 +100,7 @@ function ProjectCard({ project }: { project: Project }) {
               </div>
             </div>
           </div>
-          
+
           {/* GitHub Stats - Top Right */}
           {(project.stars !== undefined || project.forks !== undefined) && (
             <div className="flex items-center gap-3 text-xs text-muted-foreground">

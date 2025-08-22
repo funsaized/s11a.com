@@ -1,6 +1,8 @@
 import React from "react";
 import { Link } from "gatsby";
 import { Button } from "../ui/button";
+import { Spotlight } from "../ui/spotlight";
+import TextType from "../text-type/TextType";
 
 const ExternalLinkIcon = () => (
   <svg
@@ -59,17 +61,34 @@ const socialLinks = [
 
 export function Hero() {
   return (
-    <section className="relative py-12 md:py-18 lg:py-32">
-      <div className="container mx-auto px-4">
+    <section className="relative py-12 md:py-18 lg:py-32 overflow-hidden">
+      {/* Spotlight Effect - Only visible in dark mode */}
+      <Spotlight
+        className="-top-40 left-10 md:-top-20 md:left-1/3 lg:-top-32 lg:left-1/4 dark:block hidden"
+        fill="white"
+      />
+
+      {/* Subtle background overlay to enhance spotlight effect */}
+      <div className="absolute inset-0 bg-gradient-to-br from-transparent via-transparent to-slate-900/5 dark:to-slate-100/5 pointer-events-none" />
+
+      <div className="container mx-auto px-4 relative z-10">
         <div className="mx-auto max-w-4xl text-center">
           {/* Main Hero Content */}
-          <div className="mb-8">
-            <h1 className="mb-6 text-4xl font-bold tracking-tight md:text-6xl lg:text-7xl">
-              Hi, I'm{" "}
-              <span className="bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent">
-                Sai
-              </span>
-            </h1>
+          <div className="mb-8 relative z-10">
+            <TextType
+              text={["Hi, I'm Sai,"]}
+              as="h1"
+              className="mb-6 text-4xl font-bold tracking-tight md:text-6xl lg:text-7xl"
+              textColors={[
+                "", // Use default foreground color for "Hi, I'm "
+                "#ea580c", // Orange for "Sai"
+                "", // Use default foreground color for " - Engineer"
+              ]}
+              typingSpeed={75}
+              pauseDuration={1500}
+              showCursor={true}
+              cursorCharacter="|"
+            />
 
             <p className="mb-4 text-xl md:text-2xl text-muted-foreground">
               Engineer • Healthcare • AI • Lifestyle
