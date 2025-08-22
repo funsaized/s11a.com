@@ -1,5 +1,20 @@
 const path = require("path");
 
+// Configure Webpack aliases for shadcn/ui
+exports.onCreateWebpackConfig = ({ actions }) => {
+  actions.setWebpackConfig({
+    resolve: {
+      alias: {
+        "@": path.resolve(__dirname, "src"),
+        "@/components": path.resolve(__dirname, "src/components"),
+        "@/utils": path.resolve(__dirname, "src/utils"),
+        "@/lib": path.resolve(__dirname, "src/lib"),
+        "@/hooks": path.resolve(__dirname, "src/hooks"),
+      },
+    },
+  });
+};
+
 exports.createPages = async ({ graphql, actions, reporter }) => {
   const { createPage } = actions;
 
@@ -22,9 +37,7 @@ exports.createPages = async ({ graphql, actions, reporter }) => {
         }
       }
       notes: allMdx(
-        filter: {
-          internal: { contentFilePath: { regex: "/content/notes/" } }
-        }
+        filter: { internal: { contentFilePath: { regex: "/content/notes/" } } }
       ) {
         nodes {
           id
@@ -64,9 +77,13 @@ exports.createPages = async ({ graphql, actions, reporter }) => {
 
   notes.forEach((note) => {
     // Generate slug from title if not provided, or from file path
-    const slug = note.frontmatter.slug || 
-                 note.frontmatter.title?.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') ||
-                 path.basename(note.internal.contentFilePath, '.mdx').toLowerCase();
+    const slug =
+      note.frontmatter.slug ||
+      note.frontmatter.title
+        ?.toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-|-$/g, "") ||
+      path.basename(note.internal.contentFilePath, ".mdx").toLowerCase();
 
     createPage({
       path: `/notes/${slug}`,
