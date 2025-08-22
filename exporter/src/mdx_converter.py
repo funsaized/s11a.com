@@ -1,0 +1,395 @@
+#!/usr/bin/env python3
+"""
+MDX Converter for Apple Notes MDX Exporter
+
+This module handles conversion of HTML content to MDX format with proper frontmatter.
+It ensures compatibility with Gatsby and other MDX-based static site generators.
+"""
+
+import re
+from typing import Dict, List, Optional, Any
+from datetime import datetime
+import logging
+
+try:
+    import markdownify
+except ImportError:
+    raise ImportError("markdownify is required. Install with: pip install markdownify")
+
+try:
+    from bs4 import BeautifulSoup
+except ImportError:
+    raise ImportError("BeautifulSoup4 is required. Install with: pip install beautifulsoup4")
+
+logger = logging.getLogger(__name__)
+
+
+class MDXConverter:
+    """Converts HTML content to MDX format with frontmatter."""
+    
+    def __init__(self, config: Optional[Dict] = None):
+        """
+        Initialize the MDX converter.
+        
+        Args:
+            config: Configuration dictionary with conversion options
+        """
+        self.config = config or {}
+        
+        # Configuration options
+        self.markdown_extensions = self.config.get("markdown_extensions", [
+            "tables", "strikethrough", "task_lists"
+        ])
+        self.mdx_components = self.config.get("mdx_components", False)
+        self.tags_in_frontmatter = self.config.get("tags_in_frontmatter", True)
+        self.date_format = self.config.get("date_format", "%Y-%m-%d")
+        
+        # Configure markdownify
+        self.markdownify_options = {
+            'heading_style': 'ATX',  # Use # for headings
+            'bullets': '-',  # Use - for unordered lists
+            'strong_em_symbol': '**',  # Use ** for bold
+            'strip': ['script', 'style'],  # Remove script and style tags
+            'convert': [
+                'h1', 'h2', 'h3', 'h4', 'h5', 'h6',  # Headings
+                'p', 'br',  # Paragraphs and breaks
+                'strong', 'b', 'em', 'i', 'u',  # Text formatting
+                'ul', 'ol', 'li',  # Lists
+                'a',  # Links
+                'img',  # Images
+                'blockquote',  # Quotes
+                'code', 'pre',  # Code
+                'table', 'thead', 'tbody', 'tr', 'th', 'td',  # Tables
+                'div', 'span'  # Generic containers
+            ]
+        }
+        
+        logger.info("MDXConverter initialized")
+    
+    def convert(self, html_content: str, metadata: Dict) -> str:
+        """
+        Convert HTML content to MDX with frontmatter.
+        
+        Args:
+            html_content: HTML content from Apple Notes
+            metadata: Note metadata dictionary
+            
+        Returns:
+            MDX content with frontmatter
+        """
+        try:
+            # Generate frontmatter
+            frontmatter = self._generate_frontmatter(metadata)
+            
+            # Clean and convert HTML to Markdown
+            markdown_content = self._convert_html_to_markdown(html_content)
+            
+            # Post-process markdown for MDX compatibility
+            mdx_content = self._post_process_markdown(markdown_content)
+            
+            # Combine frontmatter and content
+            full_content = frontmatter + mdx_content
+            
+            logger.debug(f"Converted note '{metadata.get('title', 'Unknown')}' to MDX")
+            return full_content
+            
+        except Exception as e:
+            logger.error(f"Error converting to MDX: {e}")
+            # Return basic fallback content
+            return self._generate_fallback_content(html_content, metadata)
+    
+    def _generate_frontmatter(self, metadata: Dict) -> str:
+        """Generate YAML frontmatter for the MDX file."""
+        title = metadata.get('title', 'Untitled Note')
+        created = metadata.get('created', '')
+        modified = metadata.get('modified', '')
+        folder = metadata.get('folder', 'Notes')
+        
+        # Format dates
+        created_date = self._format_date(created)
+        modified_date = self._format_date(modified)
+        
+        # Escape title for YAML
+        safe_title = self._escape_yaml_string(title)
+        safe_folder = self._escape_yaml_string(folder)
+        
+        # Build frontmatter
+        frontmatter_lines = [
+            "---",
+            f"title: {safe_title}",
+            f"date: {created_date}",
+            f"modified: {modified_date}",
+            f"folder: {safe_folder}",
+            f"type: note",
+            f"source: apple-notes"
+        ]
+        
+        # Add tags if enabled and folder is meaningful
+        if self.tags_in_frontmatter and folder and folder != "Notes":
+            frontmatter_lines.append(f"tags: [\"{safe_folder.strip('\"')}\"]")
+        
+        # Add custom fields from config
+        custom_fields = self.config.get("custom_frontmatter", {})
+        for key, value in custom_fields.items():
+            frontmatter_lines.append(f"{key}: {value}")
+        
+        frontmatter_lines.extend(["---", ""])
+        
+        return "\\n".join(frontmatter_lines)
+    
+    def _convert_html_to_markdown(self, html_content: str) -> str:
+        """Convert HTML content to Markdown."""
+        if not html_content or html_content.strip() == "":
+            return ""
+        
+        try:
+            # Pre-process HTML to handle Apple Notes specific elements
+            processed_html = self._preprocess_html(html_content)
+            
+            # Convert to Markdown using markdownify
+            markdown = markdownify.markdownify(
+                processed_html,
+                **self.markdownify_options
+            )
+            
+            return markdown.strip()
+            
+        except Exception as e:
+            logger.error(f"Error in HTML to Markdown conversion: {e}")
+            # Fallback: return cleaned HTML
+            return self._clean_html_fallback(html_content)
+    
+    def _preprocess_html(self, html_content: str) -> str:
+        """Preprocess HTML to handle Apple Notes specific elements."""
+        try:
+            soup = BeautifulSoup(html_content, 'html.parser')
+            
+            # Handle Apple Notes checklists
+            self._convert_checklists(soup)
+            
+            # Handle line breaks in paragraphs
+            self._normalize_line_breaks(soup)
+            
+            # Clean up empty elements
+            self._remove_empty_elements(soup)
+            
+            # Handle Apple Notes specific styling
+            self._clean_apple_notes_styling(soup)
+            
+            return str(soup)
+            
+        except Exception as e:
+            logger.warning(f"Error preprocessing HTML: {e}")
+            return html_content
+    
+    def _convert_checklists(self, soup: BeautifulSoup) -> None:
+        """Convert Apple Notes checklists to Markdown task lists."""
+        # Look for checkbox patterns in Apple Notes
+        # Apple Notes often uses specific div structures for checkboxes
+        checkbox_pattern = re.compile(r'☐|☑|✓|✗|□|■', re.UNICODE)
+        
+        for element in soup.find_all(text=checkbox_pattern):
+            parent = element.parent
+            if parent and parent.name in ['p', 'div', 'li']:
+                # Convert to Markdown task list format
+                text = str(element)
+                if '☑' in text or '✓' in text or '■' in text:
+                    # Checked item
+                    new_text = re.sub(r'[☑✓■]\\s*', '- [x] ', text)
+                else:
+                    # Unchecked item
+                    new_text = re.sub(r'[☐□]\\s*', '- [ ] ', text)
+                
+                element.replace_with(new_text)
+    
+    def _normalize_line_breaks(self, soup: BeautifulSoup) -> None:
+        """Normalize line breaks in HTML content."""
+        # Replace <br> tags with actual line breaks where appropriate
+        for br in soup.find_all('br'):
+            br.replace_with('\\n')
+        
+        # Handle <div> tags used for line breaks in Apple Notes
+        for div in soup.find_all('div'):
+            if not div.get_text().strip():
+                div.replace_with('\\n')
+    
+    def _remove_empty_elements(self, soup: BeautifulSoup) -> None:
+        """Remove empty HTML elements."""
+        for element in soup.find_all():
+            if (not element.get_text().strip() and 
+                not element.find('img') and 
+                element.name not in ['br', 'hr', 'img']):
+                element.decompose()
+    
+    def _clean_apple_notes_styling(self, soup: BeautifulSoup) -> None:
+        """Clean Apple Notes specific styling attributes."""
+        # Remove Apple Notes specific attributes
+        for element in soup.find_all():
+            # Remove style attributes that don't translate well
+            if element.get('style'):
+                del element['style']
+            
+            # Remove Apple Notes specific classes
+            if element.get('class'):
+                classes = element.get('class')
+                cleaned_classes = [c for c in classes if not c.startswith('Apple-')]
+                if cleaned_classes:
+                    element['class'] = cleaned_classes
+                else:
+                    del element['class']
+    
+    def _post_process_markdown(self, markdown_content: str) -> str:
+        """Post-process Markdown content for MDX compatibility."""
+        if not markdown_content:
+            return ""
+        
+        # Fix excessive line breaks
+        markdown_content = re.sub(r'\\n{3,}', '\\n\\n', markdown_content)
+        
+        # Fix image syntax for relative paths
+        markdown_content = re.sub(
+            r'!\\[([^\\]]*)\\]\\(\\./attachments/([^\\)]+)\\)',
+            r'![\\1](./attachments/\\2)',
+            markdown_content
+        )
+        
+        # Fix link syntax
+        markdown_content = re.sub(
+            r'\\[([^\\]]+)\\]\\(([^\\)]+)\\)',
+            r'[\\1](\\2)',
+            markdown_content
+        )
+        
+        # Add MDX components if enabled
+        if self.mdx_components:
+            markdown_content = self._add_mdx_components(markdown_content)
+        
+        # Ensure content ends with a single newline
+        markdown_content = markdown_content.rstrip() + '\\n'
+        
+        return markdown_content
+    
+    def _add_mdx_components(self, content: str) -> str:
+        """Add MDX-specific components if enabled."""
+        # This is a placeholder for MDX component processing
+        # Could convert specific patterns to JSX components
+        # For example, converting note references to custom components
+        
+        # Example: Convert [[Note Title]] to <NoteLink title="Note Title" />
+        content = re.sub(
+            r'\\[\\[([^\\]]+)\\]\\]',
+            r'<NoteLink title="\\1" />',
+            content
+        )
+        
+        return content
+    
+    def _format_date(self, date_string: str) -> str:
+        """Format date string for frontmatter."""
+        if not date_string:
+            return datetime.now().strftime(self.date_format)
+        
+        try:
+            # Parse ISO date string
+            if 'T' in date_string:
+                dt = datetime.fromisoformat(date_string.replace('Z', '+00:00'))
+            else:
+                dt = datetime.strptime(date_string, '%Y-%m-%d')
+            
+            return dt.strftime(self.date_format)
+        except Exception:
+            logger.warning(f"Could not parse date: {date_string}")
+            return datetime.now().strftime(self.date_format)
+    
+    def _escape_yaml_string(self, value: str) -> str:
+        """Escape a string for safe YAML output."""
+        if not value:
+            return '""'
+        
+        # Check if the string needs quotes
+        needs_quotes = (
+            '"' in value or
+            "'" in value or
+            ':' in value or
+            '-' in value or
+            '[' in value or
+            ']' in value or
+            '{' in value or
+            '}' in value or
+            value.strip() != value
+        )
+        
+        if needs_quotes:
+            # Escape double quotes and wrap in quotes
+            escaped = value.replace('"', '\\\\"')
+            return f'"{escaped}"'
+        else:
+            return value
+    
+    def _clean_html_fallback(self, html_content: str) -> str:
+        """Fallback method to clean HTML when conversion fails."""
+        try:
+            soup = BeautifulSoup(html_content, 'html.parser')
+            return soup.get_text()
+        except Exception:
+            # Last resort: return raw content
+            return html_content
+    
+    def _generate_fallback_content(self, html_content: str, metadata: Dict) -> str:
+        """Generate fallback MDX content when conversion fails."""
+        title = metadata.get('title', 'Untitled Note')
+        
+        frontmatter = f"""---
+title: "{self._escape_yaml_string(title)}"
+date: {datetime.now().strftime(self.date_format)}
+type: note
+source: apple-notes
+conversion_error: true
+---
+
+"""
+        
+        clean_content = self._clean_html_fallback(html_content)
+        return frontmatter + clean_content
+    
+    def validate_mdx_output(self, mdx_content: str) -> Dict[str, Any]:
+        """Validate the generated MDX content."""
+        validation_result = {
+            "valid": True,
+            "errors": [],
+            "warnings": [],
+            "stats": {}
+        }
+        
+        try:
+            # Check for frontmatter
+            if not mdx_content.startswith('---'):
+                validation_result["errors"].append("Missing frontmatter")
+                validation_result["valid"] = False
+            
+            # Check for basic structure
+            lines = mdx_content.split('\\n')
+            frontmatter_end = -1
+            for i, line in enumerate(lines[1:], 1):
+                if line.strip() == '---':
+                    frontmatter_end = i
+                    break
+            
+            if frontmatter_end == -1:
+                validation_result["errors"].append("Malformed frontmatter")
+                validation_result["valid"] = False
+            
+            # Basic stats
+            validation_result["stats"] = {
+                "total_lines": len(lines),
+                "content_lines": len(lines) - frontmatter_end - 1 if frontmatter_end > 0 else 0,
+                "character_count": len(mdx_content),
+                "image_count": mdx_content.count('!['),
+                "link_count": mdx_content.count('](')
+            }
+            
+        except Exception as e:
+            validation_result["errors"].append(f"Validation error: {str(e)}")
+            validation_result["valid"] = False
+        
+        return validation_result
