@@ -193,9 +193,11 @@ const TextType = ({
       className: `inline-block whitespace-pre-wrap tracking-tight ${className}`,
       ...props,
     },
-    <span 
-      className="inline" 
-      style={getCurrentTextColor() ? { color: getCurrentTextColor() } : undefined}
+    <span
+      className="inline"
+      style={
+        getCurrentTextColor() ? { color: getCurrentTextColor() } : undefined
+      }
     >
       {displayedText}
     </span>,

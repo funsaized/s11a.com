@@ -58,9 +58,7 @@ export default IndexPage;
 export const query = graphql`
   query {
     allMdx(
-      filter: {
-        internal: { contentFilePath: { regex: "/content/articles/" } }
-      }
+      filter: { internal: { contentFilePath: { regex: "/content/articles/" } } }
       sort: { frontmatter: { date: DESC } }
       limit: 4
     ) {

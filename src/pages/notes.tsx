@@ -109,7 +109,7 @@ function NoteCard({ note }: { note: Note }) {
           </Link>
         </CardTitle>
       </CardHeader>
-      
+
       <CardContent className="flex-1 flex flex-col">
         {note.excerpt && (
           <p className="text-muted-foreground text-sm mb-4 line-clamp-3 flex-1">
@@ -184,13 +184,17 @@ const NotesPage: React.FC<PageProps<NotesPageData>> = ({ data }) => {
   const notes: Note[] = data.allMdx.nodes.map((node) => {
     // Generate slug from title or filename
     const getFilenameFromPath = (filePath: string): string => {
-      return filePath.split('/').pop()?.replace('.mdx', '') || '';
+      return filePath.split("/").pop()?.replace(".mdx", "") || "";
     };
-    
-    const generatedSlug = node.frontmatter.slug || 
-                         node.frontmatter.title?.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') ||
-                         getFilenameFromPath(node.internal.contentFilePath).toLowerCase();
-    
+
+    const generatedSlug =
+      node.frontmatter.slug ||
+      node.frontmatter.title
+        ?.toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-|-$/g, "") ||
+      getFilenameFromPath(node.internal.contentFilePath).toLowerCase();
+
     return {
       id: node.id,
       title: node.frontmatter.title,
@@ -229,7 +233,8 @@ const NotesPage: React.FC<PageProps<NotesPageData>> = ({ data }) => {
         searchQuery === "" ||
         note.title.toLowerCase().includes(searchLower) ||
         (note.excerpt && note.excerpt.toLowerCase().includes(searchLower)) ||
-        (note.tags && note.tags.some((tag) => tag.toLowerCase().includes(searchLower)));
+        (note.tags &&
+          note.tags.some((tag) => tag.toLowerCase().includes(searchLower)));
 
       // Category filter
       const matchesCategory =
@@ -277,7 +282,8 @@ const NotesPage: React.FC<PageProps<NotesPageData>> = ({ data }) => {
               📓 Personal Notes & Jottings
             </h1>
             <p className="text-lg text-muted-foreground">
-              A collection of quick notes, thoughts, and scratchpad entries on various topics.
+              A collection of quick notes, thoughts, and scratchpad entries on
+              various topics.
             </p>
           </div>
 
@@ -400,9 +406,7 @@ export default NotesPage;
 export const query = graphql`
   query {
     allMdx(
-      filter: {
-        internal: { contentFilePath: { regex: "/content/notes/" } }
-      }
+      filter: { internal: { contentFilePath: { regex: "/content/notes/" } } }
       sort: { frontmatter: { date: DESC } }
     ) {
       nodes {
