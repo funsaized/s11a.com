@@ -45,23 +45,13 @@ class MDXConverter:
         self.date_format = self.config.get("date_format", "%Y-%m-%d")
         
         # Configure markdownify
+        # Note: In markdownify 1.2.0+, use either 'strip' or 'convert', not both
         self.markdownify_options = {
             'heading_style': 'ATX',  # Use # for headings
             'bullets': '-',  # Use - for unordered lists
             'strong_em_symbol': '**',  # Use ** for bold
             'strip': ['script', 'style'],  # Remove script and style tags
-            'convert': [
-                'h1', 'h2', 'h3', 'h4', 'h5', 'h6',  # Headings
-                'p', 'br',  # Paragraphs and breaks
-                'strong', 'b', 'em', 'i', 'u',  # Text formatting
-                'ul', 'ol', 'li',  # Lists
-                'a',  # Links
-                'img',  # Images
-                'blockquote',  # Quotes
-                'code', 'pre',  # Code
-                'table', 'thead', 'tbody', 'tr', 'th', 'td',  # Tables
-                'div', 'span'  # Generic containers
-            ]
+            # Tags to strip are automatically excluded from conversion
         }
         
         logger.info("MDXConverter initialized")
@@ -135,7 +125,7 @@ class MDXConverter:
         
         frontmatter_lines.extend(["---", ""])
         
-        return "\\n".join(frontmatter_lines)
+        return "\n".join(frontmatter_lines)
     
     def _convert_html_to_markdown(self, html_content: str) -> str:
         """Convert HTML content to Markdown."""
@@ -152,6 +142,11 @@ class MDXConverter:
                 **self.markdownify_options
             )
             
+            # Log image conversion for debugging
+            image_count = markdown.count('![')
+            if image_count > 0:
+                logger.debug(f"Converted {image_count} images to markdown format")
+            
             return markdown.strip()
             
         except Exception as e:
@@ -163,6 +158,19 @@ class MDXConverter:
         """Preprocess HTML to handle Apple Notes specific elements."""
         try:
             soup = BeautifulSoup(html_content, 'html.parser')
+            
+            # Ensure image tags have proper alt attributes for better markdown conversion
+            for img in soup.find_all('img'):
+                if not img.get('alt'):
+                    # Use filename as alt text if no alt attribute
+                    src = img.get('src', '')
+                    if '../../attachments/' in src:
+                        filename = src.split('/')[-1]
+                        # Remove extension and clean up filename for alt text
+                        alt_text = filename.rsplit('.', 1)[0].replace('-', ' ').title()
+                        img['alt'] = alt_text
+                    else:
+                        img['alt'] = 'Image'
             
             # Handle Apple Notes checklists
             self._convert_checklists(soup)
@@ -195,10 +203,10 @@ class MDXConverter:
                 text = str(element)
                 if '☑' in text or '✓' in text or '■' in text:
                     # Checked item
-                    new_text = re.sub(r'[☑✓■]\\s*', '- [x] ', text)
+                    new_text = re.sub(r'[☑✓■]\s*', '- [x] ', text)
                 else:
                     # Unchecked item
-                    new_text = re.sub(r'[☐□]\\s*', '- [ ] ', text)
+                    new_text = re.sub(r'[☐□]\s*', '- [ ] ', text)
                 
                 element.replace_with(new_text)
     
@@ -206,12 +214,12 @@ class MDXConverter:
         """Normalize line breaks in HTML content."""
         # Replace <br> tags with actual line breaks where appropriate
         for br in soup.find_all('br'):
-            br.replace_with('\\n')
+            br.replace_with('\n')
         
         # Handle <div> tags used for line breaks in Apple Notes
         for div in soup.find_all('div'):
             if not div.get_text().strip():
-                div.replace_with('\\n')
+                div.replace_with('\n')
     
     def _remove_empty_elements(self, soup: BeautifulSoup) -> None:
         """Remove empty HTML elements."""
@@ -244,19 +252,35 @@ class MDXConverter:
             return ""
         
         # Fix excessive line breaks
-        markdown_content = re.sub(r'\\n{3,}', '\\n\\n', markdown_content)
+        markdown_content = re.sub(r'\n{3,}', '\n\n', markdown_content)
         
-        # Fix image syntax for relative paths
+        # Ensure proper markdown image syntax for attachment images
+        # Look for HTML img tags that weren't converted to markdown and convert them
+        img_pattern = re.compile(
+            r'<img[^>]*src=["\']?(\.\./\.\./attachments\/[^"\'>\s]+)["\']?[^>]*(?:\/?>|>[^<]*<\/img>)',
+            re.IGNORECASE
+        )
+        
+        def convert_img_to_markdown(match):
+            src = match.group(1)
+            # Extract alt text if present
+            alt_match = re.search(r'alt=["\']?([^"\'>\s]*)["\']?', match.group(0))
+            alt = alt_match.group(1) if alt_match else "Image"
+            return f"![{alt}]({src})"
+        
+        markdown_content = img_pattern.sub(convert_img_to_markdown, markdown_content)
+        
+        # Fix any malformed image syntax for relative paths
         markdown_content = re.sub(
-            r'!\\[([^\\]]*)\\]\\(\\./attachments/([^\\)]+)\\)',
-            r'![\\1](./attachments/\\2)',
+            r'!\[([^\]]*)\]\(\.\.\/\.\.\/attachments\/([^\)]+)\)',
+            r'![\1](../../attachments/\2)',
             markdown_content
         )
         
         # Fix link syntax
         markdown_content = re.sub(
-            r'\\[([^\\]]+)\\]\\(([^\\)]+)\\)',
-            r'[\\1](\\2)',
+            r'\[([^\]]+)\]\(([^\)]+)\)',
+            r'[\1](\2)',
             markdown_content
         )
         
@@ -265,7 +289,7 @@ class MDXConverter:
             markdown_content = self._add_mdx_components(markdown_content)
         
         # Ensure content ends with a single newline
-        markdown_content = markdown_content.rstrip() + '\\n'
+        markdown_content = markdown_content.rstrip() + '\n'
         
         return markdown_content
     
@@ -277,8 +301,8 @@ class MDXConverter:
         
         # Example: Convert [[Note Title]] to <NoteLink title="Note Title" />
         content = re.sub(
-            r'\\[\\[([^\\]]+)\\]\\]',
-            r'<NoteLink title="\\1" />',
+            r'\[\[([^\]]+)\]\]',
+            r'<NoteLink title="\1" />',
             content
         )
         
@@ -321,7 +345,7 @@ class MDXConverter:
         
         if needs_quotes:
             # Escape double quotes and wrap in quotes
-            escaped = value.replace('"', '\\\\"')
+            escaped = value.replace('"', '\\"')
             return f'"{escaped}"'
         else:
             return value
@@ -368,7 +392,7 @@ conversion_error: true
                 validation_result["valid"] = False
             
             # Check for basic structure
-            lines = mdx_content.split('\\n')
+            lines = mdx_content.split('\n')
             frontmatter_end = -1
             for i, line in enumerate(lines[1:], 1):
                 if line.strip() == '---':

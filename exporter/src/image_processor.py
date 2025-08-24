@@ -10,9 +10,11 @@ import os
 import base64
 import hashlib
 import re
+import io
 from pathlib import Path
-from typing import Dict, List, Tuple, Optional
+from typing import Dict, List, Tuple, Optional, Union
 import logging
+from dataclasses import dataclass, field
 
 try:
     from PIL import Image
@@ -20,10 +22,41 @@ try:
 except ImportError:
     raise ImportError("Pillow is required. Install with: pip install Pillow")
 
+# Enable HEIC/HEIF support if available
+try:
+    import pillow_heif
+    pillow_heif.register_heif_opener()
+    HEIC_SUPPORT = True
+except ImportError:
+    HEIC_SUPPORT = False
+
 try:
     from bs4 import BeautifulSoup
 except ImportError:
     raise ImportError("BeautifulSoup4 is required. Install with: pip install beautifulsoup4")
+
+@dataclass
+class ImageConfig:
+    """Configuration for image processing."""
+    image_format: str = "jpg"
+    image_quality: int = 95
+    max_filename_length: int = 50
+    max_image_size_mb: int = 50
+    enable_download: bool = True
+    download_timeout: int = 30
+    supported_web_formats: List[str] = field(default_factory=lambda: [
+        'jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp', 'tiff'
+    ])
+    
+    def __post_init__(self):
+        """Validate configuration after initialization."""
+        if self.image_quality < 1 or self.image_quality > 100:
+            raise ValueError("image_quality must be between 1 and 100")
+        if self.max_filename_length < 10:
+            raise ValueError("max_filename_length must be at least 10")
+        if self.max_image_size_mb < 1:
+            raise ValueError("max_image_size_mb must be at least 1")
+
 
 logger = logging.getLogger(__name__)
 
@@ -31,26 +64,28 @@ logger = logging.getLogger(__name__)
 class ImageProcessor:
     """Handles image extraction and processing for Notes export."""
     
-    def __init__(self, attachments_dir: Path, config: Optional[Dict] = None):
+    def __init__(self, attachments_dir: Union[str, Path], config: Optional[Union[Dict, ImageConfig]] = None):
         """
         Initialize the image processor.
         
         Args:
             attachments_dir: Directory to save extracted images
-            config: Configuration dictionary with image processing options
+            config: Configuration dictionary or ImageConfig instance
         """
         self.attachments_dir = Path(attachments_dir)
-        self.config = config or {}
         
-        # Default configuration
-        self.image_format = self.config.get("image_format", "jpg")
-        self.image_quality = self.config.get("image_quality", 95)
-        self.max_filename_length = self.config.get("max_filename_length", 50)
+        # Handle config initialization
+        if isinstance(config, ImageConfig):
+            self.config = config
+        elif isinstance(config, dict):
+            self.config = ImageConfig(**config)
+        else:
+            self.config = ImageConfig()
         
         # Ensure attachments directory exists
         self.attachments_dir.mkdir(parents=True, exist_ok=True)
         
-        # Supported image formats
+        # Supported image formats mapping
         self.supported_formats = {
             'image/jpeg': 'jpg',
             'image/jpg': 'jpg', 
@@ -58,7 +93,25 @@ class ImageProcessor:
             'image/gif': 'gif',
             'image/webp': 'webp',
             'image/heic': 'heic',
-            'image/heif': 'heic'
+            'image/heif': 'heic',
+            'image/bmp': 'bmp',
+            'image/tiff': 'tiff',
+            'image/tif': 'tiff',
+            'image/x-icon': 'ico',
+            'image/vnd.microsoft.icon': 'ico',
+            'image/avif': 'avif'
+        }
+        
+        # MIME type detection patterns
+        self.format_signatures = {
+            b'\xff\xd8\xff': 'jpg',
+            b'\x89PNG\r\n\x1a\n': 'png',
+            b'GIF8': 'gif',
+            b'RIFF': 'webp',  # Requires additional check for WEBP
+            b'BM': 'bmp',
+            b'II*\x00': 'tiff',
+            b'MM\x00*': 'tiff',
+            b'\x00\x00\x01\x00': 'ico'
         }
         
         # Pattern for base64 images in HTML
@@ -68,6 +121,11 @@ class ImageProcessor:
         )
         
         logger.info(f"ImageProcessor initialized. Output dir: {self.attachments_dir}")
+        logger.info(f"Config: format={self.config.image_format}, quality={self.config.image_quality}")
+        if HEIC_SUPPORT:
+            logger.info("✅ HEIC/HEIF support enabled")
+        else:
+            logger.warning("⚠️ HEIC/HEIF support not available - install pillow-heif for better compatibility")
     
     def process_html_images(self, html_content: str, note_name: str) -> Tuple[str, List[str]]:
         """
@@ -99,10 +157,17 @@ class ImageProcessor:
                     image_path = self._extract_base64_image(src, note_name, idx)
                     if image_path:
                         # Update the img tag with relative path
-                        relative_path = f"./attachments/{image_path.name}"
+                        # MDX files are in notes/{folder}/ so need ../../attachments/
+                        relative_path = f"../../attachments/{image_path.name}"
+                        old_src = img_tag.get('src', '')[:100]  # First 100 chars for logging
                         img_tag['src'] = relative_path
+                        # Ensure alt attribute exists for better markdown conversion
+                        if not img_tag.get('alt'):
+                            # Use filename as alt text
+                            alt_text = image_path.stem.replace('-', ' ').title()
+                            img_tag['alt'] = alt_text
                         extracted_images.append(str(image_path))
-                        logger.debug(f"Extracted base64 image: {image_path.name}")
+                        logger.info(f"✅ Updated image src: '{old_src}...' → '{relative_path}'")
                 
                 elif src.startswith('cid:') or src.startswith('x-apple-data-detectors://'):
                     # Handle Apple Notes internal references
@@ -114,13 +179,29 @@ class ImageProcessor:
                     if src.startswith('http'):
                         image_path = self._download_web_image(src, note_name, idx)
                         if image_path:
-                            relative_path = f"./attachments/{image_path.name}"
+                            # MDX files are in notes/{folder}/ so need ../../attachments/
+                            relative_path = f"../../attachments/{image_path.name}"
                             img_tag['src'] = relative_path
+                            # Ensure alt attribute exists for better markdown conversion
+                            if not img_tag.get('alt'):
+                                # Use filename as alt text
+                                alt_text = image_path.stem.replace('-', ' ').title()
+                                img_tag['alt'] = alt_text
                             extracted_images.append(str(image_path))
-                            logger.debug(f"Downloaded web image: {image_path.name}")
+                            logger.debug(f"Downloaded web image: {image_path.name}, linked as: {relative_path}")
             
             # Convert back to HTML
             modified_html = str(soup)
+            
+            # Log final HTML state for debugging
+            if extracted_images:
+                # Show first few img tags in final HTML for verification
+                final_soup = BeautifulSoup(modified_html, 'html.parser')
+                final_img_tags = final_soup.find_all('img')[:2]  # First 2 images
+                for i, tag in enumerate(final_img_tags):
+                    src = tag.get('src', '')
+                    alt = tag.get('alt', '')
+                    logger.info(f"📋 Final img[{i}]: src='{src}' alt='{alt}'")
             
             logger.info(f"Processed {len(extracted_images)} images for note: {note_name}")
             return modified_html, extracted_images
@@ -148,6 +229,17 @@ class ImageProcessor:
                 logger.error(f"Failed to decode base64 image: {e}")
                 return None
             
+            # Validate image data size
+            if not self._validate_image_size(image_data):
+                logger.warning(f"Image too large ({len(image_data)} bytes), skipping")
+                return None
+            
+            # Validate image format
+            detected_format = self._detect_image_format(image_data)
+            if detected_format:
+                logger.debug(f"Detected format: {detected_format} (claimed: {mime_type})")
+                mime_type = detected_format
+            
             # Generate unique filename
             filename = self._generate_filename(note_name, index, mime_type)
             image_path = self.attachments_dir / filename
@@ -160,24 +252,58 @@ class ImageProcessor:
             return None
     
     def _download_web_image(self, url: str, note_name: str, index: int) -> Optional[Path]:
-        """Download an image from a web URL."""
+        """Download an image from a web URL with improved error handling."""
+        if not self.config.enable_download:
+            logger.info("Web image download disabled in config")
+            return None
+        
         try:
             import urllib.request
             import urllib.parse
+            import urllib.error
             
-            # Download the image
-            with urllib.request.urlopen(url, timeout=30) as response:
-                image_data = response.read()
+            # Validate URL
+            parsed_url = urllib.parse.urlparse(url)
+            if not parsed_url.scheme in ['http', 'https']:
+                logger.warning(f"Unsupported URL scheme: {parsed_url.scheme}")
+                return None
+            
+            # Create request with headers
+            request = urllib.request.Request(
+                url,
+                headers={
+                    'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36'
+                }
+            )
+            
+            # Download with timeout and size limit
+            with urllib.request.urlopen(request, timeout=self.config.download_timeout) as response:
+                # Check content length
+                content_length = response.headers.get('content-length')
+                if content_length and int(content_length) > self.config.max_image_size_mb * 1024 * 1024:
+                    logger.warning(f"Image too large: {content_length} bytes")
+                    return None
+                
+                # Read data with size limit
+                max_size = self.config.max_image_size_mb * 1024 * 1024
+                image_data = response.read(max_size)
                 content_type = response.headers.get('content-type', 'image/jpeg')
             
-            # Extract file extension from URL or content type
-            parsed_url = urllib.parse.urlparse(url)
-            url_ext = os.path.splitext(parsed_url.path)[1].lower()
-            
-            if url_ext in ['.jpg', '.jpeg', '.png', '.gif', '.webp']:
-                mime_type = url_ext[1:]  # Remove the dot
+            # Validate downloaded data
+            if not self._validate_image_size(image_data):
+                return None
+                
+            # Detect actual format from data
+            detected_format = self._detect_image_format(image_data)
+            if detected_format:
+                mime_type = detected_format
             else:
-                mime_type = content_type.split('/')[-1] if '/' in content_type else 'jpg'
+                # Fallback to URL extension or content-type
+                url_ext = os.path.splitext(parsed_url.path)[1].lower()
+                if url_ext and url_ext[1:] in self.config.supported_web_formats:
+                    mime_type = url_ext[1:]
+                else:
+                    mime_type = content_type.split('/')[-1] if '/' in content_type else 'jpg'
             
             # Generate filename
             filename = self._generate_filename(note_name, index, mime_type)
@@ -186,74 +312,293 @@ class ImageProcessor:
             # Save image
             return self._save_image(image_data, image_path, mime_type)
             
+        except urllib.error.HTTPError as e:
+            logger.error(f"HTTP error downloading image from {url}: {e.code} {e.reason}")
+        except urllib.error.URLError as e:
+            logger.error(f"URL error downloading image from {url}: {e.reason}")
         except Exception as e:
-            logger.error(f"Error downloading web image from {url}: {e}")
-            return None
+            logger.error(f"Unexpected error downloading image from {url}: {e}")
+        
+        return None
     
     def _save_image(self, image_data: bytes, image_path: Path, original_format: str) -> Optional[Path]:
-        """Save image data to file, converting format if needed."""
+        """Save image data to file with robust format handling and conversion."""
         try:
-            # Open image with Pillow
-            image = Image.open(io.BytesIO(image_data))
+            # Check for HEIC/HEIF data by examining file header
+            is_heic = self._detect_heic_format(image_data)
+            if is_heic:
+                logger.info(f"Detected HEIC/HEIF format, attempting conversion")
+                original_format = 'heic'
             
-            # Handle HEIC conversion
-            if original_format.lower() in ['heic', 'heif']:
-                logger.info(f"Converting HEIC image to {self.image_format.upper()}")
-                # Convert to RGB if needed
+            # Attempt to open image with Pillow
+            try:
+                image = Image.open(io.BytesIO(image_data))
+                
+                # Verify image integrity
+                image.verify()
+                
+                # Reopen for processing (verify() makes image unusable)
+                image = Image.open(io.BytesIO(image_data))
+                
+            except Exception as e:
+                logger.error(f"Failed to open image with Pillow: {e}")
+                return self._fallback_save(image_data, image_path, original_format)
+            
+            # Handle HEIC conversion - always convert to target format
+            if original_format.lower() in ['heic', 'heif'] or is_heic:
+                return self._convert_heic_image(image, image_path)
+            
+            # Handle regular image formats with proper conversion
+            return self._convert_standard_image(image, image_path, original_format)
+            
+        except Exception as e:
+            logger.error(f"Error saving image to {image_path}: {e}")
+            return self._fallback_save(image_data, image_path, original_format)
+    
+    def _convert_heic_image(self, image: Image.Image, image_path: Path) -> Optional[Path]:
+        """Convert HEIC/HEIF image to target format."""
+        try:
+            if not HEIC_SUPPORT:
+                logger.error("HEIC support not available - install pillow-heif")
+                return None
+            
+            logger.info(f"Converting HEIC/HEIF image to {self.config.image_format.upper()}")
+            
+            # Convert to RGB if needed (HEIC images often need this)
+            if image.mode in ['RGBA', 'P']:
+                # Create white background for transparency
+                background = Image.new('RGB', image.size, (255, 255, 255))
+                if image.mode == 'RGBA':
+                    background.paste(image, mask=image.split()[-1])  # Alpha channel as mask
+                else:
+                    background.paste(image)
+                image = background
+            elif image.mode != 'RGB':
+                image = image.convert('RGB')
+            
+            # Force file extension to target format
+            image_path = image_path.with_suffix(f'.{self.config.image_format}')
+            
+            # Save with optimization
+            save_kwargs = {'optimize': True}
+            if self.config.image_format.lower() == 'jpg':
+                save_kwargs.update({
+                    'quality': self.config.image_quality,
+                    'format': 'JPEG'
+                })
+            elif self.config.image_format.lower() == 'png':
+                save_kwargs['format'] = 'PNG'
+            
+            image.save(image_path, **save_kwargs)
+            logger.debug(f"Converted HEIC to {self.config.image_format.upper()}: {image_path.name} ({image.size})")
+            return image_path
+            
+        except Exception as e:
+            logger.error(f"HEIC conversion failed: {e}")
+            return None
+    
+    def _convert_standard_image(self, image: Image.Image, image_path: Path, original_format: str) -> Optional[Path]:
+        """Convert standard image formats with proper mode handling."""
+        try:
+            target_format = self.config.image_format.lower()
+            
+            # Handle format-specific conversions
+            if target_format == 'jpg':
+                # JPEG doesn't support transparency
                 if image.mode in ['RGBA', 'P']:
+                    # Create white background
+                    background = Image.new('RGB', image.size, (255, 255, 255))
+                    if image.mode == 'RGBA':
+                        background.paste(image, mask=image.split()[-1])
+                    else:
+                        background.paste(image)
+                    image = background
+                elif image.mode != 'RGB':
                     image = image.convert('RGB')
                 
-                # Update file extension
-                image_path = image_path.with_suffix(f'.{self.image_format}')
-            
-            # Save based on desired format
-            if self.image_format == 'jpg' and image.mode in ['RGBA', 'P']:
-                # Convert to RGB for JPEG
-                image = image.convert('RGB')
-                image.save(image_path, 'JPEG', quality=self.image_quality, optimize=True)
-            elif self.image_format == 'png':
+                # Ensure correct file extension
+                image_path = image_path.with_suffix('.jpg')
+                image.save(image_path, 'JPEG', quality=self.config.image_quality, optimize=True)
+                
+            elif target_format == 'png':
+                # PNG supports all modes
+                image_path = image_path.with_suffix('.png')
                 image.save(image_path, 'PNG', optimize=True)
+                
+            elif target_format == 'webp':
+                # WebP supports all modes
+                image_path = image_path.with_suffix('.webp')
+                image.save(image_path, 'WebP', quality=self.config.image_quality, optimize=True)
+                
             else:
-                # Save in original format or specified format
-                image.save(image_path, quality=self.image_quality if self.image_format == 'jpg' else None)
+                # Keep original format or convert to JPEG as fallback
+                if original_format in ['heic', 'heif'] or target_format not in self.supported_formats.values():
+                    target_format = 'jpg'
+                    if image.mode != 'RGB':
+                        image = image.convert('RGB')
+                    image_path = image_path.with_suffix('.jpg')
+                    image.save(image_path, 'JPEG', quality=self.config.image_quality, optimize=True)
+                else:
+                    image_path = image_path.with_suffix(f'.{target_format}')
+                    image.save(image_path, optimize=True)
             
             logger.debug(f"Saved image: {image_path.name} ({image.size})")
             return image_path
             
         except Exception as e:
-            logger.error(f"Error saving image to {image_path}: {e}")
-            # Fallback: save raw data
-            try:
-                with open(image_path, 'wb') as f:
-                    f.write(image_data)
-                logger.info(f"Saved raw image data: {image_path.name}")
-                return image_path
-            except Exception as e2:
-                logger.error(f"Failed to save raw image data: {e2}")
+            logger.error(f"Image conversion failed: {e}")
+            return None
+    
+    def _fallback_save(self, image_data: bytes, image_path: Path, original_format: str) -> Optional[Path]:
+        """Fallback method to save raw image data when Pillow fails."""
+        try:
+            # Don't save raw HEIC data as it won't be viewable
+            if self._detect_heic_format(image_data):
+                logger.error("Cannot save raw HEIC data - conversion required but failed")
                 return None
+            
+            # For other formats, try to save raw data
+            with open(image_path, 'wb') as f:
+                f.write(image_data)
+            
+            logger.info(f"Saved raw image data: {image_path.name} ({len(image_data)} bytes)")
+            return image_path
+            
+        except Exception as e:
+            logger.error(f"Fallback save failed: {e}")
+            return None
+    
+    def _detect_heic_format(self, image_data: bytes) -> bool:
+        """Detect HEIC/HEIF format by examining file header."""
+        try:
+            if len(image_data) < 32:
+                return False
+            
+            # Check for HEIC/HEIF signatures in ftyp box
+            header = image_data[:32]
+            
+            # HEIC/HEIF patterns (look for ftyp box with specific brand)
+            heic_patterns = [
+                b'ftypheic',  # HEIC
+                b'ftypheif',  # HEIF  
+                b'ftypmif1',  # HEIF variant
+                b'ftypheix',  # HEIC variant
+                b'ftyphvcC',  # HEIF sequence
+                b'ftyphevc',  # HEIF video
+                b'ftypmif2'   # Another HEIF variant
+            ]
+            
+            for pattern in heic_patterns:
+                if pattern in header:
+                    return True
+            
+            # Additional check for ISO base media file format
+            if header[4:8] == b'ftyp' and (b'hei' in header[8:20] or b'mif' in header[8:20]):
+                return True
+                    
+            return False
+            
+        except Exception:
+            return False
+    
+    def _detect_image_format(self, image_data: bytes) -> Optional[str]:
+        """Detect image format from file signature."""
+        try:
+            if len(image_data) < 16:
+                return None
+            
+            # Check file signatures
+            header = image_data[:16]
+            
+            # JPEG
+            if header.startswith(b'\xff\xd8\xff'):
+                return 'jpg'
+            
+            # PNG
+            if header.startswith(b'\x89PNG\r\n\x1a\n'):
+                return 'png'
+            
+            # GIF
+            if header.startswith(b'GIF8'):
+                return 'gif'
+            
+            # WebP
+            if header.startswith(b'RIFF') and b'WEBP' in image_data[8:16]:
+                return 'webp'
+            
+            # BMP
+            if header.startswith(b'BM'):
+                return 'bmp'
+            
+            # TIFF (little and big endian)
+            if header.startswith(b'II*\x00') or header.startswith(b'MM\x00*'):
+                return 'tiff'
+            
+            # ICO
+            if header.startswith(b'\x00\x00\x01\x00'):
+                return 'ico'
+            
+            # HEIC/HEIF
+            if self._detect_heic_format(image_data):
+                return 'heic'
+            
+            return None
+            
+        except Exception:
+            return None
+    
+    def _validate_image_size(self, image_data: bytes) -> bool:
+        """Validate image data size against configured limits."""
+        size_mb = len(image_data) / (1024 * 1024)
+        if size_mb > self.config.max_image_size_mb:
+            logger.warning(f"Image size {size_mb:.1f}MB exceeds limit {self.config.max_image_size_mb}MB")
+            return False
+        return True
     
     def _generate_filename(self, note_name: str, index: int, mime_type: str) -> str:
-        """Generate a unique filename for an image."""
-        # Sanitize note name
-        safe_name = re.sub(r'[<>:"/\\|?*]', '-', note_name)
-        safe_name = safe_name[:self.max_filename_length].strip()
+        """Generate a unique filename for an image with improved sanitization."""
+        # Comprehensive filename sanitization
+        safe_name = re.sub(r'[<>:"/\\|?*\x00-\x1f]', '-', note_name)
+        safe_name = re.sub(r'[-]+', '-', safe_name)  # Replace multiple dashes
+        safe_name = safe_name.strip(' -.')  # Remove leading/trailing spaces, dashes, dots
+        safe_name = safe_name[:self.config.max_filename_length]
         
-        # Get file extension
-        extension = self.supported_formats.get(f'image/{mime_type}', mime_type)
-        if self.image_format and self.image_format != extension:
-            extension = self.image_format
+        # Ensure we have a valid name
+        if not safe_name or safe_name.isspace():
+            safe_name = 'image'
+        
+        # Get file extension based on target format
+        if mime_type.lower() in ['heic', 'heif']:
+            # Always convert HEIC to target format
+            extension = self.config.image_format
+        else:
+            # Use configured format or original format
+            extension = self.supported_formats.get(f'image/{mime_type}', mime_type)
+            if self.config.image_format and self.config.image_format != extension:
+                extension = self.config.image_format
         
         # Create filename with index
         filename = f"{safe_name}-{index:03d}.{extension}"
         
-        # Handle duplicates
+        # Handle duplicates with improved logic
         counter = 1
         original_filename = filename
         while (self.attachments_dir / filename).exists():
-            name_part = original_filename.rsplit('.', 1)[0]
-            ext_part = original_filename.rsplit('.', 1)[1]
-            filename = f"{name_part}-{counter}.{ext_part}"
+            name_parts = original_filename.rsplit('.', 1)
+            if len(name_parts) == 2:
+                name_part, ext_part = name_parts
+                filename = f"{name_part}-{counter:02d}.{ext_part}"
+            else:
+                filename = f"{original_filename}-{counter:02d}"
             counter += 1
+            
+            # Prevent infinite loops
+            if counter > 999:
+                # Use timestamp as fallback
+                import time
+                timestamp = int(time.time())
+                filename = f"{safe_name}-{timestamp}.{extension}"
+                break
         
         return filename
     
@@ -272,5 +617,3 @@ class ImageProcessor:
         }
 
 
-# Add missing import
-import io
