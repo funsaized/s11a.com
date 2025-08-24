@@ -21,6 +21,8 @@ try:
 except ImportError:
     raise ImportError("BeautifulSoup4 is required. Install with: pip install beautifulsoup4")
 
+from frontmatter_generator import SmartFrontmatterGenerator
+
 logger = logging.getLogger(__name__)
 
 
@@ -43,6 +45,13 @@ class MDXConverter:
         self.mdx_components = self.config.get("mdx_components", False)
         self.tags_in_frontmatter = self.config.get("tags_in_frontmatter", True)
         self.date_format = self.config.get("date_format", "%Y-%m-%d")
+        self.use_smart_frontmatter = self.config.get("use_smart_frontmatter", True)
+        
+        # Initialize smart frontmatter generator
+        if self.use_smart_frontmatter:
+            self.frontmatter_generator = SmartFrontmatterGenerator()
+        else:
+            self.frontmatter_generator = None
         
         # Configure markdownify
         # Note: In markdownify 1.2.0+, use either 'strip' or 'convert', not both
@@ -68,14 +77,14 @@ class MDXConverter:
             MDX content with frontmatter
         """
         try:
-            # Generate frontmatter
-            frontmatter = self._generate_frontmatter(metadata)
-            
-            # Clean and convert HTML to Markdown
+            # Clean and convert HTML to Markdown first
             markdown_content = self._convert_html_to_markdown(html_content)
             
             # Post-process markdown for MDX compatibility
             mdx_content = self._post_process_markdown(markdown_content)
+            
+            # Generate frontmatter (smart or basic)
+            frontmatter = self._generate_frontmatter(metadata, mdx_content)
             
             # Combine frontmatter and content
             full_content = frontmatter + mdx_content
@@ -88,8 +97,26 @@ class MDXConverter:
             # Return basic fallback content
             return self._generate_fallback_content(html_content, metadata)
     
-    def _generate_frontmatter(self, metadata: Dict) -> str:
+    def _generate_frontmatter(self, metadata: Dict, content: str) -> str:
         """Generate YAML frontmatter for the MDX file."""
+        # Use smart frontmatter generation if available
+        if self.frontmatter_generator and self.use_smart_frontmatter:
+            try:
+                # Generate smart frontmatter
+                frontmatter_dict = self.frontmatter_generator.generate_frontmatter(
+                    content=content,
+                    existing_metadata=metadata,
+                    fallback_only=False
+                )
+                
+                # Convert to YAML format
+                return self._dict_to_yaml_frontmatter(frontmatter_dict)
+                
+            except Exception as e:
+                logger.warning(f"Smart frontmatter generation failed: {e}. Using basic frontmatter.")
+                # Fall through to basic generation
+        
+        # Basic frontmatter generation (fallback)
         title = metadata.get('title', 'Untitled Note')
         created = metadata.get('created', '')
         modified = metadata.get('modified', '')
@@ -126,6 +153,53 @@ class MDXConverter:
         frontmatter_lines.extend(["---", ""])
         
         return "\n".join(frontmatter_lines)
+    
+    def _dict_to_yaml_frontmatter(self, frontmatter_dict: Dict[str, Any]) -> str:
+        """
+        Convert a dictionary to YAML frontmatter format.
+        
+        Args:
+            frontmatter_dict: Dictionary containing frontmatter fields
+            
+        Returns:
+            YAML frontmatter string
+        """
+        lines = ["---"]
+        
+        # Define the order of fields for better readability
+        field_order = ["title", "slug", "date", "category", "tags", "excerpt", "author", "modified", "folder", "type", "source"]
+        
+        # Add fields in order
+        for field in field_order:
+            if field in frontmatter_dict:
+                value = frontmatter_dict[field]
+                
+                if field == "tags" and isinstance(value, list):
+                    # Format tags as YAML array
+                    if value:
+                        tags_str = ", ".join([f'"{tag}"' for tag in value])
+                        lines.append(f"tags: [{tags_str}]")
+                    else:
+                        lines.append("tags: []")
+                elif isinstance(value, str):
+                    # Escape string values if needed
+                    safe_value = self._escape_yaml_string(value)
+                    lines.append(f"{field}: {safe_value}")
+                else:
+                    lines.append(f"{field}: {value}")
+        
+        # Add any remaining fields not in the order list
+        for field, value in frontmatter_dict.items():
+            if field not in field_order:
+                if isinstance(value, str):
+                    safe_value = self._escape_yaml_string(value)
+                    lines.append(f"{field}: {safe_value}")
+                else:
+                    lines.append(f"{field}: {value}")
+        
+        lines.extend(["---", ""])
+        
+        return "\n".join(lines)
     
     def _convert_html_to_markdown(self, html_content: str) -> str:
         """Convert HTML content to Markdown."""
@@ -164,7 +238,7 @@ class MDXConverter:
                 if not img.get('alt'):
                     # Use filename as alt text if no alt attribute
                     src = img.get('src', '')
-                    if '../../attachments/' in src:
+                    if '/images/articles/' in src:
                         filename = src.split('/')[-1]
                         # Remove extension and clean up filename for alt text
                         alt_text = filename.rsplit('.', 1)[0].replace('-', ' ').title()
@@ -254,10 +328,10 @@ class MDXConverter:
         # Fix excessive line breaks
         markdown_content = re.sub(r'\n{3,}', '\n\n', markdown_content)
         
-        # Ensure proper markdown image syntax for attachment images
+        # Ensure proper markdown image syntax for article images
         # Look for HTML img tags that weren't converted to markdown and convert them
         img_pattern = re.compile(
-            r'<img[^>]*src=["\']?(\.\./\.\./attachments\/[^"\'>\s]+)["\']?[^>]*(?:\/?>|>[^<]*<\/img>)',
+            r'<img[^>]*src=["\']?(\/images\/articles\/[^"\'>\s]+)["\']?[^>]*(?:\/?>|>[^<]*<\/img>)',
             re.IGNORECASE
         )
         
@@ -270,10 +344,10 @@ class MDXConverter:
         
         markdown_content = img_pattern.sub(convert_img_to_markdown, markdown_content)
         
-        # Fix any malformed image syntax for relative paths
+        # Fix any malformed image syntax for article image paths
         markdown_content = re.sub(
-            r'!\[([^\]]*)\]\(\.\.\/\.\.\/attachments\/([^\)]+)\)',
-            r'![\1](../../attachments/\2)',
+            r'!\[([^\]]*)\]\(\/images\/articles\/([^\)]+)\)',
+            r'![\1](/images/articles/\2)',
             markdown_content
         )
         

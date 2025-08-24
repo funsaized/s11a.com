@@ -70,6 +70,36 @@ class AppleScriptBridge:
             logger.error(f"Failed to execute AppleScript: {e}")
             raise RuntimeError(f"Failed to execute AppleScript: {e}")
 
+    def _is_archive_folder(self, folder_name: str) -> bool:
+        """Check if a folder name indicates an archive folder."""
+        if not folder_name:
+            return False
+        
+        # Check for various archive folder name patterns
+        folder_lower = folder_name.lower()
+        archive_patterns = [
+            'archive',
+            'archived',
+            'archives',
+            '👵🏾 archive 💀',  # Specific pattern from your existing notes
+            'old',
+            'deleted',
+            'trash',
+            'backup'
+        ]
+        
+        # Check if folder name matches any archive pattern
+        for pattern in archive_patterns:
+            if pattern in folder_lower:
+                return True
+        
+        # Check for emoji-based archive patterns (common in Apple Notes)
+        if ('archive' in folder_lower and ('💀' in folder_name or '👵' in folder_name)) or \
+           ('old' in folder_lower and ('💀' in folder_name or '🗑' in folder_name)):
+            return True
+        
+        return False
+
     def extract_hashtags(self, content: str) -> Set[str]:
         """
         Extract hashtags from note content, handling HTML and various edge cases.
@@ -222,6 +252,11 @@ class AppleScriptBridge:
 
                             # Apply folder filter if specified
                             if folder_filter and note_dict["noteFolder"] != folder_filter:
+                                continue
+                            
+                            # Skip notes from Archive folders
+                            if self._is_archive_folder(note_dict["noteFolder"]):
+                                logger.debug(f"Skipping note from Archive folder: {note_dict['noteFolder']}")
                                 continue
                             
                             notes_data.append(note_dict)

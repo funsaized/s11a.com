@@ -35,6 +35,8 @@ try:
 except ImportError:
     raise ImportError("BeautifulSoup4 is required. Install with: pip install beautifulsoup4")
 
+from filename_utils import generate_image_filename
+
 @dataclass
 class ImageConfig:
     """Configuration for image processing."""
@@ -157,8 +159,8 @@ class ImageProcessor:
                     image_path = self._extract_base64_image(src, note_name, idx)
                     if image_path:
                         # Update the img tag with relative path
-                        # MDX files are in notes/{folder}/ so need ../../attachments/
-                        relative_path = f"../../attachments/{image_path.name}"
+                        # Use absolute path for web serving: /images/articles/
+                        relative_path = f"/images/articles/{image_path.name}"
                         old_src = img_tag.get('src', '')[:100]  # First 100 chars for logging
                         img_tag['src'] = relative_path
                         # Ensure alt attribute exists for better markdown conversion
@@ -179,8 +181,8 @@ class ImageProcessor:
                     if src.startswith('http'):
                         image_path = self._download_web_image(src, note_name, idx)
                         if image_path:
-                            # MDX files are in notes/{folder}/ so need ../../attachments/
-                            relative_path = f"../../attachments/{image_path.name}"
+                            # Use absolute path for web serving: /images/articles/
+                            relative_path = f"/images/articles/{image_path.name}"
                             img_tag['src'] = relative_path
                             # Ensure alt attribute exists for better markdown conversion
                             if not img_tag.get('alt'):
@@ -240,8 +242,8 @@ class ImageProcessor:
                 logger.debug(f"Detected format: {detected_format} (claimed: {mime_type})")
                 mime_type = detected_format
             
-            # Generate unique filename
-            filename = self._generate_filename(note_name, index, mime_type)
+            # Generate unique filename using kebab-case
+            filename = generate_image_filename(note_name, index, mime_type)
             image_path = self.attachments_dir / filename
             
             # Save and potentially convert image
@@ -305,8 +307,8 @@ class ImageProcessor:
                 else:
                     mime_type = content_type.split('/')[-1] if '/' in content_type else 'jpg'
             
-            # Generate filename
-            filename = self._generate_filename(note_name, index, mime_type)
+            # Generate filename using kebab-case
+            filename = generate_image_filename(note_name, index, mime_type)
             image_path = self.attachments_dir / filename
             
             # Save image
@@ -556,17 +558,7 @@ class ImageProcessor:
         return True
     
     def _generate_filename(self, note_name: str, index: int, mime_type: str) -> str:
-        """Generate a unique filename for an image with improved sanitization."""
-        # Comprehensive filename sanitization
-        safe_name = re.sub(r'[<>:"/\\|?*\x00-\x1f]', '-', note_name)
-        safe_name = re.sub(r'[-]+', '-', safe_name)  # Replace multiple dashes
-        safe_name = safe_name.strip(' -.')  # Remove leading/trailing spaces, dashes, dots
-        safe_name = safe_name[:self.config.max_filename_length]
-        
-        # Ensure we have a valid name
-        if not safe_name or safe_name.isspace():
-            safe_name = 'image'
-        
+        """Generate a unique filename for an image using kebab-case conventions."""
         # Get file extension based on target format
         if mime_type.lower() in ['heic', 'heif']:
             # Always convert HEIC to target format
@@ -577,8 +569,8 @@ class ImageProcessor:
             if self.config.image_format and self.config.image_format != extension:
                 extension = self.config.image_format
         
-        # Create filename with index
-        filename = f"{safe_name}-{index:03d}.{extension}"
+        # Use the new kebab-case filename generator
+        filename = generate_image_filename(note_name, index, extension, self.config.max_filename_length)
         
         # Handle duplicates with improved logic
         counter = 1
@@ -587,7 +579,12 @@ class ImageProcessor:
             name_parts = original_filename.rsplit('.', 1)
             if len(name_parts) == 2:
                 name_part, ext_part = name_parts
-                filename = f"{name_part}-{counter:02d}.{ext_part}"
+                # Insert counter before the index part
+                if name_part.endswith(f"-{index:03d}"):
+                    base_part = name_part[:-4]  # Remove "-000"
+                    filename = f"{base_part}-{counter:02d}-{index:03d}.{ext_part}"
+                else:
+                    filename = f"{name_part}-{counter:02d}.{ext_part}"
             else:
                 filename = f"{original_filename}-{counter:02d}"
             counter += 1
@@ -597,7 +594,8 @@ class ImageProcessor:
                 # Use timestamp as fallback
                 import time
                 timestamp = int(time.time())
-                filename = f"{safe_name}-{timestamp}.{extension}"
+                base_name = generate_image_filename(f"image-{timestamp}", index, extension)
+                filename = base_name
                 break
         
         return filename
