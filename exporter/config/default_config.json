@@ -1,0 +1,59 @@
+{
+  "export_path": "./output",
+  "output_format": "mdx",
+  "image_format": "jpg",
+  "image_quality": 95,
+  "markdown_extensions": [
+    "tables",
+    "strikethrough", 
+    "task_lists"
+  ],
+  "incremental_export": false,
+  "include_empty_notes": false,
+  "date_format": "%Y-%m-%d",
+  "max_filename_length": 50,
+  "folder_filter": null,
+  "tags_in_frontmatter": true,
+  "mdx_components": false,
+  "custom_frontmatter": {},
+  "use_smart_frontmatter": true,
+  "anthropic_api_key": null,
+  "verbose_logging": false,
+  "timeout_seconds": 300,
+  "batch_size": 50,
+  "error_handling": {
+    "continue_on_error": true,
+    "max_retries": 3,
+    "retry_delay": 1
+  },
+  "image_processing": {
+    "convert_heic": true,
+    "optimize_images": true,
+    "max_image_size": {
+      "width": 2048,
+      "height": 2048
+    },
+    "supported_formats": [
+      "jpg",
+      "jpeg", 
+      "png",
+      "gif",
+      "webp",
+      "heic",
+      "heif"
+    ]
+  },
+  "markdown_options": {
+    "heading_style": "ATX",
+    "bullets": "-",
+    "strong_em_symbol": "**",
+    "strip_tags": ["script", "style"],
+    "preserve_whitespace": false
+  },
+  "export_options": {
+    "create_index": true,
+    "generate_toc": false,
+    "include_metadata": true,
+    "compress_output": false
+  }
+}
