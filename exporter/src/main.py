@@ -202,6 +202,9 @@ class SimpleNotesExporter:
             "folder": note.get("noteFolder", "Notes")
         })
         
+        # Add fallback mechanism for orphaned images
+        mdx_content = self._add_orphaned_images_fallback(mdx_content, note_name, image_paths)
+        
         # Normal folder-based organization
         folder_name = self._sanitize_filename(note.get("noteFolder", "Notes"))
         folder_path = self.notes_dir / folder_name
@@ -402,6 +405,69 @@ class SimpleNotesExporter:
                         pass
         except Exception as e:
             logger.warning(f"Error cleaning empty folders: {e}")
+
+    def _add_orphaned_images_fallback(self, mdx_content: str, note_name: str, image_paths: List[str]) -> str:
+        """Add fallback image references for extracted images not linked in MDX."""
+        try:
+            if not image_paths:
+                return mdx_content
+            
+            # Check if MDX already contains image references
+            import re
+            existing_images = re.findall(r'!\[[^\]]*\]\([^\)]+\)', mdx_content)
+            
+            if existing_images:
+                # Images already properly linked, no fallback needed
+                logger.debug(f"Note '{note_name}' already has {len(existing_images)} image links, no fallback needed")
+                return mdx_content
+            
+            # No existing images but we have extracted images - add fallback references
+            logger.info(f"Adding fallback image references for note '{note_name}' ({len(image_paths)} images)")
+            
+            # Find appropriate insertion point (after frontmatter, before main content)
+            lines = mdx_content.split('\n')
+            insertion_point = 0
+            
+            # Skip frontmatter
+            if lines and lines[0].strip() == '---':
+                in_frontmatter = True
+                for i, line in enumerate(lines[1:], 1):
+                    if line.strip() == '---':
+                        insertion_point = i + 1
+                        break
+            
+            # Skip title if present
+            if insertion_point < len(lines):
+                for i in range(insertion_point, len(lines)):
+                    if lines[i].strip().startswith('#'):
+                        insertion_point = i + 1
+                        break
+            
+            # Create image references
+            image_refs = []
+            for image_path in image_paths:
+                image_filename = Path(image_path).name
+                # Create descriptive alt text from filename
+                alt_text = Path(image_path).stem.replace('-', ' ').title()
+                # Remove index numbers for cleaner alt text
+                alt_text = re.sub(r'-\d{3}$', '', alt_text).replace('-', ' ').title()
+                
+                image_ref = f"![{alt_text}](/images/articles/{image_filename})"
+                image_refs.append(image_ref)
+            
+            # Insert images after title/frontmatter
+            if image_refs:
+                # Add some spacing
+                image_section = ["", "{/* Images from Apple Notes */}"] + image_refs + [""]
+                lines[insertion_point:insertion_point] = image_section
+                
+                logger.info(f"✅ Added {len(image_refs)} fallback image references to '{note_name}'")
+            
+            return '\n'.join(lines)
+            
+        except Exception as e:
+            logger.error(f"Error adding fallback images for note '{note_name}': {e}")
+            return mdx_content
 
 
 def main():

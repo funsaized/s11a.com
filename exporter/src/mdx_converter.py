@@ -116,90 +116,178 @@ class MDXConverter:
                 logger.warning(f"Smart frontmatter generation failed: {e}. Using basic frontmatter.")
                 # Fall through to basic generation
         
-        # Basic frontmatter generation (fallback)
+        # Basic frontmatter generation (fallback) - Gatsby compatible
         title = metadata.get('title', 'Untitled Note')
         created = metadata.get('created', '')
         modified = metadata.get('modified', '')
         folder = metadata.get('folder', 'Notes')
         
-        # Format dates
-        created_date = self._format_date(created)
-        modified_date = self._format_date(modified)
+        # Create basic frontmatter dict and use the Gatsby-compatible formatter
+        basic_frontmatter_dict = {
+            'title': title,
+            'date': created,
+            'category': folder,
+            'author': 'Sai Nimmagadda'
+        }
         
-        # Escape title for YAML
-        safe_title = self._escape_yaml_string(title)
-        safe_folder = self._escape_yaml_string(folder)
+        # Add slug
+        from filename_utils import to_kebab_case
+        basic_frontmatter_dict['slug'] = to_kebab_case(title)
         
-        # Build frontmatter
-        frontmatter_lines = [
-            "---",
-            f"title: {safe_title}",
-            f"date: {created_date}",
-            f"modified: {modified_date}",
-            f"folder: {safe_folder}",
-            f"type: note",
-            f"source: apple-notes"
-        ]
+        # Add excerpt if we can generate one from content
+        if content and len(content) > 50:
+            # Extract first sentence or paragraph for excerpt
+            import re
+            # Remove frontmatter and markdown syntax for excerpt
+            clean_content = re.sub(r'^---.*?---\s*', '', content, flags=re.DOTALL)
+            clean_content = re.sub(r'[#*`\[\]()]+', '', clean_content)
+            
+            # Get first meaningful sentence
+            sentences = clean_content.split('.')
+            if sentences and len(sentences[0].strip()) > 20:
+                excerpt = sentences[0].strip()[:150] + ('...' if len(sentences[0]) > 150 else '.')
+                basic_frontmatter_dict['excerpt'] = excerpt
         
         # Add tags if enabled and folder is meaningful
         if self.tags_in_frontmatter and folder and folder != "Notes":
-            frontmatter_lines.append(f"tags: [\"{safe_folder.strip('\"')}\"]")
+            basic_frontmatter_dict['tags'] = [folder.lower()]
         
-        # Add custom fields from config
-        custom_fields = self.config.get("custom_frontmatter", {})
-        for key, value in custom_fields.items():
-            frontmatter_lines.append(f"{key}: {value}")
-        
-        frontmatter_lines.extend(["---", ""])
-        
-        return "\n".join(frontmatter_lines)
+        # Use the Gatsby-compatible formatter
+        return self._dict_to_yaml_frontmatter(basic_frontmatter_dict)
     
     def _dict_to_yaml_frontmatter(self, frontmatter_dict: Dict[str, Any]) -> str:
         """
-        Convert a dictionary to YAML frontmatter format.
+        Convert a dictionary to Gatsby-compatible YAML frontmatter format.
         
         Args:
             frontmatter_dict: Dictionary containing frontmatter fields
             
         Returns:
-            YAML frontmatter string
+            Gatsby-compatible YAML frontmatter string
         """
         lines = ["---"]
         
-        # Define the order of fields for better readability
-        field_order = ["title", "slug", "date", "category", "tags", "excerpt", "author", "modified", "folder", "type", "source"]
+        # Create a copy and add Gatsby-required fields
+        formatted_dict = frontmatter_dict.copy()
+        
+        # Add Gatsby-required fields if missing
+        if 'readingTime' not in formatted_dict:
+            # Estimate reading time based on content (rough calculation)
+            estimated_time = 5  # Default fallback
+            formatted_dict['readingTime'] = f'{estimated_time} min read'
+            
+        if 'featured' not in formatted_dict:
+            formatted_dict['featured'] = False
+        
+        # Define the order of fields for Gatsby compatibility
+        field_order = ["title", "slug", "excerpt", "date", "category", "tags", "readingTime", "featured", "author"]
         
         # Add fields in order
         for field in field_order:
-            if field in frontmatter_dict:
-                value = frontmatter_dict[field]
+            if field in formatted_dict:
+                value = formatted_dict[field]
                 
-                if field == "tags" and isinstance(value, list):
-                    # Format tags as YAML array
+                if field == "title":
+                    # Check if title needs quotes due to special YAML characters
+                    title_str = str(value)
+                    # Quote if contains special YAML characters: [] {} () : | > @ # & * ! % ` ' " ? 
+                    if any(char in title_str for char in '[]{}():|>@#&*!%`\'"?') or title_str.endswith(':'):
+                        # Escape single quotes and wrap in single quotes
+                        escaped_title = title_str.replace("'", "''")
+                        lines.append(f"title: '{escaped_title}'")
+                    else:
+                        lines.append(f"title: {title_str}")
+                    
+                elif field == "slug":
+                    # No quotes for slug (Gatsby style)
+                    lines.append(f"slug: {value}")
+                    
+                elif field == "date":
+                    # Format date with single quotes
+                    date_str = str(value)
+                    # Try to format date properly
+                    try:
+                        from datetime import datetime
+                        # Handle various date formats
+                        for fmt in ['%Y-%m-%d', '%m/%d/%Y', '%Y-%m-%d %H:%M:%S', '%m-%d-%Y']:
+                            try:
+                                parsed_date = datetime.strptime(date_str, fmt)
+                                date_str = parsed_date.strftime('%Y-%m-%d')
+                                break
+                            except ValueError:
+                                continue
+                    except Exception:
+                        pass
+                    lines.append(f"date: '{date_str}'")
+                    
+                elif field == "excerpt" and isinstance(value, str):
+                    # Use multi-line format for long excerpts (Gatsby style)
+                    if len(value) > 60:
+                        lines.append("excerpt: >-")
+                        lines.append(f"  {value}")
+                    else:
+                        lines.append(f"excerpt: {value}")
+                        
+                elif field == "tags" and isinstance(value, list):
+                    # Format tags as multi-line YAML array (Gatsby style)
                     if value:
-                        tags_str = ", ".join([f'"{tag}"' for tag in value])
-                        lines.append(f"tags: [{tags_str}]")
+                        lines.append("tags:")
+                        for tag in value:
+                            lines.append(f"  - {tag}")
                     else:
                         lines.append("tags: []")
+                        
+                elif field == "featured":
+                    # Boolean value without quotes
+                    lines.append(f"featured: {'true' if value else 'false'}")
+                    
                 elif isinstance(value, str):
-                    # Escape string values if needed
-                    safe_value = self._escape_yaml_string(value)
-                    lines.append(f"{field}: {safe_value}")
+                    # Check if value needs quotes due to special YAML characters
+                    if any(char in value for char in '[]{}():|>@#&*!%`\'"?') or value.endswith(':'):
+                        # Escape single quotes and wrap in single quotes
+                        escaped_value = value.replace("'", "''")
+                        lines.append(f"{field}: '{escaped_value}'")
+                    else:
+                        lines.append(f"{field}: {value}")
                 else:
                     lines.append(f"{field}: {value}")
         
-        # Add any remaining fields not in the order list
-        for field, value in frontmatter_dict.items():
-            if field not in field_order:
+        # Add any remaining fields not in the order list (skip internal fields)
+        skip_fields = field_order + ["modified", "folder", "type", "source"]
+        for field, value in formatted_dict.items():
+            if field not in skip_fields:
                 if isinstance(value, str):
-                    safe_value = self._escape_yaml_string(value)
-                    lines.append(f"{field}: {safe_value}")
+                    # Check if value needs quotes due to special YAML characters
+                    if any(char in value for char in '[]{}():|>@#&*!%`\'"?') or value.endswith(':'):
+                        # Escape single quotes and wrap in single quotes
+                        escaped_value = value.replace("'", "''")
+                        lines.append(f"{field}: '{escaped_value}'")
+                    else:
+                        lines.append(f"{field}: {value}")
                 else:
                     lines.append(f"{field}: {value}")
         
         lines.extend(["---", ""])
         
         return "\n".join(lines)
+    
+    def _fix_invalid_markdown_formatting(self, content: str) -> str:
+        """Fix invalid markdown formatting patterns from Apple Notes."""
+        try:
+            # Fix any sequence of 3+ asterisks around text → **text** (proper bold)
+            # This handles ****text****, ***text***, *****text**** etc.
+            content = re.sub(r'\*{3,}([^*]+)\*{3,}', r'**\1**', content)
+            
+            # Fix standalone asterisks that might cause parsing issues
+            content = re.sub(r'(?<!\*)\*(?!\*)', '', content)
+            
+            # Convert HTML comments to MDX/JSX comments
+            content = re.sub(r'<!--\s*([^>]+)\s*-->', r'{/* \1 */}', content)
+            
+            return content
+        except Exception as e:
+            logger.warning(f"Error fixing markdown formatting: {e}")
+            return content
     
     def _convert_html_to_markdown(self, html_content: str) -> str:
         """Convert HTML content to Markdown."""
@@ -327,6 +415,9 @@ class MDXConverter:
         
         # Fix excessive line breaks
         markdown_content = re.sub(r'\n{3,}', '\n\n', markdown_content)
+        
+        # Fix invalid markdown formatting (****text**** → **text**)
+        markdown_content = self._fix_invalid_markdown_formatting(markdown_content)
         
         # Ensure proper markdown image syntax for article images
         # Look for HTML img tags that weren't converted to markdown and convert them
