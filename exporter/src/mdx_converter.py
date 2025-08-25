@@ -7,9 +7,12 @@ It ensures compatibility with Gatsby and other MDX-based static site generators.
 """
 
 import re
-from typing import Dict, List, Optional, Any
+from typing import Dict, List, Optional, Any, Tuple
 from datetime import datetime
 import logging
+import subprocess
+import json
+import os
 
 try:
     import markdownify
@@ -46,6 +49,7 @@ class MDXConverter:
         self.tags_in_frontmatter = self.config.get("tags_in_frontmatter", True)
         self.date_format = self.config.get("date_format", "%Y-%m-%d")
         self.use_smart_frontmatter = self.config.get("use_smart_frontmatter", True)
+        self.validate_mdx = self.config.get("validate_mdx", True)
         
         # Initialize smart frontmatter generator
         if self.use_smart_frontmatter:
@@ -63,7 +67,13 @@ class MDXConverter:
             # Tags to strip are automatically excluded from conversion
         }
         
-        logger.info("MDXConverter initialized")
+        # Path to MDX validator
+        self.validator_path = os.path.join(
+            os.path.dirname(os.path.dirname(__file__)),
+            'src', 'mdx_validator.js'
+        )
+        
+        logger.info("MDXConverter initialized with MDX validation")
     
     def convert(self, html_content: str, metadata: Dict) -> str:
         """
@@ -86,8 +96,26 @@ class MDXConverter:
             # Generate frontmatter (smart or basic)
             frontmatter = self._generate_frontmatter(metadata, mdx_content)
             
+            # Ensure content starts with a proper heading if it doesn't already
+            mdx_content = self._ensure_heading(mdx_content, metadata)
+            
             # Combine frontmatter and content
             full_content = frontmatter + mdx_content
+            
+            # Validate MDX if enabled, with auto-fixing
+            if self.validate_mdx:
+                is_valid, validation_result = self._validate_mdx_content(full_content, auto_fix=True)
+                
+                # If auto-fix was applied, use the fixed content
+                if 'fixedContent' in validation_result and validation_result['fixedContent'] is not None:
+                    full_content = validation_result['fixedContent']
+                    logger.info(f"Auto-fixed MDX issues for '{metadata.get('title', 'Unknown')}'")
+                
+                if not is_valid:
+                    logger.warning(f"MDX validation failed for '{metadata.get('title', 'Unknown')}'")
+                    # Log validation errors for debugging
+                    for error in validation_result.get('errors', []):
+                        logger.error(f"  - {error.get('type', 'unknown')}: {error.get('message', '')}")
             
             logger.debug(f"Converted note '{metadata.get('title', 'Unknown')}' to MDX")
             return full_content
@@ -188,15 +216,8 @@ class MDXConverter:
                 value = formatted_dict[field]
                 
                 if field == "title":
-                    # Check if title needs quotes due to special YAML characters
-                    title_str = str(value)
-                    # Quote if contains special YAML characters: [] {} () : | > @ # & * ! % ` ' " ? 
-                    if any(char in title_str for char in '[]{}():|>@#&*!%`\'"?') or title_str.endswith(':'):
-                        # Escape single quotes and wrap in single quotes
-                        escaped_title = title_str.replace("'", "''")
-                        lines.append(f"title: '{escaped_title}'")
-                    else:
-                        lines.append(f"title: {title_str}")
+                    # Use proper YAML escaping for title
+                    lines.append(f"title: {self._yaml_safe_string(value)}")
                     
                 elif field == "slug":
                     # No quotes for slug (Gatsby style)
@@ -221,12 +242,15 @@ class MDXConverter:
                     lines.append(f"date: '{date_str}'")
                     
                 elif field == "excerpt" and isinstance(value, str):
-                    # Use multi-line format for long excerpts (Gatsby style)
+                    # Use proper YAML escaping for excerpt
                     if len(value) > 60:
-                        lines.append("excerpt: >-")
-                        lines.append(f"  {value}")
+                        # Use literal block scalar for long excerpts
+                        lines.append("excerpt: |-")
+                        # Indent each line of the excerpt
+                        for line in value.split('\n'):
+                            lines.append(f"  {line}")
                     else:
-                        lines.append(f"excerpt: {value}")
+                        lines.append(f"excerpt: {self._yaml_safe_string(value)}")
                         
                 elif field == "tags" and isinstance(value, list):
                     # Format tags as multi-line YAML array (Gatsby style)
@@ -242,13 +266,8 @@ class MDXConverter:
                     lines.append(f"featured: {'true' if value else 'false'}")
                     
                 elif isinstance(value, str):
-                    # Check if value needs quotes due to special YAML characters
-                    if any(char in value for char in '[]{}():|>@#&*!%`\'"?') or value.endswith(':'):
-                        # Escape single quotes and wrap in single quotes
-                        escaped_value = value.replace("'", "''")
-                        lines.append(f"{field}: '{escaped_value}'")
-                    else:
-                        lines.append(f"{field}: {value}")
+                    # Use proper YAML escaping
+                    lines.append(f"{field}: {self._yaml_safe_string(value)}")
                 else:
                     lines.append(f"{field}: {value}")
         
@@ -257,13 +276,7 @@ class MDXConverter:
         for field, value in formatted_dict.items():
             if field not in skip_fields:
                 if isinstance(value, str):
-                    # Check if value needs quotes due to special YAML characters
-                    if any(char in value for char in '[]{}():|>@#&*!%`\'"?') or value.endswith(':'):
-                        # Escape single quotes and wrap in single quotes
-                        escaped_value = value.replace("'", "''")
-                        lines.append(f"{field}: '{escaped_value}'")
-                    else:
-                        lines.append(f"{field}: {value}")
+                    lines.append(f"{field}: {self._yaml_safe_string(value)}")
                 else:
                     lines.append(f"{field}: {value}")
         
@@ -272,17 +285,14 @@ class MDXConverter:
         return "\n".join(lines)
     
     def _fix_invalid_markdown_formatting(self, content: str) -> str:
-        """Fix invalid markdown formatting patterns from Apple Notes."""
+        """Fix basic markdown formatting patterns from Apple Notes."""
         try:
             # Fix any sequence of 3+ asterisks around text → **text** (proper bold)
             # This handles ****text****, ***text***, *****text**** etc.
             content = re.sub(r'\*{3,}([^*]+)\*{3,}', r'**\1**', content)
             
-            # Fix standalone asterisks that might cause parsing issues
-            content = re.sub(r'(?<!\*)\*(?!\*)', '', content)
-            
             # Convert HTML comments to MDX/JSX comments
-            content = re.sub(r'<!--\s*([^>]+)\s*-->', r'{/* \1 */}', content)
+            content = re.sub(r'<!--\s*([^>]+?)\s*-->', r'{/* \1 */}', content)
             
             return content
         except Exception as e:
@@ -413,6 +423,14 @@ class MDXConverter:
         if not markdown_content:
             return ""
         
+        # Fix HTML entities that shouldn't be escaped in MDX
+        # These are commonly produced by some HTML-to-markdown converters
+        markdown_content = markdown_content.replace('&lt;', '<')
+        markdown_content = markdown_content.replace('&gt;', '>')
+        markdown_content = markdown_content.replace('&quot;', '"')
+        markdown_content = markdown_content.replace('&amp;', '&')
+        markdown_content = markdown_content.replace('&#39;', "'")
+        
         # Fix excessive line breaks
         markdown_content = re.sub(r'\n{3,}', '\n\n', markdown_content)
         
@@ -425,6 +443,10 @@ class MDXConverter:
         
         # Also fix headers with bold inside: # **Title** → # Title
         markdown_content = re.sub(r'^(#{1,6}\s+)\*\*([^*]+)\*\*', r'\1\2', markdown_content, flags=re.MULTILINE)
+        
+        # Fix bare URLs in angle brackets for MDX compatibility
+        # Pattern: <http://example.com> or <https://example.com> → [URL](http://example.com)
+        markdown_content = re.sub(r'<(https?://[^>]+)>', r'[\1](\1)', markdown_content)
         
         # Ensure proper markdown image syntax for article images
         # Look for HTML img tags that weren't converted to markdown and convert them
@@ -477,6 +499,37 @@ class MDXConverter:
             r'<NoteLink title="\1" />',
             content
         )
+        
+        return content
+    
+    def _ensure_heading(self, content: str, metadata: Dict) -> str:
+        """Ensure content starts with a proper heading."""
+        if not content:
+            return content
+        
+        # Check if content already starts with a heading
+        lines = content.split('\n')
+        first_non_empty_line = None
+        for line in lines:
+            if line.strip():
+                first_non_empty_line = line.strip()
+                break
+        
+        # If the first line is not a markdown heading, add one based on the title
+        if first_non_empty_line and not first_non_empty_line.startswith('#'):
+            title = metadata.get('title', 'Untitled Note')
+            # If the first line looks like the title but without # prefix, replace it
+            if first_non_empty_line.lower() == title.lower() or \
+               first_non_empty_line.replace(' ', '-').lower() == title.replace(' ', '-').lower():
+                # Replace the first non-empty line with a proper heading
+                for i, line in enumerate(lines):
+                    if line.strip():
+                        lines[i] = f"# {title}"
+                        break
+                content = '\n'.join(lines)
+            else:
+                # Add a heading at the beginning
+                content = f"# {title}\n\n{content}"
         
         return content
     
@@ -589,3 +642,123 @@ conversion_error: true
             validation_result["valid"] = False
         
         return validation_result
+    
+    def _yaml_safe_string(self, value: str) -> str:
+        """
+        Safely escape a string for YAML output using best practices.
+        
+        Args:
+            value: String value to escape
+            
+        Returns:
+            Properly escaped YAML string
+        """
+        if not value:
+            return '""'
+        
+        # Convert to string if not already
+        value = str(value)
+        
+        # Check if the string needs special handling
+        needs_quotes = False
+        
+        # YAML special characters that require quoting
+        special_chars = ':{}[]!>|*&%@`#?'
+        
+        # Check various conditions that require quoting
+        if (
+            any(char in value for char in special_chars) or
+            value.startswith(('- ', '? ', ': ')) or
+            value.endswith(':') or
+            value in ('true', 'false', 'null', 'yes', 'no', 'on', 'off') or
+            value.strip() != value or
+            '\n' in value or
+            '"' in value or
+            "'" in value
+        ):
+            needs_quotes = True
+        
+        # Try to parse as a number
+        try:
+            float(value)
+            needs_quotes = True
+        except ValueError:
+            pass
+        
+        if not needs_quotes:
+            return value
+        
+        # Use double quotes and escape appropriately
+        # Escape backslashes and double quotes
+        escaped = value.replace('\\', '\\\\').replace('"', '\\"')
+        
+        # Handle newlines
+        if '\n' in escaped:
+            # Use literal block scalar for multiline content
+            return '|-\n  ' + escaped.replace('\n', '\n  ')
+        
+        return f'"{escaped}"'
+    
+    def _validate_mdx_content(self, content: str, auto_fix: bool = True) -> Tuple[bool, Dict[str, Any]]:
+        """
+        Validate and optionally auto-fix MDX content using the Node.js validator.
+        
+        Args:
+            content: MDX content to validate
+            auto_fix: Whether to attempt auto-fixing issues
+            
+        Returns:
+            Tuple of (is_valid, validation_result)
+        """
+        try:
+            # Check if validator exists
+            if not os.path.exists(self.validator_path):
+                logger.warning("MDX validator not found, skipping validation")
+                return True, {"valid": True, "skipped": True}
+            
+            # Build command with auto-fix flag if requested
+            cmd = ['node', self.validator_path]
+            if auto_fix:
+                cmd.append('--fix')
+            cmd.append('-')
+            
+            # Run the validator with auto-fix capability
+            result = subprocess.run(
+                cmd,
+                input=content.encode('utf-8'),
+                capture_output=True,
+                text=False,
+                timeout=15  # Increased timeout for auto-fix processing
+            )
+            
+            # Parse the JSON output
+            try:
+                validation_result = json.loads(result.stdout.decode('utf-8'))
+                return validation_result.get('valid', False), validation_result
+            except json.JSONDecodeError:
+                logger.error(f"Failed to parse validator output: {result.stdout.decode('utf-8')}")
+                return True, {"valid": True, "parse_error": True}
+                
+        except subprocess.TimeoutExpired:
+            logger.error("MDX validation timed out")
+            return True, {"valid": True, "timeout": True}
+        except Exception as e:
+            logger.error(f"MDX validation error: {e}")
+            return True, {"valid": True, "error": str(e)}
+    
+    def _auto_fix_mdx_issues(self, content: str, validation_result: Dict[str, Any]) -> str:
+        """
+        Legacy method - now handled by Node.js validator.
+        This is kept for fallback purposes only.
+        
+        Args:
+            content: MDX content with issues
+            validation_result: Validation result from the validator
+            
+        Returns:
+            Fixed MDX content
+        """
+        # The Node.js validator now handles auto-fixing
+        # This method is kept as a fallback but should rarely be used
+        logger.info("Using legacy Python auto-fix - consider using Node.js validator with --fix")
+        return content
