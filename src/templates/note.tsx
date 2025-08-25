@@ -112,9 +112,8 @@ const NoteTemplate: React.FC<NoteTemplateProps> = ({
                 className="max-w-fit p-4 mb-4 text-sm text-blue-800 rounded-lg bg-blue-50 dark:bg-gray-800 dark:text-blue-400"
                 role="alert"
               >
-                <span className="font-medium">Psst!</span> Images are currently
-                being optimized and may not display properly... blame Apple for
-                not supporting Markdown
+                <span className="font-medium">Psst!</span> Format may vary...
+                blame Apple for not supporting Markdown fully
               </div>
 
               {/* Note Header */}
