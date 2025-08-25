@@ -419,6 +419,13 @@ class MDXConverter:
         # Fix invalid markdown formatting (****text**** → **text**)
         markdown_content = self._fix_invalid_markdown_formatting(markdown_content)
         
+        # Fix headers that have been incorrectly wrapped with ** for bold
+        # Pattern: **# Title** or **## Title** etc. → # Title or ## Title
+        markdown_content = re.sub(r'\*\*(#{1,6}\s+[^*]+)\*\*', r'\1', markdown_content)
+        
+        # Also fix headers with bold inside: # **Title** → # Title
+        markdown_content = re.sub(r'^(#{1,6}\s+)\*\*([^*]+)\*\*', r'\1\2', markdown_content, flags=re.MULTILINE)
+        
         # Ensure proper markdown image syntax for article images
         # Look for HTML img tags that weren't converted to markdown and convert them
         img_pattern = re.compile(
