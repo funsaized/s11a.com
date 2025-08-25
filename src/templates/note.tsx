@@ -1,9 +1,9 @@
 import React from "react";
 import { graphql, Link } from "gatsby";
+import { MDXProvider } from "@mdx-js/react";
 import { Layout } from "../components/layout/Layout";
 import { Badge } from "../components/ui/badge";
 import { Button } from "../components/ui/button";
-import { MDXProvider } from "@mdx-js/react";
 import { headingComponents } from "../components/mdx/HeadingComponents";
 
 const BackArrowIcon = () => (
@@ -171,7 +171,7 @@ const NoteTemplate: React.FC<NoteTemplateProps> = ({
               </header>
 
               {/* Note Content */}
-              <div className="prose prose-lg max-w-none dark:prose-invert prose-headings:scroll-mt-8 prose-pre:bg-muted prose-pre:border prose-pre:border-border prose-pre:text-sm prose-pre:leading-relaxed prose-pre:overflow-x-auto prose-code:bg-muted prose-code:px-1.5 prose-code:py-1 prose-code:rounded prose-code:text-sm prose-code:before:content-none prose-code:after:content-none prose-img:rounded-lg prose-img:shadow-md">
+              <div className="prose max-w-none dark:prose-invert prose-headings:scroll-mt-8 prose-pre:bg-muted prose-pre:border prose-pre:border-border prose-pre:text-sm prose-pre:leading-relaxed prose-pre:overflow-x-auto prose-code:bg-muted prose-code:px-1.5 prose-code:py-1 prose-code:rounded prose-code:text-sm prose-code:before:content-none prose-code:after:content-none prose-img:rounded-lg prose-img:shadow-md prose-a:break-words overflow-hidden">
                 <MDXProvider components={headingComponents}>
                   {children}
                 </MDXProvider>

@@ -155,3 +155,23 @@ pre[class*="language-"] {
     overflow: hidden;
   }
 }
+
+/* Fix for long URLs and text overflow in prose content */
+.prose {
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+.prose a {
+  word-break: break-word;
+  overflow-wrap: break-word;
+  hyphens: auto;
+}
+
+.prose p,
+.prose li,
+.prose td,
+.prose th {
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}

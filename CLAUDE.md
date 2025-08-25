@@ -274,7 +274,6 @@ allMarkdownRemark(
 - Implement proper ARIA labels
 - Ensure keyboard navigation support
 - Maintain color contrast ratios
-- Test with screen readers
 
 ## Performance Targets
 - **Lighthouse Score**: 90+ in all categories
@@ -286,4 +285,4 @@ allMarkdownRemark(
 - When upgrading Gatsby: Follow official migration guides
 - When adding new dependencies: Verify compatibility
 - When refactoring: Maintain backward compatibility for content
-- Always test builds after major changes
+- Always test builds after major changes. Test with builds, typechecks if applicable, and linters. Do not run development servers.
