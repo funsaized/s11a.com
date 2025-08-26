@@ -61,7 +61,7 @@ const socialLinks = [
 
 export function Hero() {
   return (
-    <section className="relative py-12 md:py-18 lg:py-32 overflow-hidden">
+    <section className="relative py-12 md:py-16 overflow-hidden">
       {/* Spotlight Effect - Only visible in dark mode */}
       <Spotlight
         className="-top-40 left-10 md:-top-20 md:left-1/3 lg:-top-32 lg:left-1/4 dark:block hidden"

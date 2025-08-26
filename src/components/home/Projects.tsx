@@ -158,8 +158,11 @@ function ProjectCard({ project }: { project: Project }) {
 
 export function Projects() {
   return (
-    <section className="py-12 md:py-18">
-      <div className="container mx-auto px-4">
+    <section className="relative py-12 md:py-16 overflow-hidden">
+      {/* Subtle background overlay to match Hero */}
+      <div className="absolute inset-0 bg-gradient-to-br from-transparent via-transparent to-slate-900/5 dark:to-slate-100/5 pointer-events-none" />
+      
+      <div className="container mx-auto px-4 relative z-10">
         <div className="mx-auto max-w-6xl">
           {/* Section Header */}
           <div className="mb-12 text-center">

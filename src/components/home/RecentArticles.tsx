@@ -123,21 +123,64 @@ export function RecentArticles({ articles }: RecentArticlesProps) {
             </p>
           </div>
 
-          {/* Articles Grid */}
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-2 mb-12">
-            {articles.map((article) => (
-              <ArticleCard key={article.id} article={article} />
-            ))}
-          </div>
+          <div className="grid gap-6 sm:grid-cols-1 md:grid-cols-2">
+            <div className="articles-grid">
+              <h2 className="mb-2 text-2xl font-bold tracking-tight md:text-3xl">
+                Blog
+              </h2>
+              <h4 className="mb-4 text-base text-muted-foreground">
+                Deep dives, guides, and development.
+              </h4>
 
-          {/* View All Button */}
-          <div className="text-center">
-            <Button asChild size="lg" variant="outline">
-              <Link to="/articles" className="inline-flex items-center gap-2">
-                View All Articles
-                <ArrowRightIcon />
-              </Link>
-            </Button>
+              {/* Articles Grid */}
+              <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-2 mb-12">
+                {articles.map((article) => (
+                  <ArticleCard key={article.id} article={article} />
+                ))}
+              </div>
+
+              {/* View All Button */}
+              <div className="text-center">
+                <Button asChild size="lg" variant="outline">
+                  <Link
+                    to="/articles"
+                    className="inline-flex items-center gap-2"
+                  >
+                    View All Articles
+                    <ArrowRightIcon />
+                  </Link>
+                </Button>
+              </div>
+            </div>
+
+            <div className="notes-grid">
+              <h2 className="mb-2 text-2xl font-bold tracking-tight md:text-3xl">
+                Notes
+              </h2>
+              <h4 className="mb-4 text-base text-muted-foreground">
+                Life, fitness, entertainment, and everything else.
+              </h4>
+
+              {/* Articles Grid */}
+              <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-2 mb-12">
+                {articles.map((article) => (
+                  <ArticleCard key={article.id} article={article} />
+                ))}
+              </div>
+
+              {/* View All Button */}
+              <div className="text-center">
+                <Button asChild size="lg" variant="outline">
+                  <Link
+                    to="/articles"
+                    className="inline-flex items-center gap-2"
+                  >
+                    View All Articles
+                    <ArrowRightIcon />
+                  </Link>
+                </Button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
