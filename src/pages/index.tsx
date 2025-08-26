@@ -3,7 +3,8 @@ import type { HeadFC, PageProps } from "gatsby";
 import { graphql } from "gatsby";
 import { Layout } from "../components/layout/Layout";
 import { Hero } from "../components/home/Hero";
-import { RecentArticles } from "../components/home/RecentArticles";
+import { ArticleList } from "../components/home/ArticleList";
+import { NoteCards } from "../components/home/NoteCards";
 import { Projects } from "../components/home/Projects";
 
 interface ArticleNode {
@@ -61,11 +62,33 @@ const IndexPage: React.FC<PageProps<IndexPageData>> = ({ data }) => {
       description="Full-stack engineer focused on healthcare, developer experience, and scalable systems. Building technology that improves patient outcomes."
     >
       <Hero />
-      <RecentArticles
-        articles={articles
-          .filter((article) => article.contentType === "article")
-          .slice(0, 4)}
-      />
+
+      {/* Articles Section */}
+      <section className="py-12 md:py-16 bg-background">
+        <div className="container mx-auto px-4">
+          <div className="mx-auto max-w-7xl">
+            <div className="grid gap-8 lg:gap-8 lg:grid-cols-2 lg:divide-x lg:divide-border">
+              <ArticleList
+                title="Blog"
+                subtitle="Guides, references, and tutorials."
+                articles={articles.filter(
+                  (article) => article.contentType === "article",
+                )}
+                viewAllLink="/articles"
+                viewAllText="See All"
+              />
+              <div className="lg:pl-8">
+                <NoteCards
+                  notes={articles.filter(
+                    (article) => article.contentType === "note",
+                  )}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <Projects />
     </Layout>
   );
