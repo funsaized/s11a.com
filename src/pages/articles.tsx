@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from "react";
 import type { HeadFC, PageProps } from "gatsby";
 import { graphql } from "gatsby";
+import { Link } from "gatsby";
 import { Layout } from "../components/layout/Layout";
 import { SearchInput } from "../components/articles/SearchInput";
 import { CategoryFilter } from "../components/articles/CategoryFilter";
@@ -14,7 +15,6 @@ import {
 } from "../components/ui/card";
 import { Badge } from "../components/ui/badge";
 import { categoryIcons, type Article } from "../data/sampleData";
-import { Link } from "gatsby";
 
 const ARTICLES_PER_PAGE = 6;
 
@@ -155,11 +155,11 @@ const ArticlesPage: React.FC<PageProps<ArticlesPageData>> = ({ data }) => {
   }));
 
   // Get unique categories and tags
-  const categories = useMemo(() => {
-    return Array.from(
-      new Set(articles.map((article) => article.category)),
-    ).sort();
-  }, [articles]);
+  const categories = useMemo(
+    () =>
+      Array.from(new Set(articles.map((article) => article.category))).sort(),
+    [articles],
+  );
 
   const allTags = useMemo(() => {
     const tagSet = new Set<string>();
@@ -170,28 +170,30 @@ const ArticlesPage: React.FC<PageProps<ArticlesPageData>> = ({ data }) => {
   }, [articles]);
 
   // Filter articles based on search and filters
-  const filteredArticles = useMemo(() => {
-    return articles.filter((article) => {
-      // Search filter - check title, excerpt, and tags
-      const searchLower = searchQuery.toLowerCase();
-      const matchesSearch =
-        searchQuery === "" ||
-        article.title.toLowerCase().includes(searchLower) ||
-        article.excerpt.toLowerCase().includes(searchLower) ||
-        article.tags.some((tag) => tag.toLowerCase().includes(searchLower));
+  const filteredArticles = useMemo(
+    () =>
+      articles.filter((article) => {
+        // Search filter - check title, excerpt, and tags
+        const searchLower = searchQuery.toLowerCase();
+        const matchesSearch =
+          searchQuery === "" ||
+          article.title.toLowerCase().includes(searchLower) ||
+          article.excerpt.toLowerCase().includes(searchLower) ||
+          article.tags.some((tag) => tag.toLowerCase().includes(searchLower));
 
-      // Category filter
-      const matchesCategory =
-        selectedCategory === "" || article.category === selectedCategory;
+        // Category filter
+        const matchesCategory =
+          selectedCategory === "" || article.category === selectedCategory;
 
-      // Tag filter
-      const matchesTags =
-        selectedTags.length === 0 ||
-        selectedTags.every((tag) => article.tags.includes(tag));
+        // Tag filter
+        const matchesTags =
+          selectedTags.length === 0 ||
+          selectedTags.every((tag) => article.tags.includes(tag));
 
-      return matchesSearch && matchesCategory && matchesTags;
-    });
-  }, [articles, searchQuery, selectedCategory, selectedTags]);
+        return matchesSearch && matchesCategory && matchesTags;
+      }),
+    [articles, searchQuery, selectedCategory, selectedTags],
+  );
 
   // Pagination
   const totalPages = Math.ceil(filteredArticles.length / ARTICLES_PER_PAGE);
@@ -287,6 +289,7 @@ const ArticlesPage: React.FC<PageProps<ArticlesPageData>> = ({ data }) => {
                   </Badge>
                 ))}
                 <button
+                  type="button"
                   className="text-sm text-primary hover:underline"
                   onClick={() => {
                     setSelectedCategory("");
@@ -321,6 +324,7 @@ const ArticlesPage: React.FC<PageProps<ArticlesPageData>> = ({ data }) => {
                 No articles found matching your criteria.
               </p>
               <button
+                type="button"
                 className="mt-4 text-primary hover:underline"
                 onClick={() => {
                   setSearchQuery("");

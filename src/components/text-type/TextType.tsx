@@ -27,8 +27,8 @@ interface TextTypeProps {
   deletingSpeed?: number;
   loop?: boolean;
   textColors?: string[];
-  variableSpeed?: { min: number; max: number; };
-  onSentenceComplete?: (sentence: string, index: number) => void;
+  variableSpeed?: { min: number; max: number };
+  onSentenceComplete?: (sentence: string, sentenceIndex: number) => void;
   startOnVisible?: boolean;
   reverseMode?: boolean;
 }
@@ -134,7 +134,7 @@ const TextType = ({
 
           setCurrentTextIndex((prev) => (prev + 1) % textArray.length);
           setCurrentCharIndex(0);
-          timeout = setTimeout(() => { }, pauseDuration);
+          timeout = setTimeout(() => {}, pauseDuration);
         } else {
           timeout = setTimeout(() => {
             setDisplayedText((prev) => prev.slice(0, -1));
@@ -143,9 +143,7 @@ const TextType = ({
       } else if (currentCharIndex < processedText.length) {
         timeout = setTimeout(
           () => {
-            setDisplayedText(
-              (prev) => prev + processedText[currentCharIndex],
-            );
+            setDisplayedText((prev) => prev + processedText[currentCharIndex]);
             setCurrentCharIndex((prev) => prev + 1);
           },
           variableSpeed ? getRandomSpeed() : typingSpeed,

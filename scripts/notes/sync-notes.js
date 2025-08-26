@@ -2,18 +2,18 @@
 
 /**
  * Sync Notes Script for Gatsby Blog
- * 
- * This script moves exported attachments and notes from the latest 
+ *
+ * This script moves exported attachments and notes from the latest
  * exporter/output/XXX folder to src/content/notes, performing a drop-in
  * replacement of existing files and folders.
  */
 
-const fs = require('fs');
-const path = require('path');
-const { execSync } = require('child_process');
+const fs = require("fs");
+const path = require("path");
+const { execSync } = require("child_process");
 
-const EXPORTER_OUTPUT_DIR = path.join(__dirname, '../../exporter/output');
-const CONTENT_NOTES_DIR = path.join(__dirname, '../../src/content/notes');
+const EXPORTER_OUTPUT_DIR = path.join(__dirname, "../../exporter/output");
+const CONTENT_NOTES_DIR = path.join(__dirname, "../../src/content/notes");
 
 /**
  * Find the latest export folder by timestamp
@@ -21,27 +21,31 @@ const CONTENT_NOTES_DIR = path.join(__dirname, '../../src/content/notes');
 function findLatestExportFolder() {
   try {
     if (!fs.existsSync(EXPORTER_OUTPUT_DIR)) {
-      throw new Error(`Exporter output directory does not exist: ${EXPORTER_OUTPUT_DIR}`);
+      throw new Error(
+        `Exporter output directory does not exist: ${EXPORTER_OUTPUT_DIR}`,
+      );
     }
 
-    const folders = fs.readdirSync(EXPORTER_OUTPUT_DIR, { withFileTypes: true })
-      .filter(dirent => dirent.isDirectory())
-      .map(dirent => ({
+    const folders = fs
+      .readdirSync(EXPORTER_OUTPUT_DIR, { withFileTypes: true })
+      .filter((dirent) => dirent.isDirectory())
+      .map((dirent) => ({
         name: dirent.name,
         path: path.join(EXPORTER_OUTPUT_DIR, dirent.name),
-        stats: fs.statSync(path.join(EXPORTER_OUTPUT_DIR, dirent.name))
+        stats: fs.statSync(path.join(EXPORTER_OUTPUT_DIR, dirent.name)),
       }))
       .sort((a, b) => b.stats.mtime - a.stats.mtime); // Sort by modification time, newest first
 
     if (folders.length === 0) {
-      throw new Error('No export folders found in exporter/output directory');
+      throw new Error("No export folders found in exporter/output directory");
     }
 
-    console.log(`Found ${folders.length} export folder(s). Using latest: ${folders[0].name}`);
+    console.log(
+      `Found ${folders.length} export folder(s). Using latest: ${folders[0].name}`,
+    );
     return folders[0];
-
   } catch (error) {
-    console.error('❌ Error finding latest export folder:', error.message);
+    console.error("❌ Error finding latest export folder:", error.message);
     process.exit(1);
   }
 }
@@ -75,9 +79,11 @@ function copyDirectorySync(src, dest) {
     }
 
     return { files: filesCopied, directories: directoriesCopied };
-
   } catch (error) {
-    console.error(`❌ Error copying directory ${src} to ${dest}:`, error.message);
+    console.error(
+      `❌ Error copying directory ${src} to ${dest}:`,
+      error.message,
+    );
     throw error;
   }
 }
@@ -86,10 +92,10 @@ function copyDirectorySync(src, dest) {
  * Sync notes and attachments from export folder
  */
 function syncNotesAndAttachments(exportFolder) {
-  const notesSourceDir = path.join(exportFolder.path, 'notes');
-  const attachmentsSourceDir = path.join(exportFolder.path, 'attachments');
+  const notesSourceDir = path.join(exportFolder.path, "notes");
+  const attachmentsSourceDir = path.join(exportFolder.path, "attachments");
 
-  console.log('\n📁 Syncing exported content...');
+  console.log("\n📁 Syncing exported content...");
   console.log(`Source: ${exportFolder.path}`);
   console.log(`Destination: ${CONTENT_NOTES_DIR}`);
 
@@ -105,37 +111,43 @@ function syncNotesAndAttachments(exportFolder) {
 
     // Sync notes if they exist
     if (fs.existsSync(notesSourceDir)) {
-      console.log('\n📝 Syncing notes...');
+      console.log("\n📝 Syncing notes...");
       const notesResult = copyDirectorySync(notesSourceDir, CONTENT_NOTES_DIR);
       totalFiles += notesResult.files;
       totalDirectories += notesResult.directories;
-      console.log(`✅ Copied ${notesResult.files} notes files and ${notesResult.directories} directories`);
+      console.log(
+        `✅ Copied ${notesResult.files} notes files and ${notesResult.directories} directories`,
+      );
     } else {
-      console.log('⚠️  No notes directory found in export folder');
+      console.log("⚠️  No notes directory found in export folder");
     }
 
     // Sync attachments if they exist
     if (fs.existsSync(attachmentsSourceDir)) {
-      console.log('\n🔗 Syncing attachments...');
-      const attachmentsDestDir = path.join(CONTENT_NOTES_DIR, 'attachments');
-      const attachmentsResult = copyDirectorySync(attachmentsSourceDir, attachmentsDestDir);
+      console.log("\n🔗 Syncing attachments...");
+      const attachmentsDestDir = path.join(CONTENT_NOTES_DIR, "attachments");
+      const attachmentsResult = copyDirectorySync(
+        attachmentsSourceDir,
+        attachmentsDestDir,
+      );
       totalFiles += attachmentsResult.files;
       totalDirectories += attachmentsResult.directories;
-      console.log(`✅ Copied ${attachmentsResult.files} attachment files and ${attachmentsResult.directories} directories`);
+      console.log(
+        `✅ Copied ${attachmentsResult.files} attachment files and ${attachmentsResult.directories} directories`,
+      );
     } else {
-      console.log('⚠️  No attachments directory found in export folder');
+      console.log("⚠️  No attachments directory found in export folder");
     }
 
     // Summary
-    console.log('\n📊 Sync Summary:');
+    console.log("\n📊 Sync Summary:");
     console.log(`   Files copied: ${totalFiles}`);
     console.log(`   Directories created/updated: ${totalDirectories}`);
     console.log(`   Source: ${exportFolder.name}`);
     console.log(`   Destination: src/content/notes/`);
-    console.log('\n✅ Notes sync completed successfully!');
-
+    console.log("\n✅ Notes sync completed successfully!");
   } catch (error) {
-    console.error('❌ Error during sync:', error.message);
+    console.error("❌ Error during sync:", error.message);
     process.exit(1);
   }
 }
@@ -147,9 +159,11 @@ function validateEnvironment() {
   const errors = [];
 
   // Check if we're in the right directory
-  const packageJsonPath = path.join(process.cwd(), 'package.json');
+  const packageJsonPath = path.join(process.cwd(), "package.json");
   if (!fs.existsSync(packageJsonPath)) {
-    errors.push('package.json not found. Please run this script from the project root.');
+    errors.push(
+      "package.json not found. Please run this script from the project root.",
+    );
   }
 
   // Check if exporter directory exists
@@ -158,8 +172,8 @@ function validateEnvironment() {
   }
 
   if (errors.length > 0) {
-    console.error('❌ Environment validation failed:');
-    errors.forEach(error => console.error(`   - ${error}`));
+    console.error("❌ Environment validation failed:");
+    errors.forEach((error) => console.error(`   - ${error}`));
     process.exit(1);
   }
 }
@@ -168,7 +182,7 @@ function validateEnvironment() {
  * Main execution
  */
 function main() {
-  console.log('🚀 Starting Notes Sync Process...\n');
+  console.log("🚀 Starting Notes Sync Process...\n");
 
   // Validate environment
   validateEnvironment();
@@ -179,11 +193,13 @@ function main() {
   // Sync notes and attachments
   syncNotesAndAttachments(latestExport);
 
-  console.log('\n🎉 All operations completed successfully!');
-  console.log('\nNext steps:');
-  console.log('   1. Review the synced content in src/content/notes/');
-  console.log('   2. Run `npm run build` to rebuild the site');
-  console.log('   3. Optionally run `npm run notes:cleanup` to clear exporter output');
+  console.log("\n🎉 All operations completed successfully!");
+  console.log("\nNext steps:");
+  console.log("   1. Review the synced content in src/content/notes/");
+  console.log("   2. Run `npm run build` to rebuild the site");
+  console.log(
+    "   3. Optionally run `npm run notes:cleanup` to clear exporter output",
+  );
 }
 
 // Execute if called directly
@@ -191,4 +207,8 @@ if (require.main === module) {
   main();
 }
 
-module.exports = { findLatestExportFolder, syncNotesAndAttachments, copyDirectorySync };
+module.exports = {
+  findLatestExportFolder,
+  syncNotesAndAttachments,
+  copyDirectorySync,
+};

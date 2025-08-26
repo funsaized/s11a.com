@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from "react";
 import type { HeadFC, PageProps } from "gatsby";
 import { graphql } from "gatsby";
+import { Link } from "gatsby";
 import { Layout } from "../components/layout/Layout";
 import { SearchInput } from "../components/articles/SearchInput";
 import { CategoryFilter } from "../components/articles/CategoryFilter";
@@ -13,7 +14,6 @@ import {
   CardTitle,
 } from "../components/ui/card";
 import { Badge } from "../components/ui/badge";
-import { Link } from "gatsby";
 
 const NOTES_PER_PAGE = 9;
 
@@ -79,17 +79,17 @@ interface Note {
 // Dynamic category emoji mapping
 const getCategoryEmoji = (category: string | undefined): string => {
   if (!category) return "📝";
-  
+
   const categoryMap: Record<string, string> = {
     food: "🍽️",
-    business: "💼", 
+    business: "💼",
     entertainment: "🎬",
     health: "💪",
     literature: "📚",
     personal: "👤",
     technology: "💻",
   };
-  
+
   return categoryMap[category.toLowerCase()] || "📝";
 };
 
@@ -200,9 +200,8 @@ const NotesPage: React.FC<PageProps<NotesPageData>> = ({ data }) => {
   // Transform GraphQL data to Note format
   const notes: Note[] = data.allMdx.nodes.map((node) => {
     // Generate slug from title or filename
-    const getFilenameFromPath = (filePath: string): string => {
-      return filePath.split("/").pop()?.replace(".mdx", "") || "";
-    };
+    const getFilenameFromPath = (filePath: string): string =>
+      filePath.split("/").pop()?.replace(".mdx", "") || "";
 
     const generatedSlug =
       node.frontmatter.slug ||
@@ -225,11 +224,13 @@ const NotesPage: React.FC<PageProps<NotesPageData>> = ({ data }) => {
   });
 
   // Get unique categories and tags
-  const categories = useMemo(() => {
-    return Array.from(
-      new Set(notes.map((note) => note.category).filter(Boolean)),
-    ).sort();
-  }, [notes]);
+  const categories = useMemo(
+    () =>
+      Array.from(
+        new Set(notes.map((note) => note.category).filter(Boolean)),
+      ).sort(),
+    [notes],
+  );
 
   const allTags = useMemo(() => {
     const tagSet = new Set<string>();
@@ -242,29 +243,31 @@ const NotesPage: React.FC<PageProps<NotesPageData>> = ({ data }) => {
   }, [notes]);
 
   // Filter notes based on search and filters
-  const filteredNotes = useMemo(() => {
-    return notes.filter((note) => {
-      // Search filter - check title, excerpt, and tags
-      const searchLower = searchQuery.toLowerCase();
-      const matchesSearch =
-        searchQuery === "" ||
-        note.title.toLowerCase().includes(searchLower) ||
-        (note.excerpt && note.excerpt.toLowerCase().includes(searchLower)) ||
-        (note.tags &&
-          note.tags.some((tag) => tag.toLowerCase().includes(searchLower)));
+  const filteredNotes = useMemo(
+    () =>
+      notes.filter((note) => {
+        // Search filter - check title, excerpt, and tags
+        const searchLower = searchQuery.toLowerCase();
+        const matchesSearch =
+          searchQuery === "" ||
+          note.title.toLowerCase().includes(searchLower) ||
+          (note.excerpt && note.excerpt.toLowerCase().includes(searchLower)) ||
+          (note.tags &&
+            note.tags.some((tag) => tag.toLowerCase().includes(searchLower)));
 
-      // Category filter
-      const matchesCategory =
-        selectedCategory === "" || note.category === selectedCategory;
+        // Category filter
+        const matchesCategory =
+          selectedCategory === "" || note.category === selectedCategory;
 
-      // Tag filter
-      const matchesTags =
-        selectedTags.length === 0 ||
-        (note.tags && selectedTags.every((tag) => note.tags!.includes(tag)));
+        // Tag filter
+        const matchesTags =
+          selectedTags.length === 0 ||
+          (note.tags && selectedTags.every((tag) => note.tags!.includes(tag)));
 
-      return matchesSearch && matchesCategory && matchesTags;
-    });
-  }, [notes, searchQuery, selectedCategory, selectedTags]);
+        return matchesSearch && matchesCategory && matchesTags;
+      }),
+    [notes, searchQuery, selectedCategory, selectedTags],
+  );
 
   // Pagination
   const totalPages = Math.ceil(filteredNotes.length / NOTES_PER_PAGE);
@@ -359,6 +362,7 @@ const NotesPage: React.FC<PageProps<NotesPageData>> = ({ data }) => {
                   </Badge>
                 ))}
                 <button
+                  type="button"
                   className="text-sm text-foreground hover:underline"
                   onClick={() => {
                     setSelectedCategory("");
@@ -392,6 +396,7 @@ const NotesPage: React.FC<PageProps<NotesPageData>> = ({ data }) => {
                 No notes found matching your criteria.
               </p>
               <button
+                type="button"
                 className="mt-4 text-foreground hover:underline"
                 onClick={() => {
                   setSearchQuery("");

@@ -10,7 +10,7 @@ import { categoryIcons } from "../../data/sampleData";
 
 interface CategoryFilterProps {
   value: string;
-  onChange: (value: string) => void;
+  onChange: (newValue: string) => void;
   categories: string[];
   className?: string;
 }

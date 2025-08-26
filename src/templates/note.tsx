@@ -104,10 +104,6 @@ const NoteTemplate: React.FC<NoteTemplateProps> = ({
           {/* Note Content */}
           <div className="bg-card border border-border rounded-lg shadow-sm">
             <div className="p-8">
-              {/* Image Disclaimer */}
-              {/*<div className="mb-4 text-xs text-muted-foreground/70 italic border-l-2 border-muted-foreground/20 pl-3">
-                Note: Images are currently being optimized and may not display properly.
-              </div>*/}
               <div
                 className="max-w-fit p-4 mb-4 text-sm text-blue-800 rounded-lg bg-blue-50 dark:bg-gray-800 dark:text-blue-400"
                 role="alert"

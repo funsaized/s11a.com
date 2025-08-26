@@ -3,3 +3,5 @@ static
 .cache
 content
 src/content
+scripts
+exporter

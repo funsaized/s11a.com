@@ -30,8 +30,8 @@ const ListIcon = () => (
 function TocList({ items, level = 0 }: { items: TocItem[]; level?: number }) {
   return (
     <ul className={`space-y-2 ${level > 0 ? "ml-4 mt-2" : ""}`}>
-      {items.map((item, index) => (
-        <li key={index}>
+      {items.map((item) => (
+        <li key={item.url}>
           <a
             href={item.url}
             onClick={(e) => {

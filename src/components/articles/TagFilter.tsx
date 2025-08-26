@@ -36,7 +36,7 @@ const ClearIcon = () => (
 
 interface TagFilterProps {
   selectedTags: string[];
-  onTagToggle: (tag: string) => void;
+  onTagToggle: (tagName: string) => void;
   onClearTags: () => void;
   availableTags: string[];
   className?: string;

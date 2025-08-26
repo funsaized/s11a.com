@@ -34,7 +34,7 @@ const ClearIcon = () => (
 
 interface SearchInputProps {
   value: string;
-  onChange: (value: string) => void;
+  onChange: (newValue: string) => void;
   placeholder?: string;
   className?: string;
 }
@@ -65,6 +65,7 @@ export function SearchInput({
 
       {value && (
         <button
+          type="button"
           onClick={handleClear}
           className="absolute inset-y-0 right-0 pr-3 flex items-center text-muted-foreground hover:text-foreground transition-colors"
           aria-label="Clear search"

@@ -102,7 +102,7 @@ const ArticleTemplate: React.FC<ArticleTemplateProps> = ({
     <Layout
       title={frontmatter.title}
       description={frontmatter.excerpt}
-      article={true}
+      article
       pathname={location.pathname}
       datePublished={frontmatter.date}
       tags={frontmatter.tags}

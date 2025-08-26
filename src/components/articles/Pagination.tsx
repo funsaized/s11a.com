@@ -36,7 +36,7 @@ const ChevronRightIcon = () => (
 interface PaginationProps {
   currentPage: number;
   totalPages: number;
-  onPageChange: (page: number) => void;
+  onPageChange: (pageNumber: number) => void;
   className?: string;
 }
 
@@ -55,7 +55,7 @@ export function Pagination({
 
     if (!showEllipsis) {
       // Show all pages if 7 or fewer
-      for (let i = 1; i <= totalPages; i++) {
+      for (let i = 1; i <= totalPages; i += 1) {
         pages.push(i);
       }
     } else {
@@ -76,7 +76,7 @@ export function Pagination({
         if (totalPages > 4) {
           pages.push("ellipsis");
         }
-        for (let i = Math.max(2, totalPages - 3); i <= totalPages; i++) {
+        for (let i = Math.max(2, totalPages - 3); i <= totalPages; i += 1) {
           pages.push(i);
         }
       } else {

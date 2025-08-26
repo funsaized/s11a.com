@@ -77,7 +77,7 @@ interface SharingComponentProps {
 export function SharingComponent({
   url,
   title,
-  excerpt,
+  excerpt: _excerpt,
   className = "",
 }: SharingComponentProps) {
   const [copied, setCopied] = React.useState(false);

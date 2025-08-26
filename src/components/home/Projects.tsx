@@ -1,6 +1,5 @@
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
-import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
 import { projects } from "../../data/sampleData";
 import type { Project } from "../../data/sampleData";
@@ -161,7 +160,7 @@ export function Projects() {
     <section className="relative py-12 md:py-16 overflow-hidden">
       {/* Subtle background overlay to match Hero */}
       <div className="absolute inset-0 bg-gradient-to-br from-transparent via-transparent to-slate-900/5 dark:to-slate-100/5 pointer-events-none" />
-      
+
       <div className="container mx-auto px-4 relative z-10">
         <div className="mx-auto max-w-6xl">
           {/* Section Header */}
@@ -177,8 +176,8 @@ export function Projects() {
 
           {/* Projects Grid */}
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 mb-12">
-            {projects.map((project, index) => (
-              <ProjectCard key={index} project={project} />
+            {projects.map((project) => (
+              <ProjectCard key={project.title} project={project} />
             ))}
           </div>
 

@@ -3,7 +3,6 @@ import { Link } from "gatsby";
 import { StaticImage } from "gatsby-plugin-image";
 import { Button } from "../ui/button";
 import { ThemeToggle } from "./ThemeToggle";
-import { cn } from "../../utils/cn";
 
 const MenuIcon = () => (
   <svg

@@ -112,22 +112,22 @@ const AboutPage: React.FC<PageProps> = () => {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <span className="text-2xl">👋</span>
-                Hello, I'm Sai
+                Hello, I&apos;m Sai
               </CardTitle>
             </CardHeader>
             <CardContent className="prose prose-lg max-w-none">
               <p className="text-muted-foreground leading-relaxed">
-                I'm a full-stack software engineer with a BSE in Electrical and
-                Computer Engineering and Biomedical Engineering from{" "}
-                <strong>Duke University</strong>. I'm passionate about building
-                scalable systems, exploring new technologies, and contributing
-                to open-source software.
+                I&apos;m a full-stack software engineer with a BSE in Electrical
+                and Computer Engineering and Biomedical Engineering from{" "}
+                <strong>Duke University</strong>. I&apos;m passionate about
+                building scalable systems, exploring new technologies, and
+                contributing to open-source software.
               </p>
               <p className="text-muted-foreground leading-relaxed">
                 I believe the best way to learn is through collaboration with
-                others. That's why I'm growing this site in parallel with my
-                exploration of new tech and open-source software, sharing
-                knowledge and experiences along the way.
+                others. That&apos;s why I&apos;m growing this site in parallel
+                with my exploration of new tech and open-source software,
+                sharing knowledge and experiences along the way.
               </p>
             </CardContent>
           </Card>
@@ -187,8 +187,8 @@ const AboutPage: React.FC<PageProps> = () => {
             </CardHeader>
             <CardContent>
               <blockquote className="text-lg italic text-center">
-                "I believe the best way to learn is through collaboration with
-                others"
+                &quot;I believe the best way to learn is through collaboration
+                with others&quot;
               </blockquote>
               <p className="text-muted-foreground mt-4 text-center">
                 Sharing is caring ❤️ and drives my commitment to open-source
@@ -200,7 +200,7 @@ const AboutPage: React.FC<PageProps> = () => {
 
           {/* Connect Section */}
           <div className="text-center">
-            <h2 className="text-2xl font-bold mb-6">Let's Connect</h2>
+            <h2 className="text-2xl font-bold mb-6">Let&apos;s Connect</h2>
             <div className="flex flex-wrap justify-center gap-4">
               <Button asChild variant="outline">
                 <a

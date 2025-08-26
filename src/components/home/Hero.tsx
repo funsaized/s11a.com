@@ -86,7 +86,7 @@ export function Hero() {
               ]}
               typingSpeed={75}
               pauseDuration={1500}
-              showCursor={true}
+              showCursor
               cursorCharacter="|"
             />
 
@@ -95,10 +95,10 @@ export function Hero() {
             </p>
 
             <p className="mx-auto max-w-2xl text-lg text-muted-foreground mb-8">
-              I'm a full stack software engineer focused on using tech to find
-              novel solutions. I build things, contribute to open source, and
-              love a good challenge. Passionate about creating technology that
-              improves outcomes and enhances developer experience.
+              I&apos;m a full stack software engineer focused on using tech to
+              find novel solutions. I build things, contribute to open source,
+              and love a good challenge. Passionate about creating technology
+              that improves outcomes and enhances developer experience.
             </p>
           </div>
 
