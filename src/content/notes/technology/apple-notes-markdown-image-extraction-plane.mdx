@@ -1,0 +1,31 @@
+---
+title: "Apple notes -> Markdown image extraction plane"
+slug: apple-notes-markdown-image-extraction-plane
+excerpt: |-
+  A detailed plan for automating the process of extracting images from Apple Notes and converting them to Markdown format.
+date: '2025-08-21'
+category: Technology
+tags:
+  - apple-notes
+  - markdown
+  - image-extraction
+  - automation
+  - workflow
+readingTime: 5 min read
+featured: false
+author: Sai Nimmagadda
+---
+# Apple notes -> Markdown image extraction plane
+
+1. Run shortcut -> Notes placed in content/notes.
+2. Run convert file and script to stage notes in working dir
+3. (Parallel to 1) we can run AppleScript Automation ExportNotesHtml.workflow to put files in Html stage
+4. Custom script that iterates notes in working directory from (2) and names the images Image-
+   .png/jpeg,etc
+
+1. Marry staging images from (4) w/ staging MDX file from (2) into directory
+2. Move staged dirs -> blog src/content/notes/&lttag>
+
+1. Script should be tag aware
+
+Automate the above w/ CRON. Orchestrate w/ bash or node whatever platform supports

@@ -1,0 +1,94 @@
+---
+title: Technical Docs Writing Guide - Research - 08/05/2025
+slug: technical-docs-writing-guide-research
+excerpt: |-
+  Research on writing effective technical documentation that helps users build meaningful relationships with products.
+date: '2025-07-29'
+category: Technology
+tags:
+  - documentation
+  - technical-writing
+  - user-experience
+  - cognitive-load
+  - empathy
+  - vue
+readingTime: 5 min read
+featured: false
+author: Sai Nimmagadda
+---
+# Technical Docs Writing Guide - Research - 08/05/2025
+
+## Problem/Question
+
+How do we write documentation that effectively helps users build meaningful relationships with technical products? The Vue ecosystem faces the challenge of transforming complex source code into accessible, empathetic guidance that respects users' cognitive limitations while maintaining their motivation to learn.
+
+## Key Findings
+
+Documentation is fundamentally an exercise in empathy rather than objective description. Users have limited cognitive capacity that depletes faster with complexity but slower when they feel smart, powerful, and curious. The curse of knowledge makes obvious concepts difficult for experts to explain to newcomers. Problem-first explanations provide essential context before introducing solutions.
+
+### Principles
+
+- **A feature doesn't exist until it's well documented**
+- **Respect users' cognitive capacity (brain power)**
+- Cognitive capacity is **depleted faster** by complex sentences, learning multiple concepts simultaneously, and abstract examples unrelated to user work
+- Cognitive capacity is **depleted more slowly** when users feel consistently smart, powerful, and curious through digestible pieces and good document flow
+- **Always see from the user's perspective** - overcome the curse of knowledge by remembering your own learning journey
+- **Describe the problem first, then the solution** - provide context so users understand relevance and importance
+- **Ask questions while writing** - vulnerability reveals what needs better explanation
+- **Participate in feature discussions** - documentation-driven development creates more explainable APIs
+
+## Implementation Notes
+
+**Content Organization Structure:**
+
+- **Installation/Integration**: Comprehensive setup for different project types
+- **Introduction/Getting Started**: &lt10 min problem overview, &lt30 min solution overview with examples
+- **Guide (sequential reading)**: Essentials (5 hours max, 20% knowledge for 80% use cases), Advanced (80% to 95% coverage)
+- **Reference/API**: Complete feature list with examples, dictionary-style format
+- **Migrations**: Version changes and comparisons with similar software
+- **Style Guide**: Opinionated recommendations for development decisions
+- **Cookbook**: Structured recipes assuming Vue familiarity
+
+**Writing Best Practices:**
+
+- Headings describe problems, not solutions (&quotPassing Data to Child Components with Props" vs &quotUsing Props")
+- Declare assumed knowledge upfront with resource links
+- Introduce one concept at a time in text and code
+- Avoid special tip/caveat blocks - blend naturally into content
+- Show concrete examples instead of abstract explanations
+- Use specific, relatable examples (&ltBlogPost> vs &ltComponentA>)
+- Prefer simple language over jargon (&quotfunction that returns a function" vs &quothigher order function")
+- Avoid struggle-invalidating words like &quoteasy," &quotjust," &quotobviously"
+
+**Grammar Standards:**
+
+- Avoid abbreviations except standard keyboard symbols (@, #, &)
+- Use colons (:) before examples, Oxford commas
+- Apply Title Case for headings, proper project name capitalization
+- No emojis in documentation
+
+**Iteration Process:**
+
+- **Excellence requires iteration: Bad → OK → Good → Great → Inspiring → Transcendent**
+- Publish at "**Good**" level, let community help improve further
+- Proofread before sharing to get substantive feedback
+- When requesting feedback, explain goals, fears, and balances you're striking
+- Thank contributors enthusiastically, use positive emojis, listen actively
+
+## Next Steps
+
+- Audit existing documentation against cognitive load principles
+- Implement problem-first heading structure across all guides
+- Create feedback collection system for identifying knowledge gaps
+- Establish documentation review process with empathy focus
+- Integrate documentation considerations into feature development workflow
+
+## References
+
+- Vue.js Documentation Writing Guide
+- Words To Avoid in Educational Writing - CSS Tricks
+- On Writing Well - William Zinsser
+- Bird by Bird - Anne Lamott
+- Cognitive Load Theory - Research foundation
+- Grammarly - Writing assistance tool
+- Code Spell Checker - VS Code extension

@@ -19,7 +19,9 @@
     "perf": "npm run lighthouse:ci",
     "deploy:check": "./scripts/deploy/deploy.sh",
     "deploy:netlify": "netlify deploy --prod --dir=public",
-    "predeploy": "npm run deploy:check"
+    "predeploy": "npm run deploy:check",
+    "notes:sync": "node scripts/notes/sync-notes.js",
+    "notes:cleanup": "node scripts/notes/cleanup-export.js"
   },
   "keywords": [],
   "author": "",

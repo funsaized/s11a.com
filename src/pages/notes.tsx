@@ -76,8 +76,25 @@ interface Note {
   author?: string;
 }
 
+// Dynamic category emoji mapping
+const getCategoryEmoji = (category: string | undefined): string => {
+  if (!category) return "📝";
+  
+  const categoryMap: Record<string, string> = {
+    food: "🍽️",
+    business: "💼", 
+    entertainment: "🎬",
+    health: "💪",
+    literature: "📚",
+    personal: "👤",
+    technology: "💻",
+  };
+  
+  return categoryMap[category.toLowerCase()] || "📝";
+};
+
 function NoteCard({ note }: { note: Note }) {
-  const categoryEmoji = note.category === "Food" ? "🍽️" : "📝";
+  const categoryEmoji = getCategoryEmoji(note.category);
 
   return (
     <Card className="group transition-all duration-200 hover:shadow-lg hover:-translate-y-1 h-full bg-card border border-border">

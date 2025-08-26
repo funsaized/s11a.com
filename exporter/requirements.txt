@@ -1,0 +1,7 @@
+beautifulsoup4==4.12.3
+markdownify==1.2.0
+Pillow==11.3.0
+python-dateutil==2.8.2
+pillow-heif==1.1.0
+anthropic==0.43.0
+python-dotenv==1.1.1

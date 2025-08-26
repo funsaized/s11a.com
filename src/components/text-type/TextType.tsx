@@ -11,6 +11,7 @@ import React, {
 } from "react";
 import { gsap } from "gsap";
 
+// TODO: refactor to motion
 interface TextTypeProps {
   className?: string;
   showCursor?: boolean;
@@ -26,7 +27,7 @@ interface TextTypeProps {
   deletingSpeed?: number;
   loop?: boolean;
   textColors?: string[];
-  variableSpeed?: { min: number; max: number };
+  variableSpeed?: { min: number; max: number; };
   onSentenceComplete?: (sentence: string, index: number) => void;
   startOnVisible?: boolean;
   reverseMode?: boolean;
@@ -133,28 +134,26 @@ const TextType = ({
 
           setCurrentTextIndex((prev) => (prev + 1) % textArray.length);
           setCurrentCharIndex(0);
-          timeout = setTimeout(() => {}, pauseDuration);
+          timeout = setTimeout(() => { }, pauseDuration);
         } else {
           timeout = setTimeout(() => {
             setDisplayedText((prev) => prev.slice(0, -1));
           }, deletingSpeed);
         }
-      } else {
-        if (currentCharIndex < processedText.length) {
-          timeout = setTimeout(
-            () => {
-              setDisplayedText(
-                (prev) => prev + processedText[currentCharIndex],
-              );
-              setCurrentCharIndex((prev) => prev + 1);
-            },
-            variableSpeed ? getRandomSpeed() : typingSpeed,
-          );
-        } else if (textArray.length > 1) {
-          timeout = setTimeout(() => {
-            setIsDeleting(true);
-          }, pauseDuration);
-        }
+      } else if (currentCharIndex < processedText.length) {
+        timeout = setTimeout(
+          () => {
+            setDisplayedText(
+              (prev) => prev + processedText[currentCharIndex],
+            );
+            setCurrentCharIndex((prev) => prev + 1);
+          },
+          variableSpeed ? getRandomSpeed() : typingSpeed,
+        );
+      } else if (textArray.length > 1) {
+        timeout = setTimeout(() => {
+          setIsDeleting(true);
+        }, pauseDuration);
       }
     };
 

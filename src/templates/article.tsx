@@ -1,12 +1,12 @@
 import React from "react";
 import { graphql, Link } from "gatsby";
+import { MDXProvider } from "@mdx-js/react";
 import { Layout } from "../components/layout/Layout";
 import { Badge } from "../components/ui/badge";
 import { Button } from "../components/ui/button";
 import { TableOfContents } from "../components/article/TableOfContents";
 import { SharingComponent } from "../components/article/SharingComponent";
 import { categoryIcons } from "../data/sampleData";
-import { MDXProvider } from "@mdx-js/react";
 import { headingComponents } from "../components/mdx/HeadingComponents";
 
 const BackArrowIcon = () => (
@@ -176,7 +176,7 @@ const ArticleTemplate: React.FC<ArticleTemplateProps> = ({
               </header>
 
               {/* Article Content */}
-              <div className="prose prose-lg max-w-none prose-headings:scroll-mt-8 prose-pre:bg-muted prose-pre:border prose-pre:border-border prose-pre:text-sm prose-pre:leading-relaxed prose-pre:overflow-x-auto prose-code:bg-muted prose-code:px-1.5 prose-code:py-1 prose-code:rounded prose-code:text-sm prose-code:before:content-none prose-code:after:content-none prose-img:rounded-lg prose-img:shadow-md">
+              <div className="prose max-w-none prose-headings:scroll-mt-8 prose-pre:bg-muted prose-pre:border prose-pre:border-border prose-pre:text-sm prose-pre:leading-relaxed prose-pre:overflow-x-auto prose-code:bg-muted prose-code:px-1.5 prose-code:py-1 prose-code:rounded prose-code:text-sm prose-code:before:content-none prose-code:after:content-none prose-img:rounded-lg prose-img:shadow-md">
                 <MDXProvider components={headingComponents}>
                   {children}
                 </MDXProvider>

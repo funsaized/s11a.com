@@ -90,6 +90,15 @@ author: 'Sai Nimmagadda'
 3. Write your content using MDX syntax
 4. The article will automatically appear on the articles page
 
+### Apple Notes Exporter
+
+The `exporter/` directory contains a Python tool for converting Apple Notes to MDX format:
+
+- **Purpose**: Export Apple Notes with smart AI-powered frontmatter generation
+- **Features**: Automatic image extraction, category organization, kebab-case filenames
+- **Output**: Web-ready MDX files with `/images/articles/` image paths
+- **Usage**: See `exporter/README.md` for detailed instructions
+
 ### Supported Categories
 
 - Backend

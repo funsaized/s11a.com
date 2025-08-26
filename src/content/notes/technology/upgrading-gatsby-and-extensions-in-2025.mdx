@@ -1,0 +1,57 @@
+---
+title: Upgrading gatsby and extensions in 2025
+slug: upgrading-gatsby-and-extensions-in-2025
+excerpt: |-
+  A detailed plan for upgrading Gatsby and its extensions in 2025, including a phased approach and considerations for major framework updates.
+date: '2025-08-02'
+category: Technology
+tags:
+  - gatsby
+  - react
+  - javascript
+  - web-development
+  - upgrades
+  - dependencies
+readingTime: 5 min read
+featured: false
+author: Sai Nimmagadda
+---
+# Upgrading gatsby and extensions in 2025
+
+## Update Strategy (Ordered by Risk & Dependencies)
+
+### Phase 1: Low-Risk Updates
+
+1. react-share (5.1.0 → 5.2.2) - Minor update, low risk
+
+2. url-join (4.0.1 → 5.0.0) - Major version but simple utility
+
+3. prettier (2.8.8 → 3.6.2) - Dev dependency, won't affect runtime
+
+### Phase 2: Development Tool Updates
+
+4. eslint-config-prettier (8.10.2 → 10.1.8) - Works with prettier update
+
+5. stylelint (14.16.1 → 16.23.0) - CSS linting tool
+
+6. stylelint-config-standard (24.0.0 → 39.0.0) - Goes with stylelint
+
+### Phase 3: Documentation Tools
+
+7. remark-cli (10.0.1 → 12.0.1) - Markdown processing
+
+8. remark-preset-lint-recommended (6.1.3 → 7.0.1) - Markdown linting
+
+### Phase 4: Type Definitions (Keep with React 18)
+
+9. @types/node (20.19.9 → 24.1.0) - Can update independently
+
+10. react-helmet (5.2.1 → 6.1.0) - May have breaking changes
+
+### Phase 5: Major Framework Updates (Skip for now)
+
+- React 18 → 19: Major update, requires thorough testing
+
+- ESLint 8 → 9: Major update with config changes
+
+- @types/react & @types/react-dom: Keep aligned with React version
