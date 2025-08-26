@@ -20,26 +20,40 @@ interface ArticleNode {
   };
 }
 
+interface ContentNode extends ArticleNode {
+  internal: {
+    contentFilePath: string;
+  };
+}
+
 interface IndexPageData {
   allMdx: {
-    nodes: ArticleNode[];
+    nodes: ContentNode[];
   };
 }
 
 const IndexPage: React.FC<PageProps<IndexPageData>> = ({ data }) => {
   // Transform the GraphQL data to match the Article interface
-  const articles = data.allMdx.nodes.map((node) => ({
-    id: node.id,
-    title: node.frontmatter.title,
-    slug: node.frontmatter.slug,
-    excerpt: node.frontmatter.excerpt || "",
-    date: node.frontmatter.date,
-    category: node.frontmatter.category,
-    tags: node.frontmatter.tags || [],
-    readingTime: node.frontmatter.readingTime,
-    featured: node.frontmatter.featured || false,
-    author: "Sai Nimmagadda",
-  }));
+  const articles = data.allMdx.nodes.map((node) => {
+    // Extract content type from file path
+    const contentType = node.internal.contentFilePath.includes("/articles/")
+      ? "article"
+      : "note";
+
+    return {
+      id: node.id,
+      title: node.frontmatter.title,
+      slug: node.frontmatter.slug,
+      excerpt: node.frontmatter.excerpt || "",
+      date: node.frontmatter.date,
+      category: node.frontmatter.category,
+      tags: node.frontmatter.tags || [],
+      readingTime: node.frontmatter.readingTime,
+      featured: node.frontmatter.featured || false,
+      author: "Sai Nimmagadda",
+      contentType,
+    };
+  });
 
   return (
     <Layout
@@ -47,7 +61,11 @@ const IndexPage: React.FC<PageProps<IndexPageData>> = ({ data }) => {
       description="Full-stack engineer focused on healthcare, developer experience, and scalable systems. Building technology that improves patient outcomes."
     >
       <Hero />
-      <RecentArticles articles={articles} />
+      <RecentArticles
+        articles={articles
+          .filter((article) => article.contentType === "article")
+          .slice(0, 4)}
+      />
       <Projects />
     </Layout>
   );
@@ -55,15 +73,20 @@ const IndexPage: React.FC<PageProps<IndexPageData>> = ({ data }) => {
 
 export default IndexPage;
 
+// TODO: limit this eventually...
 export const query = graphql`
   query {
     allMdx(
-      filter: { internal: { contentFilePath: { regex: "/content/articles/" } } }
+      filter: {
+        internal: { contentFilePath: { regex: "/content/(articles|notes)/" } }
+      }
       sort: { frontmatter: { date: DESC } }
-      limit: 4
     ) {
       nodes {
         id
+        internal {
+          contentFilePath
+        }
         frontmatter {
           title
           slug
