@@ -170,7 +170,7 @@ const NoteTemplate: React.FC<NoteTemplateProps> = ({
               </header>
 
               {/* Note Content */}
-              <div className="prose max-w-none dark:prose-invert prose-headings:scroll-mt-8 prose-pre:bg-muted prose-pre:border prose-pre:border-border prose-pre:text-sm prose-pre:leading-relaxed prose-pre:overflow-x-auto prose-code:bg-muted prose-code:px-1.5 prose-code:py-1 prose-code:rounded prose-code:text-sm prose-code:before:content-none prose-code:after:content-none prose-img:rounded-lg prose-img:shadow-md prose-a:break-words overflow-hidden">
+              <div className="prose max-w-none dark:prose-invert prose-headings:scroll-mt-8 prose-pre:bg-muted prose-pre:border prose-pre:border-border prose-pre:text-sm prose-pre:leading-relaxed prose-pre:overflow-x-auto prose-code:bg-muted prose-code:px-1.5 prose-code:py-1 prose-code:rounded prose-code:text-sm prose-code:before:content-none prose-code:after:content-none prose-img:rounded-lg prose-img:shadow-md prose-img:mx-auto prose-a:break-words overflow-hidden">
                 <MDXProvider components={headingComponents}>
                   {children}
                 </MDXProvider>
