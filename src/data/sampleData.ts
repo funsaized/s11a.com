@@ -69,6 +69,17 @@ const projects: Project[] = [
     forks: 0,
   },
   {
+    icon: "🍷",
+    title: "prompts.wine",
+    path: "https://prompts.wine",
+    source: "https://github.com/funsaized/prompts.wine",
+    description:
+      "A directory of instructions, agents, and workflows for LLMs & tools that have aged like fine wine",
+    status: "active",
+    stars: 0,
+    forks: 0,
+  },
+  {
     icon: "🧄",
     title: "Garlic-bot",
     path: "https://twitter.com/garlichub",
