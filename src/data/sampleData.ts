@@ -75,7 +75,7 @@ const projects: Project[] = [
     source: "https://github.com/funsaized/prompts.wine",
     description:
       "A directory of instructions, agents, and workflows for LLMs & tools that have aged like fine wine",
-    status: "in-progress",
+    status: "active",
     stars: 0,
     forks: 0,
   },
