@@ -61,7 +61,7 @@
     "motion": "^12.23.12",
     "prismjs": "^1.30.0",
     "react": "^18.3.1",
-    "react-dom": "^18.3.1",
+    "react-dom": "^19.1.1",
     "tailwind-merge": "^3.3.1"
   },
   "devDependencies": {
@@ -70,7 +70,7 @@
     "@tailwindcss/typography": "^0.5.16",
     "@types/node": "^24.3.1",
     "@types/react": "^19.1.10",
-    "@types/react-dom": "^19.1.7",
+    "@types/react-dom": "^19.1.9",
     "@typescript-eslint/eslint-plugin": "^5.62.0",
     "@typescript-eslint/parser": "^5.62.0",
     "autoprefixer": "^10.4.21",
