@@ -68,7 +68,7 @@
     "@babel/eslint-parser": "^7.28.4",
     "@babel/preset-react": "^7.27.1",
     "@tailwindcss/typography": "^0.5.19",
-    "@types/node": "^24.7.2",
+    "@types/node": "^24.8.1",
     "@types/react": "^19.1.10",
     "@types/react-dom": "^19.1.7",
     "@typescript-eslint/eslint-plugin": "^5.62.0",
