@@ -18,7 +18,7 @@
     "marked": "^9.0.0",
     "turndown": "^7.1.2",
     "sharp": "^0.32.0",
-    "js-yaml": "^4.1.0"
+    "js-yaml": "^4.1.1"
   },
   "devDependencies": {
     "@types/node": "^20.0.0"
