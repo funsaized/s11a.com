@@ -65,7 +65,7 @@
     "tailwind-merge": "^3.4.0"
   },
   "devDependencies": {
-    "@babel/eslint-parser": "^7.28.4",
+    "@babel/eslint-parser": "^7.28.5",
     "@babel/preset-react": "^7.28.5",
     "@tailwindcss/typography": "^0.5.19",
     "@types/node": "^24.10.1",
