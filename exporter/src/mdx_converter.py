@@ -736,8 +736,9 @@ conversion_error: true
                 validation_result = json.loads(result.stdout.decode('utf-8'))
                 return validation_result.get('valid', False), validation_result
             except json.JSONDecodeError:
-                logger.error(f"Failed to parse validator output: {result.stdout.decode('utf-8')}")
-                return True, {"valid": True, "parse_error": True}
+                stderr_output = result.stderr.decode('utf-8').strip()
+                logger.error(f"Failed to parse validator output. stderr: {stderr_output}")
+                return True, {"valid": True, "parse_error": True, "stderr": stderr_output}
                 
         except subprocess.TimeoutExpired:
             logger.error("MDX validation timed out")

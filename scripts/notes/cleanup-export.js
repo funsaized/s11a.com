@@ -11,7 +11,7 @@ const fs = require("fs");
 const path = require("path");
 const { execSync } = require("child_process");
 
-const EXPORTER_OUTPUT_DIR = path.join(__dirname, "../../exporter/output");
+const EXPORTER_OUTPUT_DIR = path.join(__dirname, "../../output");
 
 /**
  * Get directory size and file count recursively

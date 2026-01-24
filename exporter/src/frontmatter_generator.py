@@ -10,6 +10,7 @@ import os
 import re
 import json
 import logging
+import time
 from typing import Dict, List, Optional, Any
 from datetime import datetime
 from pathlib import Path
@@ -110,7 +111,6 @@ class SmartFrontmatterGenerator:
         
         try:
             # Call Claude API with Haiku model for efficiency
-            # Rate limiting is handled at the export level with delays between notes
             response = self.client.messages.create(
                 model="claude-3-haiku-20240307",
                 max_tokens=500,
@@ -122,6 +122,9 @@ class SmartFrontmatterGenerator:
                     }
                 ]
             )
+            
+            # Rate limiting: small delay after API call to avoid 429 errors
+            time.sleep(1.5)
             
             # Parse the response
             generated_text = response.content[0].text if response.content else ""

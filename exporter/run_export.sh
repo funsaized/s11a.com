@@ -13,20 +13,20 @@ if ! command -v python3 &> /dev/null; then
     exit 1
 fi
 
-# Check dependencies
-echo "📦 Checking dependencies..."
-missing_deps=()
+# Check and install dependencies from requirements.txt
+echo "📦 Checking and installing Python dependencies..."
+if [ -f "$(dirname "$0")/requirements.txt" ]; then
+    pip3 install --user -r "$(dirname "$0")/requirements.txt"
+else
+    echo "⚠️ requirements.txt not found. Skipping Python dependency installation."
+fi
 
-python3 -c "import bs4" 2>/dev/null || missing_deps+=("beautifulsoup4")
-python3 -c "import markdownify" 2>/dev/null || missing_deps+=("markdownify")
-python3 -c "import PIL" 2>/dev/null || missing_deps+=("Pillow")
-
-if [ ${#missing_deps[@]} -gt 0 ]; then
-    echo "⚠️  Missing dependencies: ${missing_deps[*]}"
-    echo ""
-    echo "Installing missing dependencies..."
-    pip3 install --user beautifulsoup4 markdownify Pillow
-    echo ""
+# Check and install Node.js dependencies for the validator
+echo "📦 Checking and installing Node.js dependencies..."
+if [ -f "$(dirname "$0")/package.json" ]; then
+    (cd "$(dirname "$0")" && npm install)
+else
+    echo "⚠️ package.json not found. Skipping Node.js dependency installation."
 fi
 
 # Run the export
