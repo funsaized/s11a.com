@@ -3,5 +3,5 @@ markdownify==1.2.2
 Pillow==12.1.0
 python-dateutil==2.9.0.post0
 pillow-heif==1.1.1
-anthropic==0.76.0
+anthropic==0.77.0
 python-dotenv==1.2.1
