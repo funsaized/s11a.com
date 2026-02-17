@@ -37,7 +37,7 @@
     "@radix-ui/react-separator": "^1.1.8",
     "@radix-ui/react-slot": "^1.2.4",
     "@radix-ui/react-toast": "^1.2.15",
-    "ajv": "^8.17.1",
+    "ajv": "^8.18.0",
     "ajv-keywords": "^5.1.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
