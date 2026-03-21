@@ -12,6 +12,8 @@ npm run clean            # Clear .cache/ and public/
 npm run typecheck        # tsc --noEmit (strict mode)
 npm run lint             # ESLint with airbnb + prettier config
 npm run format:js        # Prettier write on all JS/TS files
+npm run export-notes      # Export Apple Notes to MDX (use --dry-run to preview)
+npm run export-notes -- --dry-run   # Preview export without writing files
 npm run lighthouse       # Lighthouse performance audit
 npm run lighthouse:ci    # Build → serve → Lighthouse → kill
 ```
@@ -19,7 +21,8 @@ npm run lighthouse:ci    # Build → serve → Lighthouse → kill
 No test framework is configured. `npm test` is a placeholder that exits 1.
 No pre-commit hooks (no Husky/lint-staged).
 
-**Node version**: v22.4.1 (.nvmrc). Netlify builds use Node 18.
+- **Node version**: v22.4.1 (.nvmrc). Netlify builds use Node 18.
+- **Note**: No Python dependencies required — pipeline is pure TypeScript.
 
 ## Lint & Type Configuration
 

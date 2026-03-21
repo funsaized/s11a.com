@@ -63,6 +63,7 @@ npm run typecheck     # Run TypeScript checks
 npm run lighthouse    # Run Lighthouse performance tests
 npm run lighthouse:ci # Build and test performance
 npm run analyze       # Analyze bundle size
+npm run export-notes   # Export Apple Notes to MDX
 npm run perf          # Full performance testing suite
 ```
 
@@ -75,15 +76,15 @@ npm run perf          # Full performance testing suite
 
 ```yaml
 ---
-title: 'Your Article Title'
+title: "Your Article Title"
 slug: your-article-slug
-excerpt: 'Brief description of the article'
-date: '2024-01-01'
-category: 'Technology'
-tags: ['React', 'TypeScript']
-readingTime: '5 min read'
+excerpt: "Brief description of the article"
+date: "2024-01-01"
+category: "Technology"
+tags: ["React", "TypeScript"]
+readingTime: "5 min read"
 featured: false
-author: 'Sai Nimmagadda'
+author: "Sai Nimmagadda"
 ---
 ```
 
@@ -92,12 +93,20 @@ author: 'Sai Nimmagadda'
 
 ### Apple Notes Exporter
 
-The `exporter/` directory contains a Python tool for converting Apple Notes to MDX format:
+The `scripts/export-notes/` directory contains a TypeScript CLI for exporting Apple Notes to MDX format:
 
-- **Purpose**: Export Apple Notes with smart AI-powered frontmatter generation
-- **Features**: Automatic image extraction, category organization, kebab-case filenames
-- **Output**: Web-ready MDX files with `/images/articles/` image paths
-- **Usage**: See `exporter/README.md` for detailed instructions
+- **Purpose**: Export Apple Notes categorized by `#hashtags` to `src/content/notes/`
+- **Features**: Tag-based categorization, image extraction (HEIC→JPEG), deterministic output
+- **Excluded**: Notes tagged `#personal` or `#private`, archived notes, untagged notes
+- **Usage**:
+
+```bash
+npm run export-notes              # Export all tagged notes
+npm run export-notes -- --dry-run  # Preview what would be exported
+npm run export-notes -- --verbose  # Show per-note details
+```
+
+Notes are written to `src/content/notes/{category}/` and images to `static/images/articles/`.
 
 ### Supported Categories
 
@@ -168,6 +177,7 @@ npm run analyze      # Bundle analysis
    - Node version: `18`
 
 3. **Environment Variables** (Optional):
+
    ```
    GA_MEASUREMENT_ID=your-google-analytics-id
    ```
@@ -188,6 +198,7 @@ npm run build
 ### Performance Monitoring
 
 Set up monitoring for:
+
 - Core Web Vitals
 - Lighthouse CI
 - Bundle size tracking
@@ -200,12 +211,13 @@ Set up monitoring for:
 1. Create a GA4 property
 2. Update `gatsby-config.ts` with your Measurement ID:
    ```typescript
-   trackingIds: ["G-XXXXXXXXXX"]
+   trackingIds: ["G-XXXXXXXXXX"];
    ```
 
 ### Performance Monitoring
 
 The site includes performance monitoring setup for:
+
 - Real User Monitoring (RUM)
 - Core Web Vitals tracking
 - Error boundary reporting
