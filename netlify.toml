@@ -4,6 +4,7 @@
 
 [build.environment]
   NODE_VERSION = "22.4.1"
+  NPM_FLAGS = "--legacy-peer-deps"
 
 [[redirects]]
   from = "/*"
