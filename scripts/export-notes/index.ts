@@ -10,7 +10,7 @@ import type { ExportConfig, ProcessedImage } from "./types";
 const config: ExportConfig = {
   notesDir: "src/content/notes",
   imageDir: "static/images/articles",
-  excludeTags: ["personal", "private"],
+  excludeTags: ["private"],
   author: "Sai Nimmagadda",
   dryRun: process.argv.includes("--dry-run"),
   verbose: process.argv.includes("--verbose"),
