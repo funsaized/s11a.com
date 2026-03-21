@@ -21,7 +21,8 @@
     "deploy:netlify": "netlify deploy --prod --dir=public",
     "predeploy": "npm run deploy:check",
     "notes:sync": "node scripts/notes/sync-notes.js",
-    "notes:cleanup": "node scripts/notes/cleanup-export.js"
+    "notes:cleanup": "node scripts/notes/cleanup-export.js",
+    "export-notes": "npx tsx scripts/export-notes/index.ts"
   },
   "keywords": [],
   "author": "",
@@ -71,6 +72,8 @@
     "@types/node": "^25.2.0",
     "@types/react": "^19.1.10",
     "@types/react-dom": "^19.1.7",
+    "@types/sharp": "^0.32.0",
+    "@types/turndown": "^5.0.6",
     "@typescript-eslint/eslint-plugin": "^5.62.0",
     "@typescript-eslint/parser": "^5.62.0",
     "autoprefixer": "^10.4.24",
@@ -86,7 +89,10 @@
     "lighthouse": "^13.0.1",
     "postcss": "^8.5.6",
     "prettier": "^3.8.1",
+    "sharp": "^0.33.5",
     "tailwindcss": "^3.4.17",
+    "tsx": "^4.21.0",
+    "turndown": "^7.2.2",
     "typescript": "^5.9.3"
   }
 }
