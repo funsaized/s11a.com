@@ -1,0 +1,58 @@
+---
+title: 'OpenClaw TODO'
+slug: openclaw-todo
+excerpt: |-
+  https://www.youtube.com/watch?v=st534T7-mdE
+date: '2026-03-19'
+category: Personal-Systems
+tags:
+readingTime: 2 min read
+featured: false
+author: Sai Nimmagadda
+---
+
+https://www.youtube.com/watch?v=st534T7-mdE
+
+Security audit itself https://docs.openclaw.ai/gateway/security
+
+Pre-build idea validator + MCP https://github.com/hesamsheikh/awesome-openclaw-usecases/blob/main/usecases/pre-build-idea-validator.md (idea-reality-mcp)
+
+https://superwhisper.com/docs/get-started/transcribe-files
+
+I want you to build this iteratively. For each step, I want you to research and synthesize a best-practices approach and present it here. After I confirm, I want you to build the approach and then document it in the mr-krabs repository. Back up your own workspace in your git repository as well. Outputs should be scoped to your openclaw workspace. Build a health data pipeline:
+
+1\. Connector scripts (one per data source):
+
+\- Wearable ring API (Oura): sleep stages, HRV, readiness, activity, etc. Any data that is available
+
+\- Phone health exports (e.g., Apple Health CSV): steps, heart rate, workouts, etc. Any data that is available
+
+Each connector normalizes to a common JSONL format:
+
+\{timestamp, source, metric, value, unit\}
+
+2\. Unified timeline:
+
+\- Append-only JSONL file (health-timeline.jsonl)
+
+\- One line per measurement
+
+\- All sources write to the same file
+
+3\. Morning cron job:
+
+\- Pull latest data from all configured sources
+
+\- Run LLM analysis on recent timeline entries
+
+\- Generate: daily health summary, trend flags, coaching tips
+
+\- Deliver to your health/wellness channel
+
+4\. Trend analysis:
+
+\- Look back over weeks/months for patterns
+
+\- Flag: poor sleep streaks, HRV drops, weight changes
+
+\- Cross-reference: sleep quality vs activity level, weight vs nutrition
