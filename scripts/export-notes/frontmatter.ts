@@ -94,14 +94,11 @@ function extractExcerpt(markdown: string): string {
 
 /**
  * Format excerpt for YAML frontmatter.
- * - Use literal block scalar (|-) for excerpts >60 chars
- * - Otherwise inline format
+ * - Always use literal block scalar (|-) — immune to YAML escape interpretation
  */
 function formatExcerpt(excerpt: string): string {
-  if (!excerpt || excerpt.length <= 60) {
-    return `excerpt: "${excerpt || ""}"`;
-  }
-  // Use literal block scalar
+  if (!excerpt) return 'excerpt: ""';
+  // Always use literal block scalar — immune to YAML escape interpretation
   return `excerpt: |-\n  ${excerpt}`;
 }
 
@@ -115,7 +112,7 @@ export function generateFrontmatter(
   markdown: string,
   slug: string,
 ): string {
-  const title = note.title.replace(/"/g, '\\"');
+  const title = note.title.replace(/'/g, "''");
   const category = getCategory(tags);
   const date = note.modificationDate.slice(0, 10); // YYYY-MM-DD
   let excerpt = extractExcerpt(markdown);
@@ -130,7 +127,7 @@ export function generateFrontmatter(
 
   const lines = [
     "---",
-    `title: "${title}"`,
+    `title: '${title}'`,
     `slug: ${slug}`,
     formatExcerpt(excerpt),
     `date: '${date}'`,

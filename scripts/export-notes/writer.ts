@@ -58,6 +58,10 @@ export function validateMdx(content: string): {
       /< ?(\d)/g,
       (_match, n: string) => `&lt;${n}`,
     );
+
+    // Escape JSX-like tags: <Word> where Word starts with uppercase (MDX treats as component)
+    processed = processed.replace(/<([A-Z])/g, "&lt;$1");
+
     processedLines.push(processed);
   }
 
