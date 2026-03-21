@@ -96,6 +96,7 @@ const config: GatsbyConfig = {
         devMode: false,
         analyzerMode: "static",
         reportFilename: "bundle-analyzer-report.html",
+        openAnalyzer: false,
       },
     },
     {
