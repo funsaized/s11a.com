@@ -118,15 +118,20 @@ JSON.stringify(results);
     const notes = JSON.parse(output) as RawNote[];
     console.log(`Found ${notes.length} notes`);
 
-    // Deduplicate by note ID — JXA returns same note from multiple accounts/folders
-    const seen = new Set<string>();
-    const unique: RawNote[] = [];
+    // Deduplicate by note ID — JXA returns same note from multiple accounts/folders.
+    // Prefer smart folders (Inbox, Knowledge Base, etc.) over the default "Notes" folder,
+    // since smart folders represent the user's actual categorization.
+    const noteById = new Map<string, RawNote>();
     for (const note of notes) {
-      if (!seen.has(note.id)) {
-        seen.add(note.id);
-        unique.push(note);
+      const existing = noteById.get(note.id);
+      if (!existing) {
+        noteById.set(note.id, note);
+      } else if (existing.folder === "Notes" && note.folder !== "Notes") {
+        // Replace default folder entry with the more specific smart folder
+        noteById.set(note.id, note);
       }
     }
+    const unique = [...noteById.values()];
     const duplicateCount = notes.length - unique.length;
     if (duplicateCount > 0) {
       console.log(
