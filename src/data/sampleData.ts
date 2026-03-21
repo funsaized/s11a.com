@@ -38,12 +38,11 @@ export interface Project {
 
 const projects: Project[] = [
   {
-    icon: "🐶",
-    title: "Project SafeStream",
-    path: "https://safekids.s11a.com",
-    source: "https://safekids.s11a.com",
-    description:
-      "Shipping soon..  Community curation meets intelligent moderation in an app that works everywhere.",
+    icon: "🌅",
+    title: "Eventide",
+    path: "https://eventide.s11a.com",
+    source: "https://github.com/funsaized/Eventide",
+    description: "A modern event discovery and calendar management platform.",
     status: "active",
   },
   {
