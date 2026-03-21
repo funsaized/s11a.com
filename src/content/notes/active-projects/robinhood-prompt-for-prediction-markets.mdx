@@ -1,0 +1,338 @@
+---
+title: 'Robinhood Prompt For Prediction Markets'
+slug: robinhood-prompt-for-prediction-markets
+excerpt: |-
+  I'm uploading screens from Robinhood's mobile app for prediction markets (futures), and my own daily report summary. I want you to ideate a web application to act as a hub or dashboard for user's a...
+date: '2025-10-09'
+category: Active-Projects
+tags:
+readingTime: 6 min read
+featured: false
+author: Sai Nimmagadda
+---
+
+I'm uploading screens from Robinhood's mobile app for prediction markets (futures), and my own daily report summary. I want you to ideate a web application to act as a hub or dashboard for user's around their Robinhood prediction market activity and create a series of prompts to implement the web app according to specifications here. Specifically I want you to extract and surface right rymaway pinsights including daily changes in open positions, realized profit, unrealized profit, and more advanced analytics. The app I want to build should present a better futures markets trade viewing (read only) experience for users.
+
+The app should be built with modern NextJS, React, ShadCN, tailwind CSS, Typescript, Aslant, Prettier and react bits for animations and cool effects https://reactbits.dev.
+
+The application should be local first , meaning no data should be stored outside of the users local machine /browser. Use legend-state for state management and local persistence https://github.com/LegendApp/legend-state
+
+**
+
+## Web Application Architecture & Implementation Prompts
+
+**
+
+**
+
+## Phase 1: Project Setup & Data Model
+
+**
+
+Create a new Next.js 15+ application with TypeScript, Tailwind CSS, and ShadCN UI components.
+
+Set up the following:
+
+\- ESLint and Prettier with strict TypeScript rules
+
+\- Legend-state for state management with browser persistence
+
+\- ShadCN UI component library
+
+\- React-bits for animations
+
+Create TypeScript interfaces for the data model based on Robinhood's prediction market structure:
+
+\- Position (symbol, quantity, entry price, current price, P&L, expiry date)
+
+\- Trade (date, action, quantity, price, fees)
+
+\- DailySnapshot (date, positions, realized P&L, unrealized P&L, total equity)
+
+\- Market (symbol, name, category, current price, volume, settlement date)
+
+Implement Legend-state stores with local persistence for:
+
+\- Historical trades
+
+\- Current positions
+
+\- Daily snapshots
+
+\- User preferences/settings
+
+**
+
+## Phase 2: Data Import & Parsing
+
+**
+
+Create a data import module that:
+
+1\. Accepts PDF uploads of Robinhood daily statements
+
+2\. Parses the PDF to extract:
+
+\- Daily trade confirmations
+
+\- Open positions with cost basis and current values
+
+\- Realized and unrealized P&L
+
+\- Account summary metrics
+
+3\. Implements CSV/JSON import for manual data entry
+
+4\. Validates and normalizes imported data
+
+5\. Stores parsed data in Legend-state with automatic persistence
+
+Use pdf.js or similar library for PDF parsing. Create robust error handling
+
+and data validation to ensure data integrity.
+
+**
+
+## Phase 3: Dashboard Layout & Core Components
+
+**
+
+Build the main dashboard layout with:
+
+1\. Header Component:
+
+\- Date range selector
+
+\- Quick stats (total P&L, win rate, active positions)
+
+\- Import data button
+
+\- Settings/preferences toggle
+
+2\. Portfolio Overview Card:
+
+\- Total account value with sparkline
+
+\- Daily change ($ and %)
+
+\- Realized P&L (day/week/month/all-time)
+
+\- Unrealized P&L with breakdown by position
+
+3\. Active Positions Grid:
+
+\- Sortable/filterable table showing:
+
+\* Contract name and expiry
+
+\* Quantity and side (YES/NO)
+
+\* Entry price vs current price
+
+\* Unrealized P&L ($ and %)
+
+\* Days until expiry
+
+\* Mini price chart sparkline
+
+\- Color coding: green for profit, red for loss
+
+\- Click to expand for detailed position history
+
+4\. Performance Metrics Dashboard:
+
+\- Win rate percentage with visual indicator
+
+\- Average profit per winning trade
+
+\- Average loss per losing trade
+
+\- Profit factor (gross profit/gross loss)
+
+\- Sharpe ratio approximation
+
+\- Best/worst performing categories
+
+**
+
+## Phase 4: Advanced Analytics & Visualizations
+
+**
+
+Implement advanced analytics features:
+
+1\. P&L Analysis Chart:
+
+\- Interactive line/area chart showing cumulative P&L over time
+
+\- Toggle between realized, unrealized, and total P&L
+
+\- Zoom and pan capabilities
+
+\- Annotations for significant trades
+
+2\. Category Performance Heatmap:
+
+\- Visual heatmap showing performance by category (Sports, Politics, Crypto, etc.)
+
+\- Click to drill down into specific category performance
+
+3\. Position Timeline Visualization:
+
+\- Gantt-style chart showing position lifecycles
+
+\- Entry/exit points with P&L indicators
+
+\- Expired vs active positions
+
+4\. Risk Analytics:
+
+\- Position concentration analysis (pie chart)
+
+\- Maximum drawdown calculation and visualization
+
+\- Risk-adjusted returns metrics
+
+\- Correlation matrix between different market categories
+
+5\. Trade Journal:
+
+\- Searchable/filterable list of all historical trades
+
+\- Add notes/tags to trades
+
+\- Export functionality (CSV/PDF)
+
+Use Recharts or Victory for charting, with react-bits animations for transitions.
+
+**
+
+## Phase 5: Enhanced Features & UX
+
+**
+
+Add premium features for better user experience:
+
+1\. Smart Insights Engine:
+
+\- Automated insights generation (e.g., "You perform 23% better in sports markets")
+
+\- Pattern recognition in winning/losing trades
+
+\- Suggested position sizing based on historical performance
+
+\- Alert system for unusual activity or drawdowns
+
+2\. Comparison Tools:
+
+\- Before/after comparison views for different time periods
+
+\- Benchmark against average returns
+
+\- Side-by-side position comparison
+
+3\. Export & Reporting:
+
+\- Generate professional PDF reports with charts and metrics
+
+\- Tax preparation export (CSV with necessary fields)
+
+\- Shareable performance snapshots (with privacy controls)
+
+4\. Dark Mode & Themes:
+
+\- System-aware theme switching
+
+\- Custom color schemes for different market categories
+
+\- Accessibility options (high contrast, larger fonts)
+
+5\. Mobile Responsive Design:
+
+\- Touch-optimized interactions
+
+\- Swipeable cards for positions
+
+\- Bottom sheet pattern for detailed views
+
+**
+
+## Phase 6: Testing & Optimization
+
+**
+
+Implement comprehensive testing and optimization:
+
+1\. Unit tests for all data parsing and calculation functions
+
+2\. Integration tests for Legend-state persistence
+
+3\. E2E tests for critical user flows
+
+4\. Performance optimization:
+
+\- Virtualized lists for large datasets
+
+\- Memoization of expensive calculations
+
+\- Web Worker for heavy computations
+
+\- Lazy loading of chart components
+
+5\. Progressive Web App features for offline access
+
+**
+
+## Key Implementation Details
+
+**
+
+**For State Management (Legend-state):**
+
+typescript
+
+_// Example store structure_
+
+const appState$ = observable(\{
+
+positions: \[\] as Position\[\],
+
+trades: \[\] as Trade\[\],
+
+dailySnapshots: \[\] as DailySnapshot\[\],
+
+settings: \{
+
+theme: 'system',
+
+defaultDateRange: '30d',
+
+_// ..._
+
+}
+
+});
+
+_// Enable persistence_
+
+enableLegendStatePersistence(appState$, \{
+
+local: 'robinhood-dashboard-state'
+
+});
+
+**For Animations (React-bits):**
+
+-   Use entrance animations for cards and data updates
+-   Smooth number transitions for P&L changes
+-   Skeleton loaders during data processing
+-   Micro-interactions on hover/click
+
+**Privacy & Security Considerations:**
+
+-   All data stored locally in browser (IndexedDB via Legend-state)
+-   No external API calls or data transmission
+-   Option to password-protect the dashboard
+-   Clear data button with confirmation
+
+This architecture provides a professional-grade dashboard while maintaining complete privacy and local-first principles. The modular prompt structure allows for iterative development and testing of each component.

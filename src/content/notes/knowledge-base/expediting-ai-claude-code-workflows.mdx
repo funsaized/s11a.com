@@ -1,0 +1,57 @@
+---
+title: 'Expediting AI / Claude Code Workflows'
+slug: expediting-ai-claude-code-workflows
+excerpt: |-
+  1.  Screen recordings as spec
+date: '2026-01-23'
+category: Knowledge-Base
+tags:
+readingTime: 3 min read
+featured: false
+author: Sai Nimmagadda
+---
+
+1.  Screen recordings as spec
+
+1.  Gemini
+
+3.  Use Gemini 3 pro for specs for example
+
+1.  Then follow up with Claude to interview you with the AskUserQuestionTool
+
+1.  “Read this @Spec.md and interview me in detail using the AskUserQuestionTool about literally anything: technical implementation, UI & UX, concerns, tradeoffs, etc. But make sure the questions are not obvious. Be very in-depth and continue interviewing me continually until it’s complete, then write the spec to the file.
+
+5.  A traditional agent with limited context often tends to write everything from scratch stemming from outdated context windows
+
+1.  Instead of using libraries, it tends to make them itself…
+2.  To resolve this -> Give the specification to something like chatGPT that does heavy thinking and prompt with searching enabled:
+
+1.  “Using this particular spec, can you search online and find any relevant GitHub packages that may be useful in developing out this feature? Search online and find well maintained packages that seem to be regularly updated, have reliable communities, and can essentially simplify the development of I this particular feature. When there are multiple options, propose different ones. They should be compatible with”
+
+7.  Have Claude Code break down the full spec into phases, and have it check off each phase in the spec
+8.  Workflow i.e Gemini 3 pro spec -> ChatGPT packages -> Claude Code Spec based implementation
+9.  Opus 4.5 for implementation most of the time.. Sonnet 4.5 for quick review & polish
+10.  GPT 5.2 for architecture and planning related decisions
+
+1.  When I know the spec is going to be big.. pass to GPT 5.2 to understand how to structure for example
+
+12.  Maybe try Gemini 3 Pro for Design and Creativity
+13.  Haiku 4.5 is fast … use it for quick answers for code, small helpers and explanations, targeted edits I know should be made
+14.  Look into Codex CLI
+15.  Multiple CI tools working on different tasks in different projects…
+
+1.  Git work queues merging can be a pain
+
+17.  When you enable planning mode, Claude code spins up explore sub-agents that explore for well established patterns, passes to planning sub agent that uses information, and creates a plan for future agents
+18.  Found frontend sub-agent, backend-agent, etc didn’t coordinate well, may misinterpret requirements, complex specifications to know when to use each sub-agent this way..
+
+1.  Within the same codebase, don’t do this maybe
+
+20.  Sub agents were better for controlling the context instead… ie
+
+1.  Can you spin up an opus sub agent, a YY sub agent that uses the X MCP server other than figure out
+2.  Consider this bug from multiple angles… etc
+
+References:
+
+-   https://www.youtube.com/watch?v=sy65ARFI9Bg&t=343s
