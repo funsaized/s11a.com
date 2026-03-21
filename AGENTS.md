@@ -14,6 +14,7 @@ npm run lint             # ESLint with airbnb + prettier config
 npm run format:js        # Prettier write on all JS/TS files
 npm run export-notes      # Export Apple Notes to MDX (use --dry-run to preview)
 npm run export-notes -- --dry-run   # Preview export without writing files
+npm run export-notes -- --verbose   # Show per-note details during export
 npm run lighthouse       # Lighthouse performance audit
 npm run lighthouse:ci    # Build → serve → Lighthouse → kill
 ```
@@ -138,6 +139,8 @@ src/
   styles/           # Global CSS (globals.css, prism-theme.css)
   templates/        # Page templates (article.tsx, note.tsx)
   utils/            # Utility functions (cn.ts)
+scripts/
+  export-notes/     # Apple Notes → MDX export pipeline (TypeScript CLI)
 ```
 
 ## Content (MDX)
