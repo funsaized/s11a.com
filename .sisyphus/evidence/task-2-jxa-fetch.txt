@@ -1,3 +1,0 @@
-Fetching notes from Apple Notes...
-Found 220 notes
-{"count":220,"sample":"xTbKNFjjqhqw (root pwd)"}

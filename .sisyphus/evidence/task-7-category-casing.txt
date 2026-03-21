@@ -1,3 +1,0 @@
-Wrote 1 notes across 1 categories
-dir_lowercase: true
-frontmatter_pascalcase: true
