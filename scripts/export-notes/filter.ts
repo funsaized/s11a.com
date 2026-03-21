@@ -45,7 +45,7 @@ export function extractTags(htmlBody: string): string[] {
  * Returns exported notes and statistics.
  */
 const EXCLUDED_FOLDER_PATTERN =
-  /archive|archived|archives|old|deleted|trash|backup|work/i;
+  /archive|archived|archives|old|deleted|trash|backup|work|private/i;
 
 export function filterNotes(
   notes: RawNote[],
