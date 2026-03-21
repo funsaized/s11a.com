@@ -142,11 +142,11 @@ export async function extractImages(
       const filename = `${noteSlug}-${indexStr}.${ext}`;
       images.push({ filename, data: finalBuffer, format });
 
-      // Replace <img> tag with markdown image syntax
+      // Replace <img> tag with placeholder token (to avoid Turndown escaping markdown syntax)
       // Uses .replace (not .replaceAll) so each duplicate tag is replaced once in order
       const altText = `${noteSlug} ${indexStr}`;
-      const mdImage = `![${altText}](/images/articles/${filename})`;
-      updatedHtml = updatedHtml.replace(fullImgTag, mdImage);
+      const placeholder = `__IMG_PLACEHOLDER_${indexStr}__${altText}__${filename}__`;
+      updatedHtml = updatedHtml.replace(fullImgTag, placeholder);
       imageIndex++;
     } catch (err) {
       console.warn(
@@ -178,4 +178,17 @@ export function writeImages(images: ProcessedImage[], imageDir: string): void {
   if (images.length > 0) {
     console.log(`Wrote ${images.length} images to ${imageDir}`);
   }
+}
+
+/**
+ * Restore image placeholders to markdown image syntax.
+ * Placeholders are in format: __IMG_PLACEHOLDER_NNN__alt text__filename__
+ * Turndown escapes underscores as \_, so pattern matches: \_\_IMG\_PLACEHOLDER\_NNN\_\_...\_\_
+ * Converts to: ![alt text](/images/articles/filename)
+ */
+export function restoreImagePlaceholders(markdown: string): string {
+  return markdown.replace(
+    /\\_\\_IMG\\_PLACEHOLDER\\_\d{3}\\_\\_(.+?)\\_\\_(.+?)\\_\\_/g,
+    (_match, alt, filename) => `![${alt}](/images/articles/${filename})`,
+  );
 }

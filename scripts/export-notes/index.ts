@@ -5,7 +5,11 @@ import {
   folderToCategory,
 } from "./filter";
 import { generateFrontmatter, generateSlug } from "./frontmatter";
-import { extractImages, writeImages } from "./image-processor";
+import {
+  extractImages,
+  writeImages,
+  restoreImagePlaceholders,
+} from "./image-processor";
 import { fetchAllNotes } from "./jxa-bridge";
 import { htmlToMarkdown } from "./md-converter";
 import { atomicWriteNotes } from "./writer";
@@ -65,8 +69,15 @@ async function main(): Promise<void> {
 
       const { images, updatedHtml } = await extractImages(note.body, slug);
       const markdown = htmlToMarkdown(updatedHtml);
-      const frontmatter = generateFrontmatter(note, tags, markdown, slug);
+      const markdownWithImages = restoreImagePlaceholders(markdown);
       const category = folderToCategory(note.folder);
+      const frontmatter = generateFrontmatter(
+        note,
+        tags,
+        markdownWithImages,
+        slug,
+        category,
+      );
 
       if (config.verbose) {
         console.log(
@@ -74,7 +85,13 @@ async function main(): Promise<void> {
         );
       }
 
-      notesToWrite.push({ frontmatter, markdown, category, slug, images });
+      notesToWrite.push({
+        frontmatter,
+        markdown: markdownWithImages,
+        category,
+        slug,
+        images,
+      });
       allImages.images.push(...images);
     } catch (err) {
       const msg = `Failed to process note "${note.title}": ${err instanceof Error ? err.message : String(err)}`;

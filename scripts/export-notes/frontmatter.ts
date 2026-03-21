@@ -111,9 +111,9 @@ export function generateFrontmatter(
   tags: string[],
   markdown: string,
   slug: string,
+  category: string,
 ): string {
   const title = note.title.replace(/'/g, "''");
-  const category = getCategory(tags);
   const date = note.modificationDate.slice(0, 10); // YYYY-MM-DD
   let excerpt = extractExcerpt(markdown);
 
