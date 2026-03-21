@@ -1,0 +1,11 @@
+=== Test: Unicode Checklist Conversion ===
+Input: "<ul><li>☐ Not done</li><li>☑ Done</li><li>✓ Also done</li><li>✗ Crossed off</li></ul>"
+Output: "- [ ] Not done\n- [x] Done\n- [x] Also done\n- [ ] Crossed off"
+
+Assertions:
+  ☐ → - [ ]: true
+  ☑ → - [x]: true
+  ✓ → - [x]: true
+  ✗ → - [ ]: true
+
+ALL PASSED

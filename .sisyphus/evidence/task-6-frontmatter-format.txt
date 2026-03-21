@@ -1,0 +1,41 @@
+TASK 6: Frontmatter Format Test
+================================
+
+Test: generateFrontmatter with viral-cajun-salmon-burrito data
+
+Input:
+- note.title: "Viral Cajun Salmon Burrito"
+- note.modificationDate: "2025-08-13T00:00:00.000Z"
+- tags: ["salmon", "burrito", "cajun", "air-fryer", "mexican"]
+- markdown: "Delicious and versatile Cajun salmon burrito recipe that is perfect for a quick and easy meal. This air fryer version is crispy on the outside and tender on the inside."
+- slug: "viral-cajun-salmon-burrito"
+
+Output:
+---
+title: "Viral Cajun Salmon Burrito"
+slug: viral-cajun-salmon-burrito
+excerpt: |-
+  Delicious and versatile Cajun salmon burrito recipe that is perfect for a quick and easy meal. This air fryer version is crispy on the outside and tender on the inside.
+date: '2025-08-13'
+category: Salmon
+tags:
+  - salmon
+  - burrito
+  - cajun
+  - air-fryer
+  - mexican
+readingTime: 1 min read
+featured: false
+author: Sai Nimmagadda
+---
+
+✓ Field order correct: title, slug, excerpt, date, category, tags, readingTime, featured, author
+✓ Title double-quoted
+✓ Slug unquoted
+✓ Date single-quoted
+✓ Category unquoted (Title-Case from first tag)
+✓ Tags formatted as YAML list with "  - " prefix
+✓ Excerpt uses literal block scalar (|-) for >60 chars
+✓ readingTime unquoted
+✓ featured: false unquoted
+✓ author unquoted

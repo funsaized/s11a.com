@@ -1,0 +1,23 @@
+TASK 6: Slug Collision Detection Test
+======================================
+
+Test: generateSlug with collision detection
+
+Setup: existing = Set(['hello-world'])
+
+Test 1:
+Input: generateSlug('Hello World', existing)
+Output: "hello-world-2"
+✓ Collision detected, appended -2
+
+Test 2:
+Input: generateSlug('Hello World', existing) [after adding slug1 to set]
+Output: "hello-world-3"
+✓ Collision detected again, appended -3
+
+Test 3:
+Input: generateSlug('Hello World', existing) [after adding slug2 to set]
+Output: "hello-world-4"
+✓ Collision detected again, appended -4
+
+Collision detection working correctly. Counter increments until unique slug found.

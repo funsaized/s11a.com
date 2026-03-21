@@ -1,0 +1,10 @@
+Starting Apple Notes export...
+Fetching notes from Apple Notes...
+Found 220 notes
+Found 220 notes: 0 archived, 3 private/personal, 215 untagged -> Exporting 2
+Wrote 2 notes across 1 categories
+
+Export complete: 2 notes, 0 images, 1 categories
+
+SMOKE_EXIT:0
+inbox

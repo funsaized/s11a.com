@@ -38,3 +38,51 @@
 - Format detection: magic bytes first (JPEG=FF D8 FF, PNG=89 50 4E 47, WEBP=RIFF+WEBP), then MIME fallback
 - sharp converts HEIC→JPEG at quality 85
 - writeImages uses mkdirSync recursive + writeFileSync, warns on empty files
+
+## [2026-03-21] Task T4: HTML Preprocessor + MD Converter
+
+- preprocessHtml: strip H1, font tags, style attrs, empty spans, normalize br, convert unicode checkboxes
+- TurndownService: headingStyle atx, codeBlockStyle fenced, bulletListMarker "-"
+- Custom rules: checkbox (li+input), stripImages (img→""), stripHashtags (p/div content cleanup)
+- postProcess: trimEnd each line FIRST (Turndown's `  \n` for <br> breaks blank-line collapse), then collapse 3+ blank lines to 2
+- turndown checkbox rule: check innerHTML string for 'checked' (avoid DOM method issues)
+- tsconfig needed "DOM" in lib for @types/turndown's HTMLElement references (skipLibCheck alone insufficient)
+- stripHashtags filter expanded to ["p", "div"] — Apple Notes uses both for block content
+
+## [2026-03-21] Task T6: Frontmatter Generator
+
+- generateSlug: normalize NFKD, strip diacritics, lowercase, keep [a-z0-9-], max 80 chars
+- generateFrontmatter: accepts pre-computed slug (NOT regenerated internally)
+- excerpt: first meaningful paragraph ≥20 chars, no headers/images/code, cleaned of markdown
+- formatExcerpt: literal block scalar (|-) for excerpts >60 chars
+- date: note.modificationDate.slice(0,10) → YYYY-MM-DD
+- tags YAML: " - {tag}" (2 spaces + hyphen)
+- collision detection: append -2, -3, etc. until unique
+- Field order: title, slug, excerpt, date, category, tags, readingTime, featured, author
+- title double-quoted, slug/date/category/readingTime/featured/author unquoted
+- readingTime: Math.max(1, Math.ceil(wordCount / 200)) + " min read"
+
+## [2026-03-21] Task T7: MDX Writer
+
+- NoteToWrite interface defined in writer.ts (not types.ts) — orchestrator imports from writer.ts
+- validateMdx returns { valid, errors, fixed } — caller uses fixed content
+- Brace escaping: only outside code blocks and frontmatter
+- Category filesystem: note.category.toLowerCase() — "Food" → "food/" directory
+- Atomic swap: tmpDir and oldDir are siblings of notesDir under src/content/
+- renameSync is atomic on same filesystem (POSIX)
+- rmSync(oldDir, { recursive: true, force: true }) cleans up backup
+
+## [2026-03-21] Task T8: CLI Orchestrator
+
+- main() is async — top-level await via main().catch()
+- extractImages MUST be awaited (it downloads web images via fetch)
+- Order: slug -> extractImages -> htmlToMarkdown -> generateFrontmatter
+- writeImages called ONCE for all notes (not per-note)
+- atomicWriteNotes fatal error exits with code 1
+- NoteToWrite imported from ./writer (not ./types)
+- Idempotency: same Apple Notes -> same output (deterministic)
+
+## [2026-03-21] Task T9: Cleanup
+- Deleted: exporter/, ExportNotesHtml.workflow/, scripts/notes/
+- Removed: notes:sync and notes:cleanup from package.json scripts
+- New pipeline verified working after cleanup

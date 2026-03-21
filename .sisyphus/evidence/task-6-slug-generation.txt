@@ -1,0 +1,26 @@
+TASK 6: Slug Generation Test
+=============================
+
+Test: generateSlug edge cases
+
+Test 1 - Basic:
+Input: "Hello World!"
+Output: "hello-world"
+✓ Lowercase, special chars removed, spaces → hyphens
+
+Test 2 - Accents:
+Input: "Café & Restaurant Review"
+Output: "cafe-restaurant-review"
+✓ Unicode normalization (NFKD), diacritics stripped, special chars removed
+
+Test 3 - Hyphens:
+Input: "---Multiple---Hyphens---"
+Output: "multiple-hyphens"
+✓ Multiple hyphens collapsed, leading/trailing hyphens trimmed
+
+Test 4 - Long:
+Input: "A" * 100
+Output: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" (80 chars)
+✓ Truncated to 80 chars, trailing hyphens removed
+
+All edge cases pass.
