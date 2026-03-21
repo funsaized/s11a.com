@@ -63,7 +63,7 @@ npm run typecheck     # Run TypeScript checks
 npm run lighthouse    # Run Lighthouse performance tests
 npm run lighthouse:ci # Build and test performance
 npm run analyze       # Analyze bundle size
-npm run export-notes   # Export Apple Notes to MDX
+npm run export-notes   # Export Apple Notes to MDX (folder-based categorization)
 npm run perf          # Full performance testing suite
 ```
 
@@ -95,13 +95,26 @@ author: "Sai Nimmagadda"
 
 The `scripts/export-notes/` directory contains a TypeScript CLI for exporting Apple Notes to MDX format:
 
-- **Purpose**: Export Apple Notes categorized by `#hashtags` to `src/content/notes/`
-- **Features**: Tag-based categorization, image extraction (HEIC→JPEG), deterministic output
-- **Excluded**: Notes tagged `#personal` or `#private`, archived notes, untagged notes
-- **Usage**:
+- **Purpose**: Export Apple Notes to `src/content/notes/`, categorized by Apple Notes folder name
+- **How it works**: Accesses Notes.app via JXA/osascript, converts HTML to Markdown via Turndown, extracts images (including HEIC→JPEG), generates deterministic frontmatter
+- **Categorization**: Each Apple Notes folder maps to an export category:
+
+  | Apple Notes Folder     | Export Category   | Directory                  |
+  | ---------------------- | ----------------- | -------------------------- |
+  | Notes (default)        | General           | `notes/general/`           |
+  | 🎯 Content Creation    | Content-Creation  | `notes/content-creation/`  |
+  | 📋 Planning & Strategy | Planning-Strategy | `notes/planning-strategy/` |
+  | 📥 Inbox               | Inbox             | `notes/inbox/`             |
+  | 🚀 Active Projects     | Active-Projects   | `notes/active-projects/`   |
+  | 🤦🏽‍♂️ Personal Systems    | Personal-Systems  | `notes/personal-systems/`  |
+  | 🧠 Knowledge Base      | Knowledge-Base    | `notes/knowledge-base/`    |
+
+- **Excluded**: Notes tagged `#private` or `#work` in body text, archived notes
+- **Output**: MDX files in `src/content/notes/{category}/`, images in `static/images/articles/`
+- **Deterministic**: Same notes produce identical output every run (no AI/LLM)
 
 ```bash
-npm run export-notes              # Export all tagged notes
+npm run export-notes              # Export all notes
 npm run export-notes -- --dry-run  # Preview what would be exported
 npm run export-notes -- --verbose  # Show per-note details
 ```

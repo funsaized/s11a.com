@@ -165,6 +165,16 @@ author: "Sai Nimmagadda"
 
 Categories: Backend, Frontend, Healthcare, Architecture, DevOps, Database, Cloud, Security.
 
+### Notes Export Pipeline
+
+Notes are exported from Apple Notes via `npm run export-notes`. Categorization is folder-based — each Apple Notes folder maps to a category directory in `src/content/notes/`.
+
+- **Access method**: JXA/osascript (not SQLite) — Apple Notes native hashtags are NOT accessible via JXA
+- **Categorization**: Folder name → emoji-stripped PascalCase (e.g. `📋 Planning & Strategy` → `Planning-Strategy`)
+- **Excluded**: Notes with `#private` or `#work` in body text, archived folders
+- **Images**: Extracted from HTML (base64 + web URLs), HEIC converted to JPEG via sharp, written to `static/images/articles/`
+- **Atomic write**: Notes written to temp directory, then swapped atomically (crash-safe)
+
 ## GraphQL Patterns
 
 - **Page queries**: `export const query = graphql` at bottom of page/template files
