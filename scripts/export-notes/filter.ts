@@ -77,12 +77,7 @@ export function filterNotes(
       continue;
     }
 
-    // Skip untagged
-    if (tags.length === 0) {
-      stats.untagged++;
-      continue;
-    }
-
+    // All non-archive, non-private notes are exported (no longer skip untagged)
     stats.exported++;
     exported.push(note);
   }
@@ -102,5 +97,38 @@ export function getCategory(tags: string[]): string {
   return first
     .split("-")
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join("-");
+}
+
+/**
+ * Map Apple Notes folder name to clean category.
+ * Strips emojis, cleans up special characters, converts to PascalCase.
+ * Examples:
+ *   "Notes" → "General"
+ *   "🎯 Content Creation" → "Content-Creation"
+ *   "📋 Planning & Strategy" → "Planning-Strategy"
+ *   "🧠 Knowledge Base" → "Knowledge-Base"
+ */
+export function folderToCategory(folderName: string): string {
+  // Strip emoji characters (Unicode ranges for common emoji)
+  let clean = folderName
+    .replace(/[\u{1F300}-\u{1F9FF}]/gu, "") // Misc symbols & pictographs, supplemental
+    .replace(/[\u{2600}-\u{27BF}]/gu, "") // Misc symbols
+    .replace(/[\u{FE00}-\u{FE0F}]/gu, "") // Variation selectors
+    .replace(/[\u{200D}]/gu, "") // Zero-width joiner
+    .replace(/[\u{20E3}]/gu, "") // Combining enclosing keycap
+    .replace(/[\u{E0020}-\u{E007F}]/gu, "") // Tags
+    .trim();
+
+  if (!clean) return "General";
+
+  // Special case: default "Notes" folder
+  if (clean.toLowerCase() === "notes") return "General";
+
+  // Take first meaningful word(s) and convert to PascalCase with hyphens
+  return clean
+    .split(/[\s&]+/)
+    .filter(Boolean)
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
     .join("-");
 }

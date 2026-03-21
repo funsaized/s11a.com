@@ -1,4 +1,9 @@
-import { filterNotes, extractTags, getCategory } from "./filter";
+import {
+  filterNotes,
+  extractTags,
+  getCategory,
+  folderToCategory,
+} from "./filter";
 import { generateFrontmatter, generateSlug } from "./frontmatter";
 import { extractImages, writeImages } from "./image-processor";
 import { fetchAllNotes } from "./jxa-bridge";
@@ -61,7 +66,7 @@ async function main(): Promise<void> {
       const { images, updatedHtml } = await extractImages(note.body, slug);
       const markdown = htmlToMarkdown(updatedHtml);
       const frontmatter = generateFrontmatter(note, tags, markdown, slug);
-      const category = getCategory(tags);
+      const category = folderToCategory(note.folder);
 
       if (config.verbose) {
         console.log(
