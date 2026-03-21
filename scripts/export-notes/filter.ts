@@ -44,7 +44,8 @@ export function extractTags(htmlBody: string): string[] {
  * Filter notes based on archive status, excluded tags, and tagging.
  * Returns exported notes and statistics.
  */
-const ARCHIVE_PATTERN = /archive|archived|archives|old|deleted|trash|backup/i;
+const EXCLUDED_FOLDER_PATTERN =
+  /archive|archived|archives|old|deleted|trash|backup|work/i;
 
 export function filterNotes(
   notes: RawNote[],
@@ -63,7 +64,7 @@ export function filterNotes(
 
   for (const note of notes) {
     // Archive folder check (defense in depth — JXA bridge also filters)
-    if (ARCHIVE_PATTERN.test(note.folder)) {
+    if (EXCLUDED_FOLDER_PATTERN.test(note.folder)) {
       stats.archived++;
       continue;
     }

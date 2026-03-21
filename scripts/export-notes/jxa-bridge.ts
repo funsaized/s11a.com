@@ -117,7 +117,23 @@ JSON.stringify(results);
 
     const notes = JSON.parse(output) as RawNote[];
     console.log(`Found ${notes.length} notes`);
-    return notes;
+
+    // Deduplicate by note ID — JXA returns same note from multiple accounts/folders
+    const seen = new Set<string>();
+    const unique: RawNote[] = [];
+    for (const note of notes) {
+      if (!seen.has(note.id)) {
+        seen.add(note.id);
+        unique.push(note);
+      }
+    }
+    const duplicateCount = notes.length - unique.length;
+    if (duplicateCount > 0) {
+      console.log(
+        `Found ${unique.length} unique notes (${duplicateCount} duplicates removed)`,
+      );
+    }
+    return unique;
   } catch (error) {
     const execError = error as {
       stderr?: string | Buffer;
