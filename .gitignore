@@ -86,5 +86,5 @@ wheels/
 *.egg
 MANIFEST
 
-# Exporter output
-exporter/output/
+# Sisyphus orchestration state
+.sisyphus/
