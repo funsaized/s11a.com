@@ -1,0 +1,23 @@
+QA: Base64 Image Extraction
+Date: 2026-03-21
+
+Test: Extract base64-encoded PNG from HTML <img> tag
+Input: <div>Text <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg=="> more</div>
+
+Result:
+{
+  "imageCount": 1,
+  "firstFile": "test-note-000.png",
+  "firstFormat": "png",
+  "hasUpdatedRef": true,
+  "updatedHtml": "<div>Text ![test-note 000](/images/articles/test-note-000.png) more</div>",
+  "dataLength": 70
+}
+
+Assertions:
+✅ imageCount === 1
+✅ firstFile === "test-note-000.png" (correct naming: {slug}-{NNN}.{ext})
+✅ format detected as "png" from magic bytes (89 50 4E 47)
+✅ hasUpdatedRef === true (markdown reference includes /images/articles/test-note-000)
+✅ <img> tag replaced with ![test-note 000](/images/articles/test-note-000.png)
+✅ Buffer decoded from base64 (70 bytes = 1x1 red pixel PNG)

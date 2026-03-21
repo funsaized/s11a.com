@@ -1,0 +1,30 @@
+QA: Error Handling
+Date: 2026-03-21
+
+Error handling verified in image-processor.ts:
+
+1. Malformed data URLs (no comma separator):
+   → console.warn + continue (no crash)
+
+2. Failed HTTP downloads (non-200 status):
+   → console.warn with status code + continue
+
+3. Oversized images (>50MB via content-length):
+   → console.warn + continue
+
+4. Unrecognized src (Apple internal refs, etc.):
+   → console.warn with truncated src (first 80 chars) + continue
+
+5. Empty/null buffer after download:
+   → silently continue
+
+6. General processing errors (sharp failure, etc.):
+   → try/catch with console.warn + continue
+
+7. Fetch timeout:
+   → AbortController with 30s timeout
+   → clearTimeout in finally block (no leak)
+
+✅ All error paths use console.warn (no throws that crash pipeline)
+✅ Each failed image is skipped; processing continues for remaining images
+✅ Typecheck passes: npx tsc --noEmit -p scripts/export-notes/tsconfig.json exits 0

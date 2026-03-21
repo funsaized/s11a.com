@@ -1,0 +1,19 @@
+QA: Image Naming Convention
+Date: 2026-03-21
+
+Verified naming format: {noteSlug}-{NNN}.{ext}
+- NNN = zero-padded 3-digit index via String(idx).padStart(3, "0")
+- ext = "jpg" for jpeg format, "png" for png, "webp" for webp
+
+Examples from test:
+  slug="test-note", idx=0 → "test-note-000.png"
+
+Markdown syntax: ![{slug} {NNN}](/images/articles/{slug}-{NNN}.{ext})
+  → "![test-note 000](/images/articles/test-note-000.png)"
+
+Matches canonical format from viral-cajun-salmon-burrito.mdx:
+  ![Viral Cajun Salmon Burrito 000](/images/articles/viral-cajun-salmon-burrito-000.jpg)
+
+✅ Naming convention matches expected pattern
+✅ Zero-padding works correctly (000, 001, etc.)
+✅ Extension mapping: jpeg→jpg, png→png, webp→webp
