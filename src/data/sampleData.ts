@@ -42,7 +42,8 @@ const projects: Project[] = [
     title: "Eventide",
     path: "https://eventide.s11a.com",
     source: "https://github.com/funsaized/Eventide",
-    description: "A modern event discovery and calendar management platform.",
+    description:
+      "Turn Robinhood Derivatives PDF statements into actionable trading analytics — entirely in your browser. No server, no cloud, no account.",
     status: "active",
   },
   {
