@@ -213,50 +213,36 @@ const AboutPage: React.FC<PageProps> = () => {
                   </p>
                   <ul className="space-y-2 text-muted-foreground">
                     <li>
-                      <strong className="text-foreground">Coding</strong>:{" "}
+                      <strong className="text-foreground">Editor</strong>:{" "}
                       <a
-                        href="https://code.visualstudio.com/"
+                        href="https://zed.dev/"
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-primary hover:underline"
                       >
-                        Visual Studio Code
+                        Zed
                       </a>
-                      <ul className="ml-4 mt-1 space-y-1">
-                        <li>
-                          <strong className="text-foreground">Theme</strong>:{" "}
-                          <a
-                            href="https://taniarascia.github.io/new-moon/"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-primary hover:underline"
-                          >
-                            New Moon Theme
-                          </a>
-                          , my custom syntax theme!
-                        </li>
-                      </ul>
                     </li>
                     <li>
                       <strong className="text-foreground">Terminal</strong>:{" "}
                       <a
-                        href="https://iterm2.com/"
+                        href="https://ghostty.org/"
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-primary hover:underline"
                       >
-                        iTerm2
+                        Ghostty
                       </a>
                     </li>
                     <li>
                       <strong className="text-foreground">Notes</strong>:{" "}
                       <a
-                        href="https://obsidian.md/"
+                        href="https://www.icloud.com/notes"
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-primary hover:underline"
                       >
-                        Obsidian
+                        Apple Notes
                       </a>
                     </li>
                   </ul>
@@ -274,8 +260,40 @@ const AboutPage: React.FC<PageProps> = () => {
                 <CardContent className="space-y-2 text-sm text-muted-foreground">
                   <ul className="space-y-2">
                     <li>
-                      <strong className="text-foreground">Coding PC</strong>: M1
-                      MacBook Pro 16&quot; 2021, 32GB RAM
+                      <strong className="text-foreground">Laptop</strong>:{" "}
+                      <a
+                        href="https://www.apple.com/macbook-air/"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-primary hover:underline"
+                      >
+                        MacBook Air 13&quot; M4
+                      </a>
+                      , 24GB RAM
+                    </li>
+                    <li>
+                      <strong className="text-foreground">Home Server</strong>:{" "}
+                      <a
+                        href="https://www.apple.com/mac-mini/"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-primary hover:underline"
+                      >
+                        Mac Mini M1
+                      </a>{" "}
+                      (2020), 16GB RAM
+                    </li>
+                    <li>
+                      <strong className="text-foreground">VPS</strong>:{" "}
+                      <a
+                        href="https://www.hetzner.com/cloud/"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-primary hover:underline"
+                      >
+                        Hetzner CPX21
+                      </a>
+                      , 3 VCPU, 4GB RAM, 40GB disk, Ubuntu
                     </li>
                     <li>
                       <strong className="text-foreground">Gaming PC</strong>
@@ -283,125 +301,91 @@ const AboutPage: React.FC<PageProps> = () => {
                         <li>
                           CPU:{" "}
                           <a
-                            href="https://www.amd.com/en/products/cpu/amd-ryzen-5-3600"
+                            href="https://www.amd.com/en/products/processors/desktops/ryzen/5000-series/amd-ryzen-7-5800x.html"
                             target="_blank"
                             rel="noopener noreferrer"
                             className="text-primary hover:underline"
                           >
-                            AMD Ryzen 5 3600
-                          </a>
-                        </li>
-                        <li>
-                          Motherboard:{" "}
-                          <a
-                            href="https://www.asrock.com/mb/AMD/B550%20Phantom%20Gaming%204/"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-primary hover:underline"
-                          >
-                            ASRock B550 Phantom Gaming 4
-                          </a>
-                        </li>
-                        <li>
-                          Memory:{" "}
-                          <a
-                            href="https://www.crucial.com/memory/ddr4/bl2k16g32c16u4b"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-primary hover:underline"
-                          >
-                            Crucial Ballistix 32GB
-                          </a>
-                        </li>
-                        <li>
-                          Storage:{" "}
-                          <a
-                            href="https://www.samsung.com/us/computing/memory-storage/solid-state-drives/970-evo-nvme-m-2-ssd-1tb-mz-v7e1t0bw/"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-primary hover:underline"
-                          >
-                            SSD 970 EVO NVMe M.2 1TB
+                            AMD Ryzen 7 5800X
                           </a>
                         </li>
                         <li>
                           GPU:{" "}
                           <a
-                            href="https://www.amd.com/en/products/graphics/amd-radeon-rx-6950-xt"
+                            href="https://www.nvidia.com/en-us/geforce/graphics-cards/30-series/rtx-3080-3080ti/"
                             target="_blank"
                             rel="noopener noreferrer"
                             className="text-primary hover:underline"
                           >
-                            Radeon 6950XT
+                            Nvidia RTX 3080 Ti
                           </a>
                         </li>
                         <li>
-                          PSU:{" "}
+                          Motherboard:{" "}
                           <a
-                            href="https://www.evga.com/products/product.aspx?pn=220-G5-0650-X1"
+                            href="https://www.msi.com/Motherboard/B550-A-PRO"
                             target="_blank"
                             rel="noopener noreferrer"
                             className="text-primary hover:underline"
                           >
-                            EVGA SuperNOVA 650 G+
+                            MSI B550-A Pro
                           </a>
                         </li>
-                        <li>
-                          Case:{" "}
-                          <a
-                            href="https://nzxt.com/product/h510-elite"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-primary hover:underline"
-                          >
-                            H510 Elite
-                          </a>
-                        </li>
+                        <li>Memory: TeamGroup DDR4 3200MHz (x2)</li>
+                        <li>Storage: 1TB NVMe M.2 SSD</li>
                       </ul>
                     </li>
                     <li>
-                      <strong className="text-foreground">Monitor</strong>:{" "}
+                      <strong className="text-foreground">Monitors</strong>:{" "}
                       <a
-                        href="https://www.asus.com/displays-desktops/monitors/tuf-gaming/tuf-gaming-vg27aq/"
+                        href="https://www.apple.com/studio-display/"
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-primary hover:underline"
                       >
-                        TUF Gaming VG27AQ
-                      </a>{" "}
-                      (x2)
+                        Apple Studio Display
+                      </a>
+                      {" + "}
+                      <a
+                        href="https://www.lg.com/us/monitors/lg-27gl850-b-gaming-monitor"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-primary hover:underline"
+                      >
+                        LG 27GL850 UltraGear 27&quot; 1440p
+                      </a>
                     </li>
                     <li>
                       <strong className="text-foreground">Keyboard</strong>:{" "}
                       <a
-                        href="https://www.durgod.com/product/fusion-retro/"
+                        href="https://www.keychron.com/products/keychron-k2-he-wireless-magnetic-switch-keyboard"
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-primary hover:underline"
                       >
-                        Durgod Fusion
+                        Keychron K2 HE Wireless
                       </a>
                     </li>
                     <li>
                       <strong className="text-foreground">Microphone</strong>:{" "}
                       <a
-                        href="https://www.bluemic.com/en-us/products/yeti/"
+                        href="https://www.audio-technica.com/en-us/at2020"
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-primary hover:underline"
                       >
-                        Blue Yeti
+                        Audio-Technica AT2020
                       </a>
                     </li>
                     <li>
                       <strong className="text-foreground">Headphones</strong>:{" "}
                       <a
-                        href="https://www.sony.com/en/headphones/products/wh-1000xm3"
+                        href="https://www.bang-olufsen.com/en/headphones/beoplay-h9"
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-primary hover:underline"
                       >
-                        Sony WH-1000XM3
+                        Bang &amp; Olufsen Beoplay H9
                       </a>
                     </li>
                   </ul>

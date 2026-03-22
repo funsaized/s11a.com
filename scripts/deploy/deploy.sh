@@ -49,7 +49,7 @@ print_status "npm version: $NPM_VERSION"
 
 # Install dependencies
 print_status "Installing dependencies..."
-npm ci
+npm ci --legacy-peer-deps
 
 # Run TypeScript checks
 print_status "Running TypeScript checks..."

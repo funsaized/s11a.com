@@ -71,6 +71,8 @@ interface SharingComponentProps {
   url: string;
   title: string;
   excerpt: string;
+  date?: string;
+  readingTime?: string;
   className?: string;
 }
 
@@ -78,6 +80,8 @@ export function SharingComponent({
   url,
   title,
   excerpt: _excerpt,
+  date,
+  readingTime,
   className = "",
 }: SharingComponentProps) {
   const [copied, setCopied] = React.useState(false);
@@ -182,13 +186,14 @@ export function SharingComponent({
         </Button>
       </div>
 
-      {/* Article Stats */}
-      <div className="pt-4 border-t text-xs text-muted-foreground">
-        <div className="space-y-1">
-          <div>Published: {new Date().toLocaleDateString()}</div>
-          <div>Reading time: 8 min</div>
+      {(date || readingTime) && (
+        <div className="pt-4 border-t text-xs text-muted-foreground">
+          <div className="space-y-1">
+            {date && <div>Published: {date}</div>}
+            {readingTime && <div>Reading time: {readingTime}</div>}
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }

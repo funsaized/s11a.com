@@ -190,6 +190,8 @@ const ArticleTemplate: React.FC<ArticleTemplateProps> = ({
                   url={articleUrl}
                   title={frontmatter.title}
                   excerpt={frontmatter.excerpt}
+                  date={frontmatter.date}
+                  readingTime={frontmatter.readingTime}
                 />
               </div>
             </aside>
