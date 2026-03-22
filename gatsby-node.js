@@ -1,7 +1,12 @@
 const path = require("path");
 
-// Configure Webpack aliases for shadcn/ui
-exports.onCreateWebpackConfig = ({ actions }) => {
+exports.onCreateWebpackConfig = ({ actions, getConfig }) => {
+  const config = getConfig();
+  config.plugins = config.plugins.filter(
+    (plugin) => plugin.constructor.name !== "ESLintWebpackPlugin",
+  );
+  actions.replaceWebpackConfig(config);
+
   actions.setWebpackConfig({
     resolve: {
       alias: {
