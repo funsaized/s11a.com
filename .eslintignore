@@ -3,5 +3,6 @@ static
 .cache
 content
 src/content
+src/components/ui
 scripts
 exporter

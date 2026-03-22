@@ -62,7 +62,7 @@ export function SEO({
     },
     ...(article &&
       datePublished && {
-        datePublished: datePublished,
+        datePublished,
         dateModified: dateModified || datePublished,
         keywords: tags.join(", "),
         articleSection: "Technology",

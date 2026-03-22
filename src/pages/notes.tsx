@@ -1,7 +1,6 @@
 import React, { useState, useMemo } from "react";
 import type { HeadFC, PageProps } from "gatsby";
-import { graphql } from "gatsby";
-import { Link } from "gatsby";
+import { graphql, Link } from "gatsby";
 import { Layout } from "../components/layout/Layout";
 import { SearchInput } from "../components/articles/SearchInput";
 import { CategoryFilter } from "../components/articles/CategoryFilter";
@@ -101,7 +100,7 @@ function NoteCard({ note }: { note: Note }) {
       <CardHeader>
         <div className="flex items-start justify-between gap-3">
           <div className="flex items-center gap-2">
-            <EditIcon className="h-4 w-4 text-muted-foreground" />
+            <EditIcon />
             {note.category && (
               <Badge variant="secondary" className="text-xs">
                 {categoryEmoji} {note.category}
@@ -227,7 +226,11 @@ const NotesPage: React.FC<PageProps<NotesPageData>> = ({ data }) => {
   const categories = useMemo(
     () =>
       Array.from(
-        new Set(notes.map((note) => note.category).filter(Boolean)),
+        new Set(
+          notes
+            .map((note) => note.category)
+            .filter((c): c is string => Boolean(c)),
+        ),
       ).sort(),
     [notes],
   );
@@ -321,7 +324,7 @@ const NotesPage: React.FC<PageProps<NotesPageData>> = ({ data }) => {
               <div className="md:w-1/3">
                 <CategoryFilter
                   categories={categories}
-                  selectedCategory={selectedCategory}
+                  value={selectedCategory}
                   onChange={setSelectedCategory}
                 />
               </div>

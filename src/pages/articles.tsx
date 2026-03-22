@@ -1,7 +1,6 @@
 import React, { useState, useMemo } from "react";
 import type { HeadFC, PageProps } from "gatsby";
-import { graphql } from "gatsby";
-import { Link } from "gatsby";
+import { graphql, Link } from "gatsby";
 import { Layout } from "../components/layout/Layout";
 import { SearchInput } from "../components/articles/SearchInput";
 import { CategoryFilter } from "../components/articles/CategoryFilter";
@@ -248,7 +247,7 @@ const ArticlesPage: React.FC<PageProps<ArticlesPageData>> = ({ data }) => {
               <div className="md:w-1/3">
                 <CategoryFilter
                   categories={categories}
-                  selectedCategory={selectedCategory}
+                  value={selectedCategory}
                   onChange={setSelectedCategory}
                 />
               </div>

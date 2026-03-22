@@ -112,6 +112,7 @@ export function Pagination({
         if (page === "ellipsis") {
           return (
             <span
+              // eslint-disable-next-line react/no-array-index-key
               key={`ellipsis-${index}`}
               className="px-2 text-muted-foreground"
             >

@@ -138,7 +138,7 @@ export function Hero() {
           </div>
 
           {/* Quick Stats */}
-          {/*<div className="mt-16 grid grid-cols-1 gap-8 sm:grid-cols-3">
+          {/* <div className="mt-16 grid grid-cols-1 gap-8 sm:grid-cols-3">
             <div className="text-center">
               <div className="text-3xl font-bold">74+</div>
               <div className="text-sm text-muted-foreground">

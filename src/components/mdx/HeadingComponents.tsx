@@ -19,11 +19,11 @@ interface HeadingProps {
 const createHeadingComponent = (
   Tag: "h1" | "h2" | "h3" | "h4" | "h5" | "h6",
 ) => {
-  return function HeadingComponent({
+  const HeadingComponent = ({
     children,
     id,
     ...props
-  }: HeadingProps & React.HTMLAttributes<HTMLHeadingElement>) {
+  }: HeadingProps & React.HTMLAttributes<HTMLHeadingElement>) => {
     // Generate ID from text content if not provided
     const textContent = typeof children === "string" ? children : "";
     const headingId = id || createSlug(textContent);
@@ -34,6 +34,7 @@ const createHeadingComponent = (
       </Tag>
     );
   };
+  return HeadingComponent;
 };
 
 // Export heading components
