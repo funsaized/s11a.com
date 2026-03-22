@@ -16,7 +16,11 @@ featured: false
 author: Sai Nimmagadda
 ---
 
-I've been a VSCode user for years. I even [wrote about my setup](/my-custom-operator-mono-vscode-setup) — Operator Mono, sidebar on the right, the whole thing. But Zed has been pulling me in. It's native, it's genuinely fast in a way that Electron apps just aren't, and the configuration surface is surprisingly deep. After a few months of daily driving it, my `settings.json` has grown into something intentional enough to document.
+I've been a VSCode user for years. I even [wrote about my setup](/my-custom-operator-mono-vscode-setup) — Operator Mono, sidebar on the right, the whole thing. But Zed has been pulling me in. 
+It's native, it's genuinely fast in a way that Electron apps just aren't, and the configuration surface is surprisingly deep. Its also completely open - if you want a feature just hack away.
+
+
+After a few months of daily driving it, my `settings.json` has grown into something intentional enough to document.
 
 Here's what it looks like at the moment:
 
@@ -69,7 +73,7 @@ I also keep a "Descriptive" profile that uses GPT for longer-form explanations w
 
 ### MCP Context Servers
 
-Zed supports MCP context servers natively — no extensions required. I have Context7 for documentation lookups and a GitHub server for repository context:
+Zed supports MCP context servers natively. No extensions required. I have Context7 for documentation lookups and a GitHub server for repository context:
 
 ```json
 {
@@ -86,11 +90,11 @@ Zed supports MCP context servers natively — no extensions required. I have Con
 }
 ```
 
-This means the agent can pull live docs and search GitHub without me leaving the editor. One less reason to open a browser tab.
+This means the agent can pull live docs and search GitHub without me leaving the editor.
 
 ## Typography is interface design
 
-If you stare at something 8+ hours a day, the font matters. I carried my Operator Mono setup over from VS Code:
+If you stare at something 8+ hours a day, the font matters. Long live Operator Mono.
 
 ```json
 {
@@ -104,9 +108,9 @@ If you stare at something 8+ hours a day, the font matters. I carried my Operato
 }
 ```
 
-The split between UI font and buffer font is intentional. [Zed Sans](https://zed.dev/blog/zed-decoded-the-design) was designed specifically for editor chrome — it's legible at small sizes for panels, tabs, and status bars. [Operator Mono](https://typography.com/blog/introducing-operator) is where I want to spend my reading time, in the actual code buffer. The `SSm Lig` variant adds font ligatures using [kiliman's project](https://github.com/kiliman/operator-mono-lig) — same approach I used in VS Code.
+The split between UI font and buffer font is intentional. [Zed Sans](https://zed.dev/blog/zed-decoded-the-design) was designed specifically for editor chrome — it's legible at small sizes for panels, tabs, and status bars. [Operator Mono](https://typography.com/blog/introducing-operator) is where I want to spend my reading time, in the actual code buffer. The `SSm Lig` variant adds font ligatures using [kiliman's project](https://github.com/kiliman/operator-mono-lig).
 
-The `"comfortable"` line height gives breathing room between lines without feeling wasteful. Weight 400 on the buffer keeps things clean — Operator Mono's italics do the heavy lifting for visual distinction (more on that below).
+The `"comfortable"` line height gives breathing room between lines without feeling wasteful.Operator Mono's italics do the heavy lifting for visual distinction (more on that below).
 
 The terminal gets its own font config too:
 
@@ -125,7 +129,7 @@ Consistency across buffer and terminal means no visual jarring when switching be
 
 ## Two editors for the price of one
 
-I switch between light and dark mode depending on the time of day and environment. Zed makes this seamless with system-aware theming:
+I switch between light and dark mode depending on the time of day and environment. Zed makes this possible with system-aware theming:
 
 ```json
 {
@@ -148,7 +152,8 @@ I switch between light and dark mode depending on the time of day and environmen
   Catppuccin Iced Latte (Blur) in daylight
 </p>
 
-Both themes use blur effects, which gives the editor a frosted-glass look on macOS. Even the icon themes switch — Base Charmed for light, Soft Charmed for dark. The goal is that both modes feel _designed_, not like one is the "real" theme and the other is a fallback.
+Both themes use blur effects, which gives the editor a frosted-glass look on macOS. Even the icon themes switch — Base Charmed for light, Soft Charmed for dark. 
+The goal is that both modes feel _designed_, not like one is the "real" theme and the other is a fallback.
 
 ### Italic overrides everywhere
 
@@ -175,13 +180,7 @@ This is where Operator Mono earns its keep. I override syntax highlighting on _b
 }
 ```
 
-The same overrides are applied to Catppuccin Iced Latte. Operator Mono's cursive italics make `import`, `const`, `return`, and type annotations visually distinct without needing color alone. It's subtle but it changes how you scan code.
-
-### Custom themes
-
-I also keep a few custom themes in `~/.config/zed/themes/` for when I want a change of scenery — EmberKerning (cool navy tones), Flawless1 (warm dark), and Noctilume (deep blue). All variations on the same principle: muted backgrounds, saturated accents, low-contrast chrome.
-
-![Zed custom theme screenshot](/images/articles/zed-custom-theme.png)
+The same overrides are applied to the light variant. Operator Mono's cursive italics make `import`, `const`, `return`, and type annotations visually distinct without needing color alone. It's subtle but it changes how you scan code.
 
 ## Information density without noise
 
@@ -223,7 +222,7 @@ Three guides. 80 for my preferred line length. 100 for "okay, this is getting lo
 }
 ```
 
-When I have multiple panes open, inactive panes dim to 75% opacity. This is one of those features that sounds minor until you try it — it makes the active pane pop without any extra chrome.
+When I have multiple panes open, inactive panes dim to 75% opacity. This is one of those features that sounds minor until you try it — it makes the active pane pop.
 
 ### Project panel on the right
 
@@ -240,7 +239,7 @@ When I have multiple panes open, inactive panes dim to 75% opacity. This is one 
 }
 ```
 
-Same as my [VS Code setup](/my-custom-operator-mono-vscode-setup) — sidebar on the right avoids the code jumping left when you toggle the panel. File icons on, folder icons off. Comfortable spacing because cramped trees are hard to scan.
+The sidebar on the right is a lifestyle. It avoids the code jumping left when you toggle the panel. File icons on, folder icons off. Comfortable spacing because cramped trees are hard to scan.
 
 ### Git inline blame
 
@@ -257,7 +256,7 @@ Same as my [VS Code setup](/my-custom-operator-mono-vscode-setup) — sidebar on
 }
 ```
 
-Blame annotations appear after column 80 with a 600ms delay. The delay is important — it keeps the blame from flickering as you navigate. Showing commit summaries inline means I can read _why_ a line was changed without leaving the buffer.
+Blame annotations appear after column 80 with a 600ms delay. The delay is important as it keeps the blame from flickering as you navigate. Showing commit summaries inline means I can read _why_ a line was changed without leaving the buffer.
 
 ## Let the machines handle formatting
 
@@ -297,7 +296,7 @@ Prettier runs on save globally. For JavaScript, TypeScript, and TSX, I also run 
 }
 ```
 
-For JSON, CSS, SCSS, HTML, and Markdown, Prettier is configured as an external formatter since these don't need ESLint. The per-language `tab_size: 2` override is important — my global default is 4, but the JS/TS ecosystem has standardized on 2.
+For JSON, CSS, SCSS, HTML, and Markdown, Prettier is configured as an external formatter since these don't need ESLint. The per-language `tab_size: 2` override is importat, as the JS/TS ecosystem has standardized on 2.
 
 ### TypeScript LSP
 
