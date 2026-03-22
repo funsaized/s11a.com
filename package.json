@@ -9,7 +9,7 @@
     "build": "gatsby build",
     "serve": "gatsby serve",
     "clean": "gatsby clean",
-    "lint": "ESLINT_USE_FLAT_CONFIG=false eslint .",
+    "lint": "eslint .",
     "format:js": "prettier '**/*.{js,jsx,ts,tsx}' --write",
     "typecheck": "tsc --noEmit",
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -64,26 +64,22 @@
     "tailwind-merge": "^3.4.0"
   },
   "devDependencies": {
-    "@babel/eslint-parser": "^7.28.5",
-    "@babel/preset-react": "^7.28.5",
+    "@eslint/js": "^10.0.1",
     "@tailwindcss/typography": "^0.5.19",
     "@types/node": "^25.2.0",
     "@types/react": "^19.1.10",
     "@types/react-dom": "^19.1.7",
     "@types/sharp": "^0.32.0",
     "@types/turndown": "^5.0.6",
-    "@typescript-eslint/eslint-plugin": "^5.62.0",
-    "@typescript-eslint/parser": "^5.62.0",
     "autoprefixer": "^10.4.24",
     "chrome-launcher": "^1.2.1",
-    "eslint": "^8.57.1",
-    "eslint-config-airbnb": "^19.0.4",
+    "eslint": "^9.39.4",
     "eslint-config-prettier": "^10.1.8",
-    "eslint-import-resolver-typescript": "^4.4.4",
-    "eslint-plugin-import": "^2.32.0",
     "eslint-plugin-import-x": "^4.16.1",
     "eslint-plugin-jsx-a11y": "^6.10.2",
     "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^7.0.1",
+    "globals": "^17.4.0",
     "lighthouse": "^13.0.1",
     "postcss": "^8.5.6",
     "prettier": "^3.8.1",
@@ -91,6 +87,7 @@
     "tailwindcss": "^3.4.17",
     "tsx": "^4.21.0",
     "turndown": "^7.2.2",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.57.1"
   }
 }
