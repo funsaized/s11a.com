@@ -1,0 +1,147 @@
+---
+title: 'I Gave Myself an AI Agent: My Discord-Powered Automation Stack'
+slug: openclaw-personal-ai-agent-setup
+excerpt: >-
+  For the last few months I've been building something I didn't know I needed: a personal AI agent
+  that's always on, connected to my calendar, my smart home, and my daily workflows. Here's the
+  architecture, the why, and what it's actually like to have a digital operator running 24/7.
+date: '2026-03-31'
+category: Automation
+tags:
+  - AI
+  - OpenClaw
+  - Home Automation
+  - Productivity
+  - Discord
+readingTime: 8 min read
+featured: false
+author: Sai Nimmagadda
+---
+
+![My Discord channel acting as mission control for a personal AI agent](/images/articles/openclaw-discord-briefing.png)
+
+A few months ago I set out to answer a question that had been nagging at me: what if the AI tools I was using could actually *do* things, not just answer questions?
+
+I had been treating AI like a fancy search engine — ask a question, get an answer, done. But the real power of LLMs isn't in answering trivia. It's in orchestration. It's in the gap between "I should check my calendar" and actually having your day organized before you've finished your first coffee. That's what I've been building.
+
+The result is a personal AI agent running on a Hetzner VPS, connected to Discord, iCloud Calendar, Home Assistant, and a growing suite of automation workflows. It's not perfect. It's not fully autonomous. But it's been running every morning for months now, and I've learned enough to know what works and what doesn't.
+
+## What is OpenClaw, Actually?
+
+[OpenClaw](https://github.com/openclaw/openclaw) is a self-hosted AI agent framework. You run a gateway on a VPS — mine is on a Hetzner Ubuntu instance — and that gateway acts as the brain. It runs cron jobs, executes skills, manages sessions, and routes messages to and from channels like Discord.
+
+The key distinction: this isn't a chatbot living inside a single app. It's an always-on agent with persistent memory, tool access, and the ability to run scheduled workflows without me initiating anything.
+
+The setup I have splits the gateway (the agent brain) from the execution layer (my Mac Mini) via an encrypted SSH tunnel. The VPS handles the AI processing and routing; the Mac Mini handles anything that needs to touch the local network — specifically, a Home Assistant VM running in UTM with my smart home devices.
+
+![The architecture: VPS gateway connecting Discord, iCloud, and Tavily, tunneling to Mac Mini for Home Assistant and browser control](/images/articles/openclaw-architecture-diagram.png)
+
+Here's the topology in plain terms:
+
+- **Hetzner VPS** runs the OpenClaw gateway (always-on, stable IP)
+- **Discord** is the primary interface — I DM the bot or mention it in a channel, and it responds
+- **iCloud CalDAV** handles calendar — the agent reads and writes events directly to my iCloud calendar via HTTPS
+- **Tavily** is the research layer — the agent fires web searches as part of automated briefings
+- **SSH tunnel** connects to my Mac Mini at home
+- **Mac Mini** runs the Companion app and a Home Assistant VM (UTM)
+- **Home Assistant** controls Nanoleaf panels, Philips Hue lights, and a Govee floor lamp
+
+The SSH tunnel means the Mac Mini initiates the connection outward to the VPS — the VPS doesn't need to reach into my home network. NAT-friendly. Works behind a residential connection.
+
+## The Morning Briefing: The Workflow That Made Me a Believer
+
+The feature that sold me on this whole setup was embarrassingly simple: every morning at 4 AM ET, a cron job fires. The agent wakes up, searches the web for weather in Morrisville, pulls my calendar from iCloud, queries prediction market activity, and grabs tech headlines. Then it formats all of that into a clean briefing and posts it to Discord before I'm even awake.
+
+```
+4:00 AM ET — cron fires
+→ Tavily: weather for Morrisville, NC
+→ CalDAV: today's calendar events
+→ Tavily: prediction market highlights (Kalshi, Robinhood Derivatives)
+→ Tavily: top tech/AI headlines
+→ Agent composes briefing (< 30 lines)
+→ Posts to Discord
+```
+
+That's it. No me involved. No opening apps. By the time I check my phone, there's a clean summary waiting for me.
+
+The impact of this was immediate and disproportionate to its complexity. Before this, checking all those things manually took maybe 10 minutes. 10 minutes I was either skipping or doing while half-asleep. Now it's done. The information arrives at the exact moment I want it — first thing in the morning, before I've made any decisions about the day.
+
+I have the same thing running on weekdays at 5 PM for market close. Again: no effort, no me remembering to check. It just shows up.
+
+## Smart Home Control Without Opening an App
+
+The Home Assistant integration was the part I was most skeptical about, and it's ended up being the most satisfying.
+
+I have three lighting ecosystems that don't natively talk to each other: Philips Hue (Zigbee via a hub), Nanoleaf Elements (hex panels + Shapes triangles, WiFi), and a Govee Dome floor lamp (WiFi). Home Assistant brings them all under one API. OpenClaw brings that API to Discord.
+
+I defined scenes in my agent's SOUL.md — the file that shapes the agent's personality and preferences. One of those scenes is "deep work mode":
+
+- Nanoleaf Elements: reading light effect at 40% brightness
+- Nanoleaf Shapes: "Be Productive" effect at 50%
+- Govee Dome: white light
+- Desk lamp: bright cool white
+- Everything in the living room: off
+
+Now I can type "deep work mode" in Discord and watch my office transform in about 2 seconds. No opening the Nanoleaf app, no navigating to scenes, no waiting for Bluetooth. One message.
+
+![My desk in deep work mode — smart lighting controlled through Discord, orchestrated by an AI agent that knows my preferences](/images/articles/openclaw-smart-home-scene.png)
+
+The agent doesn't just blindly fire commands though. It knows to route those calls through the Mac Mini via the SSH tunnel, hitting the Home Assistant REST API on the local network. If the tunnel is down, the command fails cleanly rather than silently falling through to something else. That's the kind of detail that separates a proof-of-concept from something you actually trust.
+
+## Health Pipeline: When Your Data Actually Shows Up
+
+I've been wearing an Oura ring for a while, and I have an Apple Health XML export. For most of that time, that data lived in files I never looked at. The morning briefing pipeline now pulls from both.
+
+Sleep data, readiness scores, heart rate trends — the agent reads from the Oura API and parses the Apple Health XML export. The result is a daily health brief that lands alongside the market and calendar data. No opening Oura app. No downloading exports. It's just there.
+
+I didn't realize how much I was ignoring health data until it started appearing unprompted in my morning context. Seeing a trend line without actively asking for it changes the kind of attention you pay to it.
+
+## The Diagnostic Toolkit: When the Operator Needs an Operator
+
+Here's the meta part: I built tools to monitor the tools. A few weeks ago I got tired of not knowing why something had failed, so I built a diagnostic toolkit for the agent itself (yes, this is an agent that monitors itself — the recursion is intentional).
+
+The toolkit runs four checks:
+
+**System health check** — gateway process alive, port reachable, LLM failure rate from the last 24h, structured log errors, server log errors. It has an exponential backoff on alerts so the same failure doesn't spam me repeatedly.
+
+**Cron debugging** — query job history by name/status/date, detect persistent failures (3+ failures in a 6-hour window, which distinguishes a flaky job from a one-off crash), and auto-clean stale jobs stuck in "running" for more than 2 hours (handles machine sleep and process crashes).
+
+**Log viewer** — reads from both JSONL event streams and SQLite. Has quick-access aliases like `errors-1h` and `llm-errors` for common queries. `--json` mode for piping into other tools.
+
+**Model diagnostics** — shows which model is actually running versus what's configured, runs canary tests against each provider to verify auth is still valid, and aggregates usage data (token counts, costs, cron reliability).
+
+The canary tests were an interesting finding. The fallback chain has 9 models configured: MiniMax, OpenAI Codex, several Anthropic models. Running canary tests against them revealed that only MiniMax has an active API key in this environment. The Anthropic models use OAuth (GitHub device flow for Codex, Anthropic's own OAuth for Claude) — completely different auth mechanism, credentials stored in OpenClaw's auth profile store rather than environment variables. The canary had to be rewritten to handle that distinction.
+
+## Why This, Not Just... ChatGPT?
+
+I've been asked this a few times. The short answer: automation requires an always-on agent. ChatGPT doesn't run when I'm asleep. It doesn't check my calendar. It doesn't control my lights. It responds when I prompt it.
+
+The more interesting answer: the value isn't in the AI's intelligence. It's in the **integration layer**. The AI is the glue between systems that already exist. Calendar, weather, smart home, web search, cron scheduling — none of these are novel. The novelty is having one agent that can reason across all of them, on a schedule, without me initiating anything.
+
+I think about it like the difference between reading about your fitness data in a spreadsheet versus having a coach who shows up every morning and says "here's what happened overnight, here's what you should do today." The data didn't change. The context and timing of delivery changed everything.
+
+## What I Didn't Expect
+
+A few things caught me off guard:
+
+**Failure modes are educational.** When the SSH tunnel drops and the morning briefing partially fails, I learn something about the topology I wouldn't have thought about otherwise. The system forces you to understand your infrastructure in a way that's different from just running a managed service.
+
+**The agent is only as good as its memory.** OpenClaw uses a SQLite-backed memory system with semantic search. The quality of the agent's context depends heavily on what's been written to that memory. Early on, the agent was forgetting preferences. Once I understood how to write to memory files consistently, the continuity improved dramatically.
+
+**Security is genuinely non-trivial.** Running an always-on agent with calendar access, smart home control, and Discord integration means you've built something with real reach. The architecture uses allowlist-based exec (only explicitly approved binaries can run), the gateway is bound to loopback only, channel access is gated by user ID allowlists, and credentials are split across encrypted config and systemd environment files. I'm not going to pretend this is perfectly hardened — but I've thought about each layer.
+
+## What's Next
+
+The foundation is solid. The daily workflows run reliably. What I want to build next:
+
+- **Health trend analysis** — not just showing daily numbers, but flagging when a metric has been declining over a week and suggesting interventions
+- **Calendar proactive scheduling** — the agent already reads my calendar, but I'd like it to surface conflicts or suggest time blocks based on my Tiimo routine patterns
+- **Better browser autonomy** — the agent can already control a managed Edge instance via CDP. I want to extend that to more complex multi-step browsing workflows
+
+The diagnostic toolkit I built is also getting a proper home in the mr-krabs repo — it's documented with the exact prompt that generated it, so anyone cloning that repo can understand not just what was built but why each decision was made.
+
+---
+
+If you want to dig into the actual setup, the code lives in the [mr-krabs repository](https://github.com/funsaized/mr-krabs). The architecture doc covers the full topology, the setup guide has the step-by-step for rebuilding from scratch, and the diagnostic toolkit is fully documented with usage examples.
+
+This post is part of me documenting the build in progress — expect follow-ups as the system evolves. Questions, feedback, or "why didn't you just use X?" are all welcome.
