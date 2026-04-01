@@ -159,19 +159,18 @@ Skills in OpenClaw are plugin packages that extend the agent's capabilities. The
 
 The agent runs on a schedule, not just in response to prompts.
 
-**Morning briefing** — 4:00 AM ET, daily. Fetches weather, pulls calendar from iCloud, queries prediction market activity via Tavily, grabs Hacker News top 5 via Firebase API, fetches tech headlines. Composes under 40 lines and posts to Discord.
-
-**Market recap** — 5:00 PM ET weekdays. Market close summary, prediction market highlights, posts to Discord.
-
-**OpenClaw version watch** — 9:00 PM ET, daily. Checks whether a newer OpenClaw version is available.
-
-**Nightly security review** — 2:00 AM ET, daily. Runs full security audit.
-
-**Nightly log ingest** — 7:30 AM ET, daily.
-
-**Health morning brief** — 4:30 AM ET, daily. Parses Oura sleep/readiness data and Apple Health XML export.
-
-**Antfarm polling crons** — Every 5 minutes. Check for pending work and spawn agents.
+```markdown
+# Daily Schedule
+| Job | Time (ET) | Frequency | Description |
+|-----|----------|-----------|-------------|
+| Morning briefing | 4:00 AM | Daily | Weather, calendar, market data, tech headlines |
+| Health morning brief | 4:30 AM | Daily | Oura sleep, Apple Health XML parsing |
+| Market recap | 5:00 PM | Mon-Fri | Market close summary, prediction markets |
+| OpenClaw version watch | 9:00 PM | Daily | Check for newer OpenClaw releases |
+| Nightly security review | 2:00 AM | Daily | Full security audit |
+| Nightly log ingest | 7:30 AM UTC | Daily | Parse and ingest log data |
+| Antfarm polling | Every 5 min | Continuous | Check pending work, spawn agents |
+```
 
 ## Subagent Policy: When to Spawn
 
