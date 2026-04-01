@@ -164,6 +164,7 @@ The agent runs on a schedule, not just in response to prompts.
 | Job | Time (ET) | Frequency | Description |
 |-----|----------|-----------|-------------|
 | Morning briefing | 4:00 AM | Daily | Weather, calendar, market data, tech headlines |
+| Morning market brief | 9:30 AM | Mon-Fri | Pre-market: overnight moves, key levels, actionable setup |
 | Health morning brief | 4:30 AM | Daily | Oura sleep, Apple Health XML parsing |
 | Market recap | 5:00 PM | Mon-Fri | Market close summary, prediction markets |
 | OpenClaw version watch | 9:00 PM | Daily | Check for newer OpenClaw releases |
@@ -188,23 +189,23 @@ The agent doesn't do everything in a single session. Some tasks go to subagents.
 - Thread-bound ACP harness requests (Discord thread sessions)
 - Anything in the workspace directory
 
-The model routing is centralized in `config/model-routing.json`. Different tasks route to different models.
+The model routing is centralized in `config/model-routing.json`. Different tasks route to different models. The agent reads this file autonomously when spawning subagents and picks the right model for the task type.
+
+Default model is **M2.7-highspeed** with fallbacks through M2.5, Haiku, Sonnet, and Opus if needed.
 
 ```json
 {
+  "defaults": {
+    "main": "minimax/MiniMax-M2.7-highspeed",
+    "fallbacks": ["anthropic/claude-haiku-4-5", "minimax/MiniMax-M2.5"]
+  },
   "routes": {
-    "conversation": {
-      "model": "minimax/MiniMax-M2.7-highspeed",
-      "fallbacks": ["anthropic/claude-haiku-4-5"]
-    },
-    "web_search": {
-      "model": "anthropic/claude-haiku-4-5",
-      "fallbacks": ["minimax/MiniMax-M2.5"]
-    },
-    "coding": {
-      "model": "openai-codex/gpt-5.3-codex",
-      "fallbacks": ["anthropic/claude-sonnet-4-6"]
-    }
+    "conversation": { "model": "minimax/MiniMax-M2.7-highspeed" },
+    "web_search": { "model": "anthropic/claude-haiku-4-5" },
+    "coding": { "model": "openai-codex/gpt-5.3-codex" },
+    "debugging": { "model": "anthropic/claude-sonnet-4-6" },
+    "high_stakes": { "model": "anthropic/claude-opus-4-6" },
+    "vision": { "model": "minimax/MiniMax-VL-01" }
   }
 }
 ```
