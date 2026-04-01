@@ -16,13 +16,14 @@ featured: false
 author: Sai Nimmagadda
 ---
 
-![A handwritten note explaining a concept a cafe napkin](/images/articles/technical-docs-cafe-napkin.png)
 
 I used to think good documentation was about being concise. Remove the fluff, get to the point, right?
 
 Turns out I've been thinking about it backwards for years. The best documentation isn't written at all — it's *empathized into existence*. You have to feel what it's like to not know something before you can explain it.
 
 Here's what changed how I think about writing technical docs.
+
+![A handwritten note explaining a concept a cafe napkin](/images/articles/technical-docs-cafe-napkin.png)
 
 ## The Question That Started It
 
@@ -54,8 +55,7 @@ Good documentation keeps more RAM free:
 
 This is the hardest part: once you understand something, you forget what it felt like to not understand it.
 
-TODO: change
-I remember spending three hours figuring out why my API wasn't working. Turned out I was passing the wrong type to a function. Three hours. Now when I write "just cast to the right type," I sound like someone who's never been confused in their life.
+I remember spending a full day debugging a race condition in a Node.js service. Requests were intermittently returning stale data, and I was convinced it was a caching bug. It wasn't. Two async handlers were both writing to the same shared object without awaiting each other, and the second one was occasionally resolving first. The fix was a single `await` in the right place. Now when I write "just make sure your async operations are properly sequenced," I sound like someone who has never stared at a network tab for six hours wondering why the same endpoint returns two different responses on back-to-back calls.
 
 The fix isn't to explain more. It's to remember your own confusion and write from there.
 
