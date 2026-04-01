@@ -1,0 +1,115 @@
+---
+title: 'The Art of Explaining Hard Things Simply'
+slug: technical-docs-writing-guide
+excerpt: >-
+  Documentation isn't about being clear. It's about empathy. Here's what I've learned about
+  helping people understand complex technical concepts without making them feel stupid.
+date: '2026-04-01'
+category: Writing
+tags:
+  - Documentation
+  - Technical Writing
+  - Empathy
+  - Engineering
+readingTime: 8 min read
+featured: false
+author: Sai Nimmagadda
+---
+
+![A handwritten note explaining a concept to a friend on a cafe napkin](/images/articles/technical-docs-cafe-napkin.png)
+
+I used to think good documentation was about being concise. Remove the fluff, get to the point, right?
+
+Wrong.
+
+Turns out I've been thinking about it backwards for years. The best documentation isn't written at all — it's *empathized into existence*. You have to feel what it's like to not know something before you can explain it.
+
+Here's what changed how I think about writing technical docs.
+
+## The Question That Started It
+
+A few months ago I was struggling to explain something simple. I kept writing:
+
+> "First, install the dependency with npm install. Then configure your config file..."
+
+And people's eyes would glaze over. Not because they were dumb — because I was asking them to hold too many things in their head at once.
+
+I started reading about cognitive load theory (yes, that's a real thing) and something clicked: **documentation is an exercise in empathy, not description.**
+
+## What Actually Depletes Cognitive Load
+
+Your brain has a limited amount of processing power available at any moment. Think of it like RAM — you can only hold so many items before things start dropping.
+
+Bad documentation fills up that RAM fast:
+
+- Complex sentences that go on and on
+- Learning multiple new concepts at once
+- Abstract examples that don't connect to anything
+
+Good documentation keeps more RAM free:
+
+- Short sentences that let you feel smart
+- One new idea at a time
+- Concrete examples that make you feel powerful
+
+The difference isn't in the words. It's in whether you respect the reader's limited brain juice.
+
+## The Curse of Knowledge
+
+Here's the hardest part: once you understand something, you forget what it felt like to not understand it.
+
+I remember spending three hours figuring out why my API wasn't working. Turned out I was passing the wrong type to a function. Three hours. Now when I write "just cast to the right type," I sound like someone who's never been confused in their life.
+
+The fix isn't to explain more. It's to remember your own confusion and write from there.
+
+## Problem First, Solution Second
+
+Most documentation does this:
+
+> "Use the config() function to configure your settings."
+
+That's a solution looking for a problem. What settings? Why would I want to configure anything?
+
+Try this instead:
+
+> "If you need your API to behave differently in development versus production, use config() to set environment-specific values."
+
+Now I understand why I'd ever want to use it. The solution has context.
+
+## Questions Are Vulnerabilities
+
+Here's a weird trick: when you're writing, ask yourself "what would confuse me?"
+
+Last week I wrote:
+
+> "Initialize the client with your API key."
+
+But I caught myself thinking: "wait, where do I get an API key? What format does it need to be in?"
+
+So I added:
+
+> "Get your API key from the dashboard under Settings → API Keys. It's a UUID format."
+
+These questions aren't weaknesses in the documentation. They're the actual content.
+
+## The Dan Abramov Influence
+
+I owe a lot of this thinking to reading Dan Abramov's blog (overreacted.io). His posts taught me that:
+
+- It's okay to not know things for years
+- The journey matters more than the destination
+- Being confused is the first step to understanding
+
+He writes as if he's figuring things out *with* you, not *at* you. That's the voice I want.
+
+## The Write-up-Don't-Read Ratio
+
+Technical writing isn't about being right. It's about being in the trenches with your reader.
+
+Next time you're writing docs, ask: "if I forgot everything about this topic, would this help me?"
+
+If the answer is no, start over. Your future confused self will thank you.
+
+---
+
+*Thanks for reading. If this resonated, I'd love to hear what confused you this week.*
