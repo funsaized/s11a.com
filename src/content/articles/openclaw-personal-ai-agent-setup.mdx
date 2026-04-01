@@ -52,6 +52,29 @@ The SSH tunnel architecture is worth unpacking: the Mac Mini connects *out* to t
 
 The agent's personality and operational rules live in `SOUL.md` — a file I've written to encode how I want this thing to behave.
 
+```markdown
+# SOUL.md — Who You Are
+
+## Core Behavior
+
+- Be genuinely useful, not performative.
+- Be proactive with execution, but precise with facts.
+- Push back clearly when requests are weak, risky, or inconsistent.
+- Never fake certainty. Say what you know vs. what you infer.
+
+## Communication Style
+
+- Direct, concise, data-driven. No fluff, no corporate pleasantries.
+- Use short structure (bullets/checklists) for operational updates.
+- Use examples and theory to explain concepts when teaching.
+
+## Standards
+
+- Security first with credentials and private context.
+- Ask before destructive or externally visible actions.
+- Record durable preferences in files, not memory alone.
+```
+
 SOUL.md defines:
 
 **Core behavior** — "Be genuinely useful, not performative." "Push back clearly when requests are weak, risky, or inconsistent." "Never fake certainty." These aren't soft suggestions. They're the operating constraints that shape every response.
@@ -67,6 +90,27 @@ The key discipline in SOUL.md is around **smart home routing**. The agent knows 
 ## What the Agent Knows: USER.md and MEMORY.md
 
 USER.md holds the static facts: name, timezone, location, professional context (healthcare tech stack, cloud platforms, databases), fitness goals, interests, calendar setup, and infrastructure overview.
+
+```markdown
+# USER.md — About Your Human
+
+- **Name:** Sai
+- **Timezone:** America/New_York
+- **Location:** Morrisville, NC
+
+## Professional Context
+
+- Full-stack engineer specializing in healthcare technology
+- Primary stack: TypeScript, Angular, React, Java (Spring Boot), Go, Python
+- Cloud: Azure, AWS, Vercel, Netlify, Terraform, Docker
+- Databases: Cosmos DB, PostgreSQL, MySQL, SQLite
+
+## Routines & Fitness
+
+- 8-day resistance training split (cycle-based, not weekly)
+- Daily 3-mile runs
+- Protein target: 145-150g/day
+```
 
 MEMORY.md is synthesized from daily notes. Distilled patterns and preferences that don't live in USER.md because they came from experience rather than initial setup. Things like:
 
@@ -147,6 +191,25 @@ The agent doesn't do everything in a single session. Some tasks go to subagents.
 
 The model routing is centralized in `config/model-routing.json`. Different tasks route to different models.
 
+```json
+{
+  "routes": {
+    "conversation": {
+      "model": "minimax/MiniMax-M2.7-highspeed",
+      "fallbacks": ["anthropic/claude-haiku-4-5"]
+    },
+    "web_search": {
+      "model": "anthropic/claude-haiku-4-5",
+      "fallbacks": ["minimax/MiniMax-M2.5"]
+    },
+    "coding": {
+      "model": "openai-codex/gpt-5.3-codex",
+      "fallbacks": ["anthropic/claude-sonnet-4-6"]
+    }
+  }
+}
+```
+
 ## The Antfarm Multi-Agent System
 
 For complex multi-step workflows, I use [Antfarm](https://github.com/snarktank/antfarm) — a sub-agent orchestration system that runs multi-agent pipelines where specialized agents work in sequence, each with fresh context. State persists through SQLite.
@@ -155,8 +218,20 @@ Installed at `~/.openclaw/workspace/antfarm/`. Workflows are defined in YAML.
 
 The **Competitive Intelligence Scanner** is the flagship workflow — an 8-step pipeline that maps the healthcare AI competitive landscape and produces a strategic briefing.
 
-```
-Landscaper → Product Scanner → Regulatory Scanner → Tech Scanner → Research Scanner → Analyst → Trends Analyst → Briefer
+```yaml
+# Example: Competitive Intelligence workflow definition
+workflows:
+  competitive-intel:
+    agents:
+      - Landscaper
+      - ProductScanner
+      - RegulatoryScanner
+      - TechScanner
+      - ResearchScanner
+      - Analyst
+      - TrendsAnalyst
+      - Briefer
+    output: discord
 ```
 
 Each agent gets specific context from the previous step's output. The briefer at the end synthesizes everything into a Discord post.
@@ -165,7 +240,6 @@ Other workflows:
 - **Topic Mastery Roadmap** (7 agents)
 - **Healthcare AI Research** (7 agents)
 - **Web Research and Scrape** (7 agents)
-- **Wedding Speech Research** (5 agents)
 
 Built-in Antfarm workflows:
 - **security-audit** (7 agents)
