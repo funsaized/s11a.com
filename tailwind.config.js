@@ -49,11 +49,12 @@ module.exports = {
               borderLeftColor: theme("colors.border"),
             },
             code: {
-              backgroundColor: theme("colors.muted.DEFAULT"),
-              color: theme("colors.foreground"),
-              padding: "0.25rem 0.375rem",
+              backgroundColor: "hsl(var(--code-inline-bg))",
+              color: "hsl(var(--code-inline-color))",
+              padding: "0.2em 0.4em",
               borderRadius: "0.25rem",
-              fontSize: "0.875em",
+              fontSize: "0.85em",
+              fontWeight: "400",
             },
             "code::before": {
               content: '""',
@@ -62,8 +63,9 @@ module.exports = {
               content: '""',
             },
             pre: {
-              backgroundColor: theme("colors.muted.DEFAULT"),
-              color: theme("colors.foreground"),
+              backgroundColor: "hsl(var(--code-block-bg))",
+              color: "hsl(var(--code-block-color))",
+              border: "1px solid hsl(var(--code-block-border))",
             },
             thead: {
               borderBottomColor: theme("colors.border"),
