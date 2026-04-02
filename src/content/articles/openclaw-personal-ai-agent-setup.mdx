@@ -2,8 +2,7 @@
 title: 'I Gave Myself an AI Agent: Building a Personal Automation Stack That Runs While I Sleep'
 slug: openclaw-personal-ai-agent-setup
 excerpt: >-
-  Eight months ago I set out to answer one question: what if the AI tools I used every day
-  could actually do things, not just answer questions? This is the story of what I built
+  Eight months ago I set out to answer one question: what if the AI tools I used every day could actually do things, not just answer questions? This is the ongoing story of my buildings with openclaw
   to bridge the gap between AI knowing things and AI doing things.
 date: '2026-04-02'
 category: Automation
@@ -18,15 +17,17 @@ featured: false
 author: Sai Nimmagadda
 ---
 
-![My Discord channel acting as mission control for a personal AI agent](/images/articles/openclaw-discord-briefing.png)
 
-I didn't set out to build a personal AI agent. I set out to answer a question that had been nagging me for months: what if the AI tools I was using every day could actually *do* things, not just answer questions?
+I didn't set out to build a personal AI agent. I set out to answer a question that had been nagging me for months: what if the AI tools I used could actually _finish_ my TODOs and not just answer questions?
 
 I was treating AI like a fancy search engine. Ask a question, get an answer, done. Fine. But I kept running into the same ceiling. AI would tell me what the weather was. It couldn't check my calendar to see if I had an early meeting first. It would tell me what news happened overnight. It couldn't post that summary to `Discord` before I woke up. It would answer questions about my smart home setup. It couldn't actually flip the lights on when I said "movie mode."
 
 The gap between "AI knows this" and "AI does this" was costing me real time. Small time, distributed across every morning and every evening, but real. I started building toward an always-on agent that could operate on a schedule, connect to my real accounts, and take actions in the real world.
 
 Eight months later, I have something that posts my morning briefing at 4 AM before I'm awake, controls my lights through `Home Assistant`, reads and writes my `iCloud` calendar, runs competitive intelligence pipelines while I sleep, and keeps a memory that survives sessions through files rather than context windows. Here's how it all fits together, and what I've learned building it.
+
+![My Discord channel acting as mission control for a personal AI agent](/images/articles/openclaw-discord-briefing.png)
+
 
 ## The Core Question: Why Not Just Use ChatGPT?
 
