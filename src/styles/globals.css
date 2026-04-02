@@ -48,6 +48,13 @@
     --sidebar-accent-foreground: 22.7 82.5% 31.4%;
     --sidebar-border: 48 96.6% 76.7%;
     --sidebar-ring: 37.7 92.1% 50.2%;
+
+    /* Code styling */
+    --code-inline-bg: 36 20% 91%;
+    --code-inline-color: 0 0% 25%;
+    --code-block-bg: 220 10% 96%;
+    --code-block-border: 220 10% 88%;
+    --code-block-color: 0 0% 20%;
   }
 
   .dark {
@@ -93,6 +100,12 @@
     --sidebar-accent-foreground: 48 100% 96.1%;
     --sidebar-border: 22.7 82.5% 31.4%;
     --sidebar-ring: 37.7 92.1% 50.2%;
+
+    --code-inline-bg: 20 30% 22%;
+    --code-inline-color: 36 20% 75%;
+    --code-block-bg: 220 13% 10%;
+    --code-block-border: 220 10% 18%;
+    --code-block-color: 0 0% 85%;
   }
 }
 
@@ -105,22 +118,47 @@
   }
 }
 
-/* Prism.js syntax highlighting - Amber theme */
 code[class*="language-"],
 pre[class*="language-"] {
-  color: hsl(var(--foreground));
+  color: hsl(var(--code-block-color));
   background: none;
   text-shadow: none;
-  font-family: ui-monospace, SFMono-Regular, "SF Mono", Consolas, "Liberation Mono", Menlo, monospace;
-  font-size: 1em;
+  font-family:
+    ui-monospace, SFMono-Regular, "SF Mono", Consolas, "Liberation Mono", Menlo,
+    monospace;
+  font-size: 0.875em;
   text-align: left;
   white-space: pre;
   word-spacing: normal;
   word-break: normal;
   word-wrap: normal;
-  line-height: 1.5;
+  line-height: 1.6;
   tab-size: 4;
   hyphens: none;
+}
+
+pre[class*="language-"] {
+  padding: 1.25rem;
+  margin: 1.5rem 0;
+  overflow: auto;
+  border-radius: calc(var(--radius) - 2px);
+  background: hsl(var(--code-block-bg));
+  border: 1px solid hsl(var(--code-block-border));
+}
+
+:not(pre) > code[class*="language-"],
+:not(pre) > code {
+  padding: 0.2em 0.4em;
+  border-radius: 0.25rem;
+  white-space: normal;
+  background: hsl(var(--code-inline-bg));
+  color: hsl(var(--code-inline-color));
+  font-family:
+    ui-monospace, SFMono-Regular, "SF Mono", Consolas, "Liberation Mono", Menlo,
+    monospace;
+  font-size: 0.85em;
+  font-weight: 400;
+  border: none;
 }
 
 pre[class*="language-"] {
