@@ -207,4 +207,3 @@ Notes are exported from Apple Notes via `npm run export-notes`. Categorization i
 - JSX text: `react/no-unescaped-entities` is error-level — use `&apos;` not `'` in JSX
 - `gatsby-plugin-preact` swaps React for Preact at runtime (smaller bundle)
 - No GitHub Actions CI — build/deploy is Netlify-only (push triggers deploy)
-- `CLAUDE.md` is outdated (references SCSS, BEM, old frontmatter schema) — trust `AGENTS.md` over `CLAUDE.md`
