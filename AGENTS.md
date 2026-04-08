@@ -27,12 +27,13 @@ No pre-commit hooks (no Husky/lint-staged).
 
 ## Lint & Type Configuration
 
-- **ESLint**: airbnb + prettier extends, `@typescript-eslint/parser`
-  - `ESLINT_USE_FLAT_CONFIG=false` — uses legacy `.eslintrc.json`
+- **ESLint**: flat config (`eslint.config.mjs`), airbnb-style rules + prettier
+  - `@typescript-eslint/parser` for `.ts/.tsx`
   - Unused vars: prefix with `_` to ignore (`argsIgnorePattern: "^_"`)
   - `no-console`: warn level, `console.warn` and `console.error` allowed
+  - `react/no-unescaped-entities`: error — use `&apos;` `&quot;` in JSX
   - `import/order`: off (no enforced import sorting)
-  - `.js` files use `@babel/eslint-parser`; `.ts/.tsx` use `@typescript-eslint/parser`
+  - Ignored: `src/content/**`, `src/components/ui/**`, `gatsby-node.js`, `gatsby-ssr.js`
 - **TypeScript**: `strict: true`, target es2018, `noEmit: true`
   - Path alias: `@/*` → `./src/*` (also in webpack config via `gatsby-node.js`)
 - **Prettier**: v3, no config file — uses defaults (double quotes, trailing commas)
@@ -140,7 +141,9 @@ src/
   templates/        # Page templates (article.tsx, note.tsx)
   utils/            # Utility functions (cn.ts)
 scripts/
-  export-notes/     # Apple Notes → MDX export pipeline (TypeScript CLI)
+  export-notes/     # Apple Notes → MDX export pipeline (TypeScript CLI, own tsconfig)
+  deploy/           # Pre-deploy validation + build script
+  performance/      # Lighthouse CI runner (thresholds: P:90 A:95 BP:90 S:95)
 ```
 
 ## Content (MDX)
@@ -187,15 +190,21 @@ Notes are exported from Apple Notes via `npm run export-notes`. Categorization i
 
 - `gatsby-config.ts` — Plugin configuration (MDX, images, sitemap, analytics)
 - `gatsby-node.js` — Page creation + webpack `@/` alias (CommonJS, not TS)
-- `netlify.toml` — Build config, security headers, cache rules
+- `gatsby-ssr.js` — Theme flash prevention (CommonJS)
+- `netlify.toml` — Build config, security headers, cache rules, `--legacy-peer-deps`
 - `tailwind.config.js` — Content paths, typography plugin, custom animations
-- `.eslintrc.json` — Linting rules (airbnb base)
+- `eslint.config.mjs` — Flat config, airbnb-style rules + prettier
 - `tsconfig.json` — Strict TS, path aliases
+- `components.json` — shadcn/ui component config (aliases, icon lib: lucide)
 
 ## Gotchas
 
-- `gatsby-node.js` is CommonJS (`require`/`exports`) — the rest of the project is ESM
+- `gatsby-node.js` and `gatsby-ssr.js` are CommonJS (`require`/`exports`) — the rest of the project is ESM
 - Path alias `@/*` requires BOTH `tsconfig.json` paths AND `gatsby-node.js` webpack alias
 - No test suite — validate changes with `npm run typecheck && npm run lint && npm run build`
 - Prettier has no config file — uses defaults (double quotes, trailing commas, 80 char width)
 - MDX content uses `gatsby-remark-prismjs` for syntax highlighting, not rehype-prism
+- JSX text: `react/no-unescaped-entities` is error-level — use `&apos;` not `'` in JSX
+- `gatsby-plugin-preact` swaps React for Preact at runtime (smaller bundle)
+- No GitHub Actions CI — build/deploy is Netlify-only (push triggers deploy)
+- `CLAUDE.md` is outdated (references SCSS, BEM, old frontmatter schema) — trust `AGENTS.md` over `CLAUDE.md`
