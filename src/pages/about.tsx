@@ -72,10 +72,10 @@ const AboutPage: React.FC<PageProps> = () => {
       icon: "🧩",
     },
     {
-      title: "Learning Golang",
+      title: "AI & Agents",
       description:
-        "Exploring Go for building high-performance distributed systems",
-      icon: "🐹",
+        "Building AI tooling that automates repetitive workflows and boosts productivity",
+      icon: "🤖",
     },
     {
       title: "Keyboard Customization",
