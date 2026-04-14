@@ -13,69 +13,98 @@ import { Button } from "../components/ui/button";
 const AboutPage: React.FC<PageProps> = () => {
   const skills = [
     {
-      category: "Languages",
-      items: ["Java", "JavaScript", "TypeScript", "Python", "Go", "Scala"],
-    },
-    {
-      category: "Frontend",
-      items: ["Angular", "React", "Next.js", "Gatsby", "Local-First"],
-    },
-    {
-      category: "Backend",
+      category: "Full-Stack Product Engineering",
       items: [
-        "Spring",
-        "Spring Boot",
-        "Node.js",
-        "GraphQL",
-        "REST APIs",
-        "RPC",
+        "0→1 Product Delivery",
+        "Product-Led Engineering",
+        "User-Centric Systems",
+        "Frontend Architecture",
+        "Design Systems",
+        "Application Performance",
+        "Accessibility",
+        "Cross-Functional Delivery",
+      ],
+    },
+    {
+      category: "Backend & Platform",
+      items: [
+        "API Design",
+        "Service Architecture",
+        "Distributed Systems",
         "Microservices",
-        "Data Engineering",
-        "Data Science",
+        "Platform Engineering",
+        "REST APIs",
+        "GraphQL",
+        "RPC",
+        "Java",
+        "Go",
       ],
     },
     {
-      category: "Cloud & DevOps",
+      category: "Datastores & Search",
       items: [
-        "Azure",
-        "AWS",
-        "Kubernetes",
-        "DataBricks",
-        "Terraform",
-        "Jenkins",
-        "Github",
-        "Docker",
-      ],
-    },
-    {
-      category: "Datastores",
-      items: [
-        "MySQL",
+        "Data Modeling",
         "PostgreSQL",
-        "CosmosDB",
+        "MySQL",
         "Redis",
-        "Memcached",
         "Elasticsearch",
+        "Cosmos DB",
       ],
     },
     {
-      category: "Tools",
-      items: ["Git", "Linux", "Bash", "Bootstrap", "Jupyter", "AI Agents"],
+      category: "Cloud, DevOps & Reliability",
+      items: [
+        "AWS",
+        "Azure",
+        "Infrastructure as Code",
+        "CI/CD",
+        "Observability",
+        "Release Engineering",
+        "GitHub",
+        "Jenkins",
+      ],
+    },
+    {
+      category: "Data & ML Engineering",
+      items: [
+        "Python",
+        "Databricks",
+        "Batch Pipelines",
+        "Streaming Systems",
+        "LLM Workflows",
+        "AI Agents",
+        "RAG",
+        "Embeddings",
+        "Evaluation Loops",
+      ],
+    },
+    {
+      category: "Domain & Leadership Strengths",
+      items: [
+        "Healthcare Systems",
+        "Developer Experience",
+        "System Design",
+        "Technical Strategy",
+        "Platform Thinking",
+        "Mentoring",
+        "Stakeholder Communication",
+        "Open Source",
+      ],
     },
   ];
 
   const currentFocus = [
     {
-      title: "Data Structures & Algorithms",
+      title: "AI Product Engineering",
       description:
-        "Practicing problem-solving on LeetCode to sharpen algorithmic thinking",
-      icon: "🧩",
+        "Building practical LLM and agent workflows that automate research, content, and developer tasks without losing rigor",
+      icon: "🤖",
     },
     {
-      title: "AI & Agents",
+      title: "Platform & Architecture",
       description:
-        "Building AI tooling that automates repetitive workflows and boosts productivity",
-      icon: "🤖",
+        "Designing systems that scale operationally: strong APIs, sane deployment paths, maintainable service boundaries, and fast developer feedback loops",
+      icon: "🏗️",
     },
     {
       title: "Keyboard Customization",
@@ -84,10 +113,44 @@ const AboutPage: React.FC<PageProps> = () => {
     },
   ];
 
+  const frameworks = [
+    {
+      category: "Frontend",
+      items: [
+        "React",
+        "Next.js",
+        "TanStack",
+        "Angular",
+        "Gatsby",
+        "Tailwind CSS",
+        "shadcn/ui",
+      ],
+    },
+    {
+      category: "Backend",
+      items: [
+        "Spring",
+        "Spring Boot",
+        "Node.js",
+        "GraphQL",
+        "REST",
+        "Microservices",
+      ],
+    },
+    {
+      category: "Mobile & Cross-Platform",
+      items: ["React Native", "Expo"],
+    },
+    {
+      category: "Data & Platform",
+      items: ["Databricks", "Kubernetes", "Terraform", "Docker"],
+    },
+  ];
+
   return (
     <Layout
       title="About"
-      description="Learn more about Sai Nimmagadda, full-stack engineer focused on healthcare and scalable systems."
+      description="Learn more about Sai Nimmagadda, a full-stack and platform engineer focused on scalable web systems, healthcare technology, and AI-enabled products."
     >
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto">
@@ -102,8 +165,8 @@ const AboutPage: React.FC<PageProps> = () => {
             </div>
             <h1 className="text-4xl md:text-5xl font-bold mb-4">About Me</h1>
             <p className="text-xl text-muted-foreground">
-              Full-stack engineer passionate about technology, learning, and
-              collaboration
+              Full-stack, platform, and AI-minded engineer building systems that
+              scale from product UX to infrastructure
             </p>
           </div>
 
@@ -119,22 +182,32 @@ const AboutPage: React.FC<PageProps> = () => {
               <p className="text-muted-foreground leading-relaxed">
                 I&apos;m a full-stack software engineer with a BSE in Electrical
                 and Computer Engineering and Biomedical Engineering from{" "}
-                <strong>Duke University</strong>. I&apos;m passionate about
-                building scalable systems, exploring new technologies, and
-                contributing to open-source software.
+                <strong>Duke University</strong>. My work spans product-facing
+                web applications, backend services, cloud infrastructure, and
+                data-heavy systems, with a particular interest in healthcare,
+                developer experience, and AI-enabled workflows.
               </p>
               <p className="text-muted-foreground leading-relaxed">
-                I believe the best way to learn is through collaboration with
-                others. That&apos;s why I&apos;m growing this site in parallel
-                with my exploration of new tech and open-source software,
-                sharing knowledge and experiences along the way.
+                I like problems that sit at the intersection of architecture and
+                execution: designing APIs, shaping platform capabilities,
+                modernizing delivery workflows, and turning ambiguous ideas into
+                shipped software. Across open-source and personal projects,
+                you&apos;ll see a mix of distributed systems, local-first apps,
+                developer tooling, GraphQL services, and practical LLM product
+                experiments.
+              </p>
+              <p className="text-muted-foreground leading-relaxed">
+                The throughline is leverage. I care about building products that
+                users value and the engineering systems that let teams move
+                faster: clean abstractions, reliable pipelines, observable
+                production systems, and tooling that reduces operational drag.
               </p>
             </CardContent>
           </Card>
 
           {/* Skills Grid */}
           <div className="mb-8">
-            <h2 className="text-2xl font-bold mb-6">Skills & Technologies</h2>
+            <h2 className="text-2xl font-bold mb-6">Core Expertise</h2>
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
               {skills.map((skillGroup) => (
                 <Card key={skillGroup.category}>
@@ -148,6 +221,30 @@ const AboutPage: React.FC<PageProps> = () => {
                       {skillGroup.items.map((skill) => (
                         <Badge key={skill} variant="secondary">
                           {skill}
+                        </Badge>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+
+          <div className="mb-8">
+            <h2 className="text-2xl font-bold mb-6">Frameworks & Ecosystems</h2>
+            <div className="grid gap-4 md:grid-cols-2">
+              {frameworks.map((frameworkGroup) => (
+                <Card key={frameworkGroup.category}>
+                  <CardHeader>
+                    <CardTitle className="text-lg">
+                      {frameworkGroup.category}
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="flex flex-wrap gap-2">
+                      {frameworkGroup.items.map((framework) => (
+                        <Badge key={framework} variant="secondary">
+                          {framework}
                         </Badge>
                       ))}
                     </div>
