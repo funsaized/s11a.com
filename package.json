@@ -83,7 +83,7 @@
     "lighthouse": "^13.0.1",
     "postcss": "^8.5.6",
     "prettier": "^3.8.1",
-    "sharp": "^0.33.5",
+    "sharp": "^0.34.5",
     "tailwindcss": "^3.4.17",
     "tsx": "^4.21.0",
     "turndown": "^7.2.2",
