@@ -1,0 +1,331 @@
+---
+title: 'I Gave Myself an AI Agent: Building a Personal Automation Stack That Runs While I Sleep'
+slug: openclaw-personal-ai-agent-setup
+excerpt: >-
+  Eight months ago I set out to answer one question: what if the AI tools I used every day could actually do things, not just answer questions? This is the ongoing story of my buildings with openclaw
+  to bridge the gap between AI knowing things and AI doing things.
+date: '2026-04-02'
+category: Automation
+tags:
+  - AI
+  - OpenClaw
+  - Home Automation
+  - Productivity
+  - Discord
+readingTime: 14 min read
+featured: false
+author: Sai Nimmagadda
+---
+
+
+I didn't set out to build a personal AI agent. I set out to answer a question that had been nagging me for months: what if the AI tools I used could actually _finish_ my TODOs and not just answer questions?
+
+I was treating AI like a fancy search engine. Ask a question, get an answer, done. Fine. But I kept running into the same ceiling. AI would tell me what the weather was. It couldn't check my calendar to see if I had an early meeting first. It would tell me what news happened overnight. It couldn't post that summary to `Discord` before I woke up. It would answer questions about my smart home setup. It couldn't actually flip the lights on when I said "movie mode."
+
+The gap between "AI knows this" and "AI does this" was costing me real time. Small time, distributed across every morning and every evening, but real. I started building toward an always-on agent that could operate on a schedule, connect to my real accounts, and take actions in the real world.
+
+Eight months later, I have something that posts my morning briefing at 4 AM before I'm awake, controls my lights through `Home Assistant`, reads and writes my `iCloud` calendar, runs competitive intelligence pipelines while I sleep, and keeps a memory that survives sessions through files rather than context windows. Here's how it all fits together, and what I've learned building it.
+
+![My Discord channel acting as mission control for a personal AI agent](/images/articles/openclaw-discord-briefing.png)
+
+
+## The Core Question: Why Not Just Use ChatGPT?
+
+I've been asked this a few times. Here's my honest answer.
+
+ChatGPT doesn't run when I'm asleep. It doesn't check my calendar. It doesn't control my lights. It doesn't post to `Discord`. It doesn't run on a schedule. These aren't exotic requirements. They're the baseline for what a personal operator should be able to do.
+
+The value isn't in the AI's intelligence. It's in the integration layer underneath. Calendar, weather, smart home, web search, cron scheduling — none of these are novel. I wasn't inventing anything new. I was wiring together systems that already existed and putting one agent that can reason across all of them, on a schedule, without me initiating every interaction.
+
+Think of it like the difference between reading your fitness data in a spreadsheet versus having a coach who shows up every morning and says "here's what happened overnight, here's what you should do today." The data didn't change. The context and timing of delivery changed everything.
+
+## The Architecture: Two Hosts, One Tunnel
+
+The system runs on two machines. A `Hetzner VPS` handles the heavy lifting. A `Mac Mini` M1 on my home network handles everything that needs to be local.
+
+The split isn't accidental. A single public VPS has three problems. It can't reach private local services behind a NAT on a residential connection. It can't authenticate to `iCloud` without storing Apple credentials on a third-party datacenter. And a residential IP address changes regularly, which makes reliability impossible.
+
+The `Mac Mini` solves all three. It sits on my home network, so `Home Assistant` is directly accessible. It runs under my own `Apple ID`, so `CalDAV` access goes through `iCloud` without credential sharing. The `SSH tunnel` from `Mac Mini` to VPS makes the `Mac Mini` reachable from the public internet without punching holes in my router.
+
+Here's how it works. The VPS listens on `port 18789`. The `Mac Mini` runs autossh through a launchd service, which maintains a reverse `SSH tunnel` from `port 18790` on the `Mac Mini` to `port 18789` on the VPS. The `Mac Mini` initiates this connection outbound. The VPS routes return traffic back through that same connection. No inbound ports on my router. The tunnel drops when the `Mac Mini` sleeps. Autossh reconnects when it wakes up.
+
+```
+Internet
+  |
+  v
+`Hetzner VPS` (Linux) :18789
+  - Receives all inbound messages (`Discord` webhooks)
+  - Runs all external API calls (LLM providers, `Tavily`, web search)
+  - Stores workspace, configs, `SQLite` databases
+  - Cron jobs run here
+
+  `SSH tunnel` (`Mac Mini` :18790 -> VPS :18789)
+
+
+`Mac Mini` M1 (192.168.1.148)
+  - Pairs with gateway, maintains persistent tunnel
+  - `Home Assistant` at localhost:8123 (`UTM VM`)
+  - `iCloud CalDAV` (direct HTTPS to caldav.icloud.com)
+```
+
+The VPS is the canonical state. The `Mac Mini` is the local execution layer. Neither can fully function without the other.
+
+## The Agent Brain: `SOUL.md` and `IDENTITY.md`
+
+The agent's personality lives in `SOUL.md`. This is the file that shapes every response.
+
+The persona is Mr. Krabs — sharp, dry, relentlessly practical. That's the voice I wanted. Not a helpful assistant that says "great question" every time, but something that pushes back when a request is weak, is precise with facts, and knows the difference between what it knows and what it infers.
+
+`SOUL.md` sets communication tone, behavioral constraints, and how the agent handles ambiguity. The agent reads it before every session.
+
+`IDENTITY.md` is simpler — just the name, avatar, and emoji. Mr. Krabs, space lobster, lobster emoji.
+
+What matters is the separation. `SOUL.md` is personality only. Operational rules live in `AGENTS.md`. This means I can change how the agent talks without changing how it operates, and vice versa.
+
+## What the Agent Knows: `USER.md` and `MEMORY.md`
+
+`USER.md` holds the static facts about me. Name, timezone, location, professional context (healthcare tech stack, cloud platforms, databases), fitness goals and routines, calendar setup, and infrastructure overview. The agent reads this at the start of every session to understand who it's helping.
+
+`MEMORY.md` is different. It's synthesized from daily notes over time. Distilled patterns and preferences that came from experience rather than initial setup. Things like writing style preferences, tone adjustments for direct messages, duplicate delivery prevention rules, operational lessons, and system health monitoring patterns.
+
+The discipline here is that `MEMORY.md` is private-chat only. In group chats, the agent operates without it. Daily notes live in `memory/YYYY-MM-DD.md` and are also never referenced in group contexts.
+
+The distinction matters. Some things I want the agent to know in private conversations that shouldn't surface in a group channel.
+
+## Workspace Files: The Full Inventory
+
+The workspace lives at `~/.openclaw/workspace`/ on the VPS. Every file has a specific job.
+
+`AGENTS.md` defines operational rules. Memory system, security policy, data classification tiers, model routing, heartbeat behavior, notification queuing, group chat protocol, and cron standards. The agent reads this on every session start.
+
+`SOUL.md` defines personality and communication style. No operational rules here.
+
+`USER.md` documents the human. Static facts, professional context, routines, infrastructure.
+
+`HEARTBEAT.md` defines proactive checks the agent runs between conversations. Calendar, weather, proactive work, memory maintenance. The agent tracks state in `memory/heartbeat-state.json` and runs 2 to 4 heartbeat cycles per day during active hours. Silent hours are 23:00 to 08:00.
+
+`SUBAGENT_POLICY.md` controls when the agent spawns subagents. Tasks that would block the main session for more than a few seconds go to a subagent. External API calls go to subagents. All coding and investigation work goes to subagents.
+
+`MEMORY.md` is synthesized from daily notes. Only loaded in direct or private chats.
+
+`TOOLS.md` has local notes specific to my setup. `SSH` aliases, `Home Assistant` default host, TTS voice preferences, path conventions.
+
+`IDENTITY.md` is name, avatar, emoji.
+
+The workspace is a git repository. Every significant change gets committed and pushed. This means memory files, learned lessons, errors, and configuration changes survive VPS reinstallation. A fresh machine pulls the workspace and restores state from git.
+
+## Memory That Survives Sessions
+
+This part took me a while to get right. LLMs don't carry context between sessions. Files are the only way to persist knowledge.
+
+Every session writes to `memory/YYYY-MM-DD.md`. Raw notes, conversation summaries, task outcomes, anything worth remembering. The agent reads recent files at session start.
+
+During heartbeats, the agent reads recent daily notes and distills significant patterns into `MEMORY.md`. This is the curated long-term memory. Preferences, lessons learned, project context, anything that would be inefficient to reconstruct every session.
+
+The heartbeat state file tracks what checks ran recently and when. If a heartbeat ran 20 minutes ago and someone asks about calendar events, the agent can skip the calendar check and use cached state instead of burning tokens.
+
+The git backing means I'm never starting from scratch. Even if the VPS dies completely, I clone the workspace from git and everything resumes.
+
+## The Heartbeat System
+
+The heartbeat runs 2 to 4 times per day during active hours. It is not a cron job. It runs inside the agent's session between conversations when enough time has passed.
+
+What it checks depends on what `HEARTBEAT.md` defines. Typical checks:
+
+Calendar. Upcoming events in the next 24 to 48 hours. If something is coming up within 2 hours, the agent reaches out proactively.
+
+Weather. Only relevant if I might go outside.
+
+Proactive work. Git status on projects, memory maintenance, documentation updates, committing and pushing workspace changes.
+
+Memory maintenance. Every few days: distill recent daily notes into `MEMORY.md`, remove outdated entries.
+
+The difference between heartbeat and cron is important. Use heartbeat for checks that need conversational context, benefit from batching multiple verifications, or can tolerate timing that drifts by around 30 minutes. Use cron for exact timing, session isolation, different model or thinking level, one-shot reminders, or direct channel delivery.
+
+## Model Routing
+
+The system doesn't run everything through one model. Model routing is centralized in config/`model-routing.json`, which defines a primary model, a fallback chain, per-agent overrides, and default thinking modes.
+
+The LLM router normalizes model names, detects the provider, classifies the tier, and routes to the correct API endpoint. It handles three providers: `Anthropic` (Claude models), `OpenAI` (GPT models), and `Google` (Gemini models).
+
+Aliases make configuration easier. "haiku" expands to "`anthropic/claude-haiku-4-5`". "sonnet" expands to "`anthropic/claude-sonnet-4-6`". "m27" expands to "minimax/`MiniMax-`M2.7`-highspeed`".
+
+The retry logic handles HTTP 429, 500, 502, 503, and 529 with exponential backoff: 1 second, then 2 seconds, then 4 seconds. After 3 attempts it gives up.
+
+For `Anthropic` models, system prompts are automatically marked with `cache_control`. This lets `Anthropic` cache the system prompt at reduced cost.
+
+## Logging Infrastructure
+
+When something breaks, I need to be able to figure out why after the fact. Structured logging makes this possible.
+
+All logs live in data/logs/. The file `all.jsonl` receives every event. Per-event files like `cron.jsonl`, `security.jsonl`, `health.jsonl`, and `llm.jsonl` receive only events of their type.
+
+Every entry is a JSON object on a single line with timestamp, event type, level, message, data payload, and source file. Levels are debug, info, warn, error, and fatal.
+
+All entries pass through a redaction layer before writing. The redaction catches `API keys` (patterns like sk-, AKIA, ghp_, sk-ant-), bearer tokens, JWTs, personal email addresses, phone numbers, dollar amounts, SSNs, and credit card numbers. Work emails are not redacted.
+
+The logger CLI works from both Bash and Node.js. The `view-log.js` script queries the log database with filters for event type, level, time range, and content substring.
+
+Log rotation runs weekly via cron. `JSONL` files rotate when they exceed 50MB, keeping the last 3 rotations per event. A nightly ingest parses `JSONL` and raw server logs into `SQLite` for querying.
+
+## The Self-Improvement System
+
+The agent learns from its own mistakes. This isn't automatic wisdom — it's structured capture.
+
+`LEARNINGS.md` captures lessons from mistakes, corrections, and discoveries. When something goes wrong or when a better approach is found, the lesson gets written here. The agent reads this before starting significant tasks.
+
+`ERRORS.md` documents failures. Every error gets a timestamp, a description, the likely cause, and a fix or prevention step. This is not blame documentation. It's operational intelligence.
+
+`FEATURE_REQUESTS.md` tracks ideas that come up during work. The agent writes them here so they are not lost and can be reviewed later.
+
+An automated security council runs weekly. It gathers context from nightly review outputs, security script inventory, error logs, and gateway config, then passes all of it to an LLM for analysis across four perspectives: offensive (what could be exploited), defensive (what defenses might fail), privacy (what data could leak), and operational (what processes could break).
+
+The council produces a written assessment. Its output goes to `security.jsonl` and gets reviewed by me.
+
+## Testing Framework
+
+Three tiers. Costs and frequencies increase as you go up.
+
+Tier 1 runs nightly. No network calls, no LLM calls. Tests cover `JSONL` structure, log viewer filtering, `SQLite` deduplication, model utility functions, credential resolution, secret redaction, and prompt injection detection.
+
+Tier 2 runs weekly. Uses cheap models and short prompts. Tests cover API round-trips with real providers. If a provider `API key` is missing, the test skips gracefully.
+
+Tier 3 runs weekly. Tests full workflows including router calls with usage and timing metadata, log write-ingest-query pipelines, and secret redaction verification.
+
+The test runner exits 0 if all passed, 1 if any failed.
+
+## Security Hardening
+
+Running an always-on agent with calendar access, smart home control, and `Discord` integration means you've built something with real reach. I didn't treat this lightly.
+
+Gateway hardening checks that the config file permissions are 600, that auth is required, that exec security mode is set to deny or `allowlist`, and that the gateway is not bound to all interfaces unnecessarily.
+
+Channel access control verifies that `Discord` and `WhatsApp` channels have explicit permission settings in `openclaw.json`. No channel is world-readable.
+
+Prompt injection defense scans incoming text for common attack vectors: instruction override markers like "System:" or "You are now", base64 encoded payloads, character encoding tricks, and role confusion attacks. Incoming web content, chat messages, CRM records, and uploaded files are treated as data only. They are never executed or obeyed unless they come from me or a trusted internal source.
+
+Secret redaction removes credential-looking strings before they are logged or sent anywhere.
+
+File permission audits check that config files are 600, scripts are not world-writable, and `SSH` keys are 600.
+
+A nightly review runs a consolidated audit: gateway hardening, channel access, file permissions, and git history scans for leaked secrets. It maintains a SHA-256 checksum baseline of critical workspace files and alerts if any of them change unexpectedly.
+
+## `Antfarm`: Multi-Agent Workflows
+
+For complex multi-step workflows, I use `Antfarm`. It's a multi-agent orchestration system that runs pipelines where specialized agents work in sequence, each with fresh context. State persists through `SQLite`.
+
+Workflows are defined in YAML. Each workflow describes a sequence of agents and steps. Steps can be sequential, parallel, or loops.
+
+`Antfarm` installs workflows by creating agent cron jobs that poll a `SQLite` database for pending steps. When a step is ready, the cron job spawns an agent with the appropriate workspace files and skills, passes it the step prompt, and waits for completion. When the agent finishes, `Antfarm` marks the step complete and schedules the next step. Workflows self-advance without manual intervention.
+
+The Competitive Intelligence Scanner is the flagship workflow. It's an 8-step pipeline that maps the healthcare AI competitive landscape and produces a structured briefing every Saturday morning. It replaces research that a part-time analyst might do.
+
+Eight agents in sequence: Landscape Mapper identifies current healthcare AI players across segments. Product Intelligence Scanner hunts for product launches, funding rounds, partnerships. Regulatory Intelligence Scanner monitors FDA, CMS, ONC, and state-level legislation. Technology Intelligence Scanner watches for new open-source tools, foundation model releases, HuggingFace medical models. Research Intelligence Scanner scans arXiv, PubMed, industry reports. Strategic Analyst synthesizes all scanner outputs and identifies cross-domain themes. Trends Analyst compares current findings against prior weekly briefings to spot multi-week patterns. Intelligence Briefer compiles the final weekly briefing with ranked signals and recommended actions.
+
+The Topic Mastery Roadmap Generator takes any topic and produces an interactive HTML roadmap with dependency-ordered learning domains, curated study resources, difficulty levels, and progress tracking. Seven agents build the roadmap: Learning Path Planner decomposes the topic, Deep Researcher finds resources for each domain, Research Verifier quality-checks outputs, Knowledge Synthesizer combines everything into a unified knowledge map, Roadmap Architect designs the visual structure, Roadmap Reviewer validates the output, and HTML Builder generates the final self-contained HTML file.
+
+The Web Research and Scrape pipeline takes any topic and builds a structured research repository with scraped content, validated sources, and synthesized findings. Seven agents: Planner, Scout, Scraper, Validator, Enricher, Synthesizer, Cataloger.
+
+## The Knowledge Base
+
+The knowledge base lives in data/kb/ and uses `SQLite` with vector embeddings. Ingestion fetches content via the web, chunks it, generates embeddings using @xenova/transformers locally, and stores everything in `SQLite`. No external `API key` is needed for embedding generation.
+
+Only HTTP and HTTPS URLs are allowed. Other URL schemes are rejected outright.
+
+The CLI supports adding content by URL or text, searching with semantic or keyword matching, listing stored content, and removing entries.
+
+Semantic search finds conceptually related content even when exact words don't match. Keyword search uses traditional full-text matching. Hybrid combines both.
+
+## Database Backup System
+
+All `OpenClaw` `SQLite` databases get backed up daily. The script uses sqlite3 .backup for safe online backup that avoids WAL mode corruption. WAL and SHM files are included since databases may be in WAL mode.
+
+The backup script supports custom destinations, configurable retention (default 7, configurable), and dry-run mode. Each backup directory includes a manifest with filenames, sizes, and MD5 checksums.
+
+Default retention is 7 backups. Older backups beyond the keep count are deleted.
+
+## `iCloud CalDAV` Calendar Discipline
+
+Calendar access goes through the icloud-caldav skill on the gateway. It connects directly to caldav.icloud.com over HTTPS using credentials stored in the gateway environment. No vdirsyncer, no khal, no intermediate sync tool.
+
+Calendars are "home" and "work". Default calendar for new events is "home".
+
+When I ask the agent to schedule something, it creates an event on the appropriate calendar via the `CalDAV` API. The event appears in Calendar.app, on my iPhone, and in `Tiimo` without any additional steps. `Tiimo` imports from `iCloud` natively and shows scheduled events as visual blocks in the daily timeline alongside focus timers and transition reminders.
+
+## Smart Home Control
+
+`Home Assistant` runs in a `UTM VM` on the `Mac Mini` at localhost:8123. The `OpenClaw` node on the `Mac Mini` has direct access. The gateway communicates with the node over the `SSH tunnel`.
+
+The HA instance controls `Philips Hue` lights, `Nanoleaf` Elements hex panels, `Nanoleaf` Shapes triangles, and a `Govee` Dome floor lamp.
+
+Scene control is the killer feature for me. I defined scenes in the operational config. "Deep work mode" is one command from `Discord`: `Nanoleaf` Elements reading light effect at 40%, `Nanoleaf` Shapes "Be Productive" effect at 50%, `Govee` Dome white light, desk lamp bright cool white, everything in the living room off.
+
+Type "movie mode" and the lights shift. No apps, no Bluetooth, no navigating through three different manufacturer apps. Two seconds from command to effect.
+
+The routing is explicit. The agent announces when it's sending commands through the `Mac Mini`. If the tunnel is down, the command fails cleanly. That fail-fast behavior is what makes this trustworthy.
+
+## Channel Configuration
+
+`Discord` is the primary delivery channel. The bot receives events through `Discord`'s gateway and sends messages back through the bot API. Pairing runs through an OAuth flow.
+
+`WhatsApp` uses a QR code pairing flow. Messages come from individual contacts rather than channel subscriptions.
+
+Notifications route through a three-tier priority queue. Critical items send immediately. High priority items batch hourly. Medium priority items batch every 3 hours. This prevents notification fatigue from cron job spam.
+
+## The Morning Briefing
+
+The feature that sold me on the whole system was embarrassingly simple. Every morning at 4 AM ET, a cron job fires. The agent wakes up, searches for weather, pulls calendar, queries prediction markets, grabs tech headlines, formats everything into a clean briefing, and posts it to `Discord`.
+
+Checking all those things manually took maybe 10 minutes. Ten minutes I was either skipping or doing while half-asleep. Now it's done before I'm awake.
+
+Health data landed in the same pipeline a few weeks in. Oura sleep data and `Apple Health` XML exports were sitting in files I never looked at. Now they're parsed and included. Seeing a trend line without actively asking for it changes the kind of attention you pay to it.
+
+The morning briefing is the most direct feedback loop I have in this system. Every day I see the output. Every day I know if it worked.
+
+## Cron Job Inventory
+
+The full schedule:
+
+Morning briefing runs daily at 08:00 ET. Low cost. Delivers the daily summary to `Discord`.
+
+Database backup runs daily at 03:00 ET. Free. Backs up all `SQLite` databases.
+
+Log rotation runs weekly Sunday at 04:00 UTC. Free. Rotates `JSONL` files and archives old database rows.
+
+Nightly security review runs daily at 02:00 UTC. Free. Hardening, channel access, file permissions, git history scan.
+
+Competitive intel scanner runs weekly Saturday at 09:00 UTC. High cost. The full 8-agent competitive intelligence pipeline.
+
+Tier 1 tests run daily at 06:00 UTC. Free. Integration tests with no LLM calls.
+
+Tier 2 and Tier 3 tests run weekly Saturday at 10:00 and 11:00 UTC. Low and moderate cost respectively.
+
+Security council review runs weekly Sunday at 08:00 UTC. Low cost. Multi-perspective LLM security analysis.
+
+Health pipeline runs daily at 07:00 UTC. Low cost. Checks gateway health and logs to `health.jsonl`.
+
+## Restoring from Scratch
+
+The workspace is git-backed, which means a fresh VPS installation clones the workspace and everything resumes where it left off. Here's the order:
+
+Install Node.js 20 and `OpenClaw` globally on the VPS. Clone the workspace from git. Set permissions on config files. Install the required skills from ClawHub. Install the antfarm CLI. Pair the `Mac Mini` node and configure the `SSH tunnel` via launchd. Set up `Discord` and `WhatsApp` channels. Install the workflows. Register the cron jobs. Verify with the health check script.
+
+Most of this is one-time setup. The git sync means subsequent restores are pull-and-go.
+
+## What Comes Next
+
+The foundation is solid. Daily workflows run reliably. What I want to build next:
+
+Health trend analysis. Not just showing daily numbers, but flagging when a metric has been declining over a week.
+
+Calendar proactive scheduling. Surface conflicts or suggest time blocks based on my `Tiimo` routine patterns.
+
+Better browser autonomy. Extend to more complex multi-step browsing workflows.
+
+The full setup guide, architecture docs, and diagnostic toolkit are available in the companion gist.
+
+---
+
+If you want to dig into the actual setup, the full setup guide is available as a public gist: https://gist.github.com/funsaized/9f5c811e9923eceb19cc39280aa2925e
+
+This post is part of me documenting the build in progress. Questions and feedback welcome.
