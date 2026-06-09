@@ -38,6 +38,15 @@ export interface Project {
 
 const projects: Project[] = [
   {
+    icon: "🌳",
+    title: "Arbord",
+    path: "https://arbord.dev",
+    source: "https://github.com/funsaized/arbord",
+    description:
+      "Track every claude & codex session. Watch usage. Grow a forest. Shipping Fall '26",
+    status: "active",
+  },
+  {
     icon: "🌅",
     title: "Eventide",
     path: "https://eventide.s11a.com",
@@ -51,8 +60,7 @@ const projects: Project[] = [
     title: "OctoAgenda",
     path: "https://octoagenda.s11a.com",
     source: "https://github.com/funsaized/OctoAgenda",
-    description:
-      "Scrape events from any source on the web and export to iCal (.ics)",
+    description: "Scrape events from any source on the web and export to iCal (.ics)",
     status: "in-progress",
     stars: 0,
     forks: 0,
