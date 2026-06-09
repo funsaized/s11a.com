@@ -39,7 +39,7 @@ export interface Project {
 const projects: Project[] = [
   {
     icon: "🌳",
-    title: "Arbord",
+    title: "arbord",
     path: "https://arbord.dev",
     source: "https://github.com/funsaized/arbord",
     description:
