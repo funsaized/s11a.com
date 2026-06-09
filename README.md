@@ -1,5 +1,7 @@
 # s11a.com - Personal Blog
 
+[![Netlify Status](https://api.netlify.com/api/v1/badges/7221c3fe-992b-448e-ab3f-00124c3d8801/deploy-status)](https://app.netlify.com/projects/s11a/deploys)
+
 Modern Gatsby v5 blog built with TypeScript, Tailwind CSS v3, and shadcn/ui components. Features technical articles, project showcases, and optimized performance.
 
 ## 🚀 Features
