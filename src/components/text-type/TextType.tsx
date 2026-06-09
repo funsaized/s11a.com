@@ -146,7 +146,7 @@ const TextType = ({
             setDisplayedText((prev) => prev + processedText[currentCharIndex]);
             setCurrentCharIndex((prev) => prev + 1);
           },
-          variableSpeed ? getRandomSpeed() : typingSpeed,
+          getRandomSpeed(),
         );
       } else if (textArray.length > 1) {
         timeout = setTimeout(() => {
@@ -166,7 +166,7 @@ const TextType = ({
     currentCharIndex,
     displayedText,
     isDeleting,
-    typingSpeed,
+    getRandomSpeed,
     deletingSpeed,
     pauseDuration,
     textArray,
@@ -175,7 +175,6 @@ const TextType = ({
     initialDelay,
     isVisible,
     reverseMode,
-    variableSpeed,
     onSentenceComplete,
   ]);
 

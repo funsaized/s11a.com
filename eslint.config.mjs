@@ -1,6 +1,6 @@
 import js from "@eslint/js";
 import tseslint from "typescript-eslint";
-import reactPlugin from "eslint-plugin-react";
+import eslintReactPlugin from "@eslint-react/eslint-plugin";
 import reactHooksPlugin from "eslint-plugin-react-hooks";
 import jsxA11y from "eslint-plugin-jsx-a11y";
 import importXPlugin from "eslint-plugin-import-x";
@@ -37,7 +37,7 @@ export default [
   {
     files: ["**/*.{js,jsx,ts,tsx}"],
     plugins: {
-      react: reactPlugin,
+      ...eslintReactPlugin.configs.recommended.plugins,
       "react-hooks": reactHooksPlugin,
       "import-x": importXPlugin,
     },
@@ -49,32 +49,15 @@ export default [
         ...globals.node,
       },
     },
-    settings: {
-      react: { version: "detect" },
-    },
     rules: {
       // React
-      ...reactPlugin.configs.flat.recommended.rules,
-      ...reactPlugin.configs.flat["jsx-runtime"].rules,
-      "react/prop-types": "off",
-      "react/no-danger": "off",
-      "react/jsx-filename-extension": [
-        "error",
-        { extensions: [".jsx", ".tsx"] },
-      ],
-      "react/function-component-definition": [
-        "error",
-        {
-          namedComponents: ["function-declaration", "arrow-function"],
-          unnamedComponents: "arrow-function",
-        },
-      ],
-      "react/jsx-boolean-value": "off",
-      "react/no-array-index-key": "warn",
-      "react/button-has-type": "off",
-      "react/jsx-props-no-spreading": "off",
-      "react/require-default-props": "off",
-      "react/no-unescaped-entities": "error",
+      ...eslintReactPlugin.configs.recommended.rules,
+      "@eslint-react/dom-no-dangerously-set-innerhtml": "off",
+      "@eslint-react/dom-no-missing-button-type": "off",
+      "@eslint-react/exhaustive-deps": "off",
+      "@eslint-react/no-array-index-key": "warn",
+      "@eslint-react/rules-of-hooks": "off",
+      "@eslint-react/set-state-in-effect": "off",
 
       // React Hooks
       ...reactHooksPlugin.configs.recommended.rules,
