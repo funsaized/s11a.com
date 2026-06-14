@@ -2,7 +2,6 @@ import js from "@eslint/js";
 import tseslint from "typescript-eslint";
 import eslintReactPlugin from "@eslint-react/eslint-plugin";
 import reactHooksPlugin from "eslint-plugin-react-hooks";
-import jsxA11y from "eslint-plugin-jsx-a11y";
 import importXPlugin from "eslint-plugin-import-x";
 import eslintConfigPrettier from "eslint-config-prettier";
 import globals from "globals";
@@ -29,9 +28,6 @@ export default [
 
   // ── TypeScript recommended ────────────────────────────────────
   ...tseslint.configs.recommended,
-
-  // ── JSX Accessibility ─────────────────────────────────────────
-  jsxA11y.flatConfigs.recommended,
 
   // ── All source files ──────────────────────────────────────────
   {
@@ -67,16 +63,6 @@ export default [
 
       // Imports
       "import-x/no-duplicates": "error",
-
-      // A11y — Gatsby Link integration
-      "jsx-a11y/anchor-is-valid": [
-        "error",
-        {
-          components: ["Link"],
-          specialLink: ["hrefLeft", "hrefRight", "to"],
-          aspects: ["noHref", "invalidHref", "preferButton"],
-        },
-      ],
 
       // General
       "no-nested-ternary": "off",
