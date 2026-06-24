@@ -47,6 +47,16 @@ const projects: Project[] = [
     status: "active",
   },
   {
+    icon: "🐍",
+    title: "PowerSnek",
+    path: "https://powersnek.s11a.com",
+    source: "https://github.com/funsaized/PowerSnek",
+    description: "A tiny macOS menu bar app that celebrates when you plug in.",
+    status: "active",
+    stars: 0,
+    forks: 0,
+  },
+  {
     icon: "🌅",
     title: "Eventide",
     path: "https://eventide.s11a.com",
