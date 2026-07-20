@@ -81,7 +81,7 @@
     "globals": "^17.6.0",
     "lighthouse": "^13.0.1",
     "postcss": "^8.5.14",
-    "prettier": "^3.8.1",
+    "prettier": "^3.9.5",
     "sharp": "^0.34.5",
     "tailwindcss": "^4.3.0",
     "tsx": "^4.22.4",
