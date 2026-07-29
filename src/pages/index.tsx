@@ -4,7 +4,6 @@ import { graphql } from "gatsby";
 import { Layout } from "../components/layout/Layout";
 import { Hero } from "../components/home/Hero";
 import { ArticleList } from "../components/home/ArticleList";
-import { NoteCards } from "../components/home/NoteCards";
 import { Projects } from "../components/home/Projects";
 import { SEO } from "../components/layout/SEO";
 
@@ -13,52 +12,23 @@ interface ArticleNode {
   frontmatter: {
     title: string;
     slug: string;
-    excerpt: string;
     date: string;
-    category: string;
-    tags: string[];
-    readingTime: string;
-    featured: boolean;
-  };
-}
-
-interface ContentNode extends ArticleNode {
-  internal: {
-    contentFilePath: string;
   };
 }
 
 interface IndexPageData {
   articles: {
-    nodes: ContentNode[];
-  };
-  notes: {
-    nodes: ContentNode[];
+    nodes: ArticleNode[];
   };
 }
 
 const IndexPage: React.FC<PageProps<IndexPageData>> = ({ data }) => {
-  // Transform the GraphQL data to match the Article interface
-  const content = [...data.articles.nodes, ...data.notes.nodes].map((node) => {
-    // Extract content type from file path
-    const contentType = node.internal.contentFilePath.includes("/articles/")
-      ? "article"
-      : "note";
-
-    return {
-      id: node.id,
-      title: node.frontmatter.title,
-      slug: node.frontmatter.slug,
-      excerpt: node.frontmatter.excerpt || "",
-      date: node.frontmatter.date,
-      category: node.frontmatter.category,
-      tags: node.frontmatter.tags || [],
-      readingTime: node.frontmatter.readingTime,
-      featured: node.frontmatter.featured || false,
-      author: "Sai Nimmagadda",
-      contentType,
-    };
-  });
+  const articles = data.articles.nodes.map((node) => ({
+    id: node.id,
+    title: node.frontmatter.title,
+    slug: node.frontmatter.slug,
+    date: node.frontmatter.date,
+  }));
 
   return (
     <Layout>
@@ -67,25 +37,14 @@ const IndexPage: React.FC<PageProps<IndexPageData>> = ({ data }) => {
       {/* Articles Section */}
       <section className="py-12 md:py-16 bg-background">
         <div className="container mx-auto px-4">
-          <div className="mx-auto max-w-7xl">
-            <div className="grid gap-8 lg:gap-8 lg:grid-cols-2 lg:divide-x lg:divide-border">
-              <ArticleList
-                title="Blog"
-                subtitle="Guides, references, and tutorials."
-                articles={content.filter(
-                  (article) => article.contentType === "article",
-                )}
-                viewAllLink="/articles"
-                viewAllText="See All"
-              />
-              <div className="lg:pl-8">
-                <NoteCards
-                  notes={content.filter(
-                    (article) => article.contentType === "note",
-                  )}
-                />
-              </div>
-            </div>
+          <div className="mx-auto max-w-4xl">
+            <ArticleList
+              title="Blog"
+              subtitle="Guides, references, and tutorials."
+              articles={articles}
+              viewAllLink="/articles"
+              viewAllText="See All"
+            />
           </div>
         </div>
       </section>
@@ -106,40 +65,10 @@ export const query = graphql`
     ) {
       nodes {
         id
-        internal {
-          contentFilePath
-        }
         frontmatter {
           title
           slug
-          excerpt
           date
-          category
-          tags
-          readingTime
-          featured
-        }
-      }
-    }
-    notes: allMdx(
-      filter: { internal: { contentFilePath: { regex: "/content/notes/" } } }
-      sort: { frontmatter: { date: DESC } }
-      limit: 4
-    ) {
-      nodes {
-        id
-        internal {
-          contentFilePath
-        }
-        frontmatter {
-          title
-          slug
-          excerpt
-          date
-          category
-          tags
-          readingTime
-          featured
         }
       }
     }

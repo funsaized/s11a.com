@@ -6,7 +6,6 @@ interface Article {
   title: string;
   slug: string;
   date: string;
-  contentType?: string;
 }
 
 interface ArticleListProps {
@@ -54,12 +53,12 @@ export function ArticleList({
           <article key={article.id} className="group -mx-3">
             <Link
               to={`/articles/${article.slug}`}
-              className="block px-3 py-4 rounded-lg hover:bg-muted/50 transition-colors"
+              className="flex items-baseline justify-between gap-6 px-3 py-4 rounded-lg hover:bg-muted/50 transition-colors"
             >
-              <h3 className="font-medium text-lg leading-snug text-primary group-hover:text-primary/80 transition-colors line-clamp-2">
+              <h3 className="min-w-0 font-medium text-lg leading-snug text-primary group-hover:text-primary/80 transition-colors line-clamp-2">
                 {article.title}
               </h3>
-              <time className="text-sm text-muted-foreground">
+              <time className="shrink-0 whitespace-nowrap text-sm text-muted-foreground">
                 {formatDate(article.date)}
               </time>
             </Link>

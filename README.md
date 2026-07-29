@@ -62,12 +62,10 @@ npm run build         # Build for production
 npm run serve         # Serve production build
 npm run clean         # Clean Gatsby cache
 npm run typecheck     # Run TypeScript checks
-npm test              # Run lightweight content pipeline tests
 npm run validate:content # Validate MDX metadata and local images
 npm run lighthouse    # Run Lighthouse performance tests
 npm run lighthouse:ci # Build and test performance
 npm run analyze       # Analyze bundle size
-npm run export-notes   # Export Apple Notes to MDX (folder-based categorization)
 npm run perf          # Full performance testing suite
 ```
 
@@ -94,36 +92,6 @@ author: "Sai Nimmagadda"
 
 3. Write your content using MDX syntax
 4. The article will automatically appear on the articles page
-
-### Apple Notes Exporter
-
-The `scripts/export-notes/` directory contains a TypeScript CLI for exporting Apple Notes to MDX format:
-
-- **Purpose**: Export Apple Notes to `src/content/notes/`, categorized by Apple Notes folder name
-- **How it works**: Accesses Notes.app via JXA/osascript, converts HTML to Markdown via Turndown, compresses images to content-hashed WebP files, and generates deterministic frontmatter
-- **Categorization**: Each Apple Notes folder maps to an export category:
-
-  | Apple Notes Folder     | Export Category   | Directory                  |
-  | ---------------------- | ----------------- | -------------------------- |
-  | Notes (default)        | General           | `notes/general/`           |
-  | 🎯 Content Creation    | Content-Creation  | `notes/content-creation/`  |
-  | 📋 Planning & Strategy | Planning-Strategy | `notes/planning-strategy/` |
-  | 📥 Inbox               | Inbox             | `notes/inbox/`             |
-  | 🚀 Active Projects     | Active-Projects   | `notes/active-projects/`   |
-  | 🤦🏽‍♂️ Personal Systems    | Personal-Systems  | `notes/personal-systems/`  |
-  | 🧠 Knowledge Base      | Knowledge-Base    | `notes/knowledge-base/`    |
-
-- **Excluded**: Notes tagged `#private` or `#work` in body text, archived notes
-- **Output**: MDX files in `src/content/notes/{category}/`, images in `static/images/articles/`
-- **Deterministic**: Same notes produce identical output every run (no AI/LLM)
-
-```bash
-npm run export-notes              # Export all notes
-npm run export-notes -- --dry-run  # Preview what would be exported
-npm run export-notes -- --verbose  # Show per-note details
-```
-
-Notes are written to `src/content/notes/{category}/` and images to `static/images/articles/`.
 
 ### Supported Categories
 
@@ -158,7 +126,6 @@ The site is optimized for performance with:
 
 - **Lighthouse Scores**: >90 for all metrics
 - **Core Web Vitals**: Tracks LCP, INP, and CLS
-- **Image Optimization**: Content-hashed WebP output from the Apple Notes exporter
 - **Code Splitting**: Automatic route-based splitting
 - **Caching**: Optimized cache headers
 - **Bundle Analysis**: webpack-bundle-analyzer integration
