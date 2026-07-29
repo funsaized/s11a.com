@@ -329,17 +329,6 @@ const AboutPage: React.FC<PageProps> = () => {
                         Ghostty
                       </a>
                     </li>
-                    <li>
-                      <strong className="text-foreground">Notes</strong>:{" "}
-                      <a
-                        href="https://www.icloud.com/notes"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-primary hover:underline"
-                      >
-                        Apple Notes
-                      </a>
-                    </li>
                   </ul>
                 </CardContent>
               </Card>

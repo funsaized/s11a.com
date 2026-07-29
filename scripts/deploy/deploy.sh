@@ -51,9 +51,6 @@ print_status "npm version: $NPM_VERSION"
 print_status "Installing dependencies..."
 npm ci
 
-print_status "Running lightweight tests..."
-npm test
-
 print_status "Validating content..."
 npm run validate:content
 

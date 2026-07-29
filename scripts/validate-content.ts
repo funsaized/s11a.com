@@ -76,15 +76,6 @@ export function validateContent(): string[] {
         errors.push(`${relativePath}: missing image ${match[1]}`);
       }
     }
-
-    if (
-      filePath.includes(`${path.sep}notes${path.sep}`) &&
-      /-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----|(?:api[_-]?key|secret)\s*[:=]\s*["'][^"']{12,}/i.test(
-        content,
-      )
-    ) {
-      errors.push(`${relativePath}: possible secret in exported note`);
-    }
   }
 
   return errors;

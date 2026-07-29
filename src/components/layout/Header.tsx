@@ -40,7 +40,6 @@ const CloseIcon = () => (
 const navigation = [
   { name: "Home", href: "/" },
   { name: "Articles", href: "/articles" },
-  { name: "Notes", href: "/notes" },
   { name: "About", href: "/about" },
 ];
 

@@ -12,18 +12,14 @@ npm run clean            # Clear .cache/ and public/
 npm run typecheck        # tsc --noEmit (strict mode)
 npm run lint             # ESLint with airbnb + prettier config
 npm run format:js        # Prettier write on all JS/TS files
-npm run export-notes      # Export Apple Notes to MDX (use --dry-run to preview)
-npm run export-notes -- --dry-run   # Preview export without writing files
-npm run export-notes -- --verbose   # Show per-note details during export
 npm run lighthouse       # Lighthouse performance audit
 npm run lighthouse:ci    # Build → serve → Lighthouse → kill
 ```
 
-Lightweight tests use Node's built-in test runner through `tsx`.
+There is currently no automated test suite.
 No pre-commit hooks (no Husky/lint-staged).
 
 - **Node version**: v22.4.1 locally and on Netlify.
-- **Note**: No Python dependencies required — pipeline is pure TypeScript.
 
 ## Lint & Type Configuration
 
@@ -132,23 +128,21 @@ src/
     ui/             # shadcn/ui primitives (button, badge, card, select)
   content/
     articles/       # MDX blog posts
-    notes/          # MDX notes
   data/             # Shared TypeScript interfaces and static data
   hooks/            # Custom React hooks (useTheme)
   lib/              # Library utilities
-  pages/            # Gatsby pages (index, articles, notes, 404)
+  pages/            # Gatsby pages (index, articles, 404)
   styles/           # Global CSS (globals.css, prism-theme.css)
-  templates/        # Page templates (article.tsx, note.tsx)
+  templates/        # Page templates (article.tsx)
   utils/            # Utility functions (cn.ts)
 scripts/
-  export-notes/     # Apple Notes → MDX export pipeline (TypeScript CLI, own tsconfig)
   deploy/           # Pre-deploy validation + build script
   performance/      # Lighthouse CI runner (thresholds: P:90 A:95 BP:90 S:95)
 ```
 
 ## Content (MDX)
 
-Articles in `src/content/articles/`, notes in `src/content/notes/`.
+Articles live in `src/content/articles/`.
 
 Required frontmatter for articles:
 
@@ -167,16 +161,6 @@ author: "Sai Nimmagadda"
 ```
 
 Categories: Backend, Frontend, Healthcare, Architecture, DevOps, Database, Cloud, Security.
-
-### Notes Export Pipeline
-
-Notes are exported from Apple Notes via `npm run export-notes`. Categorization is folder-based — each Apple Notes folder maps to a category directory in `src/content/notes/`.
-
-- **Access method**: JXA/osascript (not SQLite) — Apple Notes native hashtags are NOT accessible via JXA
-- **Categorization**: Folder name → emoji-stripped PascalCase (e.g. `📋 Planning & Strategy` → `Planning-Strategy`)
-- **Excluded**: Notes with `#private` or `#work` in body text, archived folders
-- **Images**: Extracted from HTML (base64 + web URLs), HEIC converted to JPEG via sharp, written to `static/images/articles/`
-- **Atomic write**: Notes written to temp directory, then swapped atomically (crash-safe)
 
 ## GraphQL Patterns
 
