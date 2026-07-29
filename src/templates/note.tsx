@@ -1,10 +1,12 @@
 import React from "react";
+import type { HeadFC } from "gatsby";
 import { graphql, Link } from "gatsby";
 import { MDXProvider } from "@mdx-js/react";
 import { Layout } from "../components/layout/Layout";
 import { Badge } from "../components/ui/badge";
 import { Button } from "../components/ui/button";
 import { headingComponents } from "../components/mdx/HeadingComponents";
+import { SEO } from "../components/layout/SEO";
 
 const BackArrowIcon = () => (
   <svg
@@ -75,20 +77,13 @@ interface NoteTemplateProps {
 
 const NoteTemplate: React.FC<NoteTemplateProps> = ({
   data,
-  location,
   children,
 }) => {
   const { mdx } = data;
   const { frontmatter } = mdx;
 
   return (
-    <Layout
-      title={frontmatter.title}
-      description={frontmatter.excerpt || "Personal notes and jottings"}
-      pathname={location.pathname}
-      datePublished={frontmatter.date}
-      tags={frontmatter.tags}
-    >
+    <Layout>
       <article className="py-8">
         <div className="container mx-auto px-4 max-w-4xl">
           {/* Back Navigation */}
@@ -189,6 +184,16 @@ const NoteTemplate: React.FC<NoteTemplateProps> = ({
 };
 
 export default NoteTemplate;
+
+export const Head: HeadFC<NoteTemplateProps["data"]> = ({ data, location }) => (
+  <SEO
+    title={data.mdx.frontmatter.title}
+    description={data.mdx.frontmatter.excerpt || "Personal notes and jottings"}
+    pathname={location.pathname}
+    datePublished={data.mdx.frontmatter.date}
+    tags={data.mdx.frontmatter.tags}
+  />
+);
 
 export const query = graphql`
   query NoteQuery($id: String!) {

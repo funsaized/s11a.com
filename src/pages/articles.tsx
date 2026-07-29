@@ -14,6 +14,7 @@ import {
 } from "../components/ui/card";
 import { Badge } from "../components/ui/badge";
 import { categoryIcons, type Article } from "../data/sampleData";
+import { SEO } from "../components/layout/SEO";
 
 const ARTICLES_PER_PAGE = 6;
 
@@ -215,10 +216,7 @@ const ArticlesPage: React.FC<PageProps<ArticlesPageData>> = ({ data }) => {
   };
 
   return (
-    <Layout
-      title="Articles"
-      description="Technical articles on healthcare technology, system architecture, and developer experience."
-    >
+    <Layout>
       <div className="container mx-auto px-4 py-8">
         <div className="mx-auto max-w-6xl">
           {/* Page Header */}
@@ -376,11 +374,9 @@ export const query = graphql`
 `;
 
 export const Head: HeadFC = () => (
-  <>
-    <title>Technical Articles - Sai Nimmagadda</title>
-    <meta
-      name="description"
-      content="Technical articles on healthcare technology, system architecture, and developer experience."
-    />
-  </>
+  <SEO
+    title="Technical Articles"
+    description="Technical articles on healthcare technology, system architecture, and developer experience."
+    pathname="/articles"
+  />
 );

@@ -49,7 +49,13 @@ print_status "npm version: $NPM_VERSION"
 
 # Install dependencies
 print_status "Installing dependencies..."
-npm ci --legacy-peer-deps
+npm ci
+
+print_status "Running lightweight tests..."
+npm test
+
+print_status "Validating content..."
+npm run validate:content
 
 # Run TypeScript checks
 print_status "Running TypeScript checks..."
@@ -114,12 +120,7 @@ for pattern in "${SENSITIVE_PATTERNS[@]}"; do
 done
 print_success "No sensitive files found in build output"
 
-# Optional: Run performance tests if lighthouse is available
-if command -v lighthouse &> /dev/null; then
-    print_status "Lighthouse is available. Consider running 'npm run lighthouse:ci' for performance testing."
-else
-    print_warning "Lighthouse not available. Install it globally for performance testing: npm install -g lighthouse"
-fi
+print_status "Lighthouse is available through the project. Run 'npm run lighthouse:ci' for a local performance audit."
 
 print_success "🎉 Deployment preparation completed successfully!"
 print_status "The site is ready to deploy from the 'public' directory"

@@ -1,6 +1,6 @@
 # AGENTS.md — s11a.com Personal Blog
 
-Gatsby 5 + React 18 + TypeScript blog. Tailwind CSS v3 + shadcn/ui components. MDX content. Deployed on Netlify.
+Gatsby 5 + React 18 + TypeScript blog. Tailwind CSS v4 + shadcn/ui components. MDX content. Deployed on Netlify.
 
 ## Build & Dev Commands
 
@@ -19,10 +19,10 @@ npm run lighthouse       # Lighthouse performance audit
 npm run lighthouse:ci    # Build → serve → Lighthouse → kill
 ```
 
-No test framework is configured. `npm test` is a placeholder that exits 1.
+Lightweight tests use Node's built-in test runner through `tsx`.
 No pre-commit hooks (no Husky/lint-staged).
 
-- **Node version**: v22.4.1 (.nvmrc). Netlify builds use Node 18.
+- **Node version**: v22.4.1 locally and on Netlify.
 - **Note**: No Python dependencies required — pipeline is pure TypeScript.
 
 ## Lint & Type Configuration
@@ -104,7 +104,7 @@ export { Button, buttonVariants };
 
 ### Styling
 
-- **Tailwind CSS v3** with `class` dark mode strategy
+- **Tailwind CSS v4** with `class` dark mode strategy
 - `cn()` utility (`src/utils/cn.ts`) for conditional class merging — uses `clsx` + `tailwind-merge`
 - CSS custom properties for theming in `src/styles/globals.css`
 - shadcn/ui components use `cva` (class-variance-authority) for variant styling

@@ -1,6 +1,6 @@
 import React from "react";
 
-interface SEOProps {
+export interface SEOProps {
   title?: string;
   description?: string;
   image?: string;
@@ -16,7 +16,7 @@ const defaultMeta = {
   description:
     "Full-stack engineer focused on healthcare, developer experience, and scalable systems.",
   siteUrl: "https://s11a.com",
-  image: "https://s11a.com/logo-512.png",
+  image: "/images/face.png",
   twitterUsername: "@FunSaized",
 };
 
@@ -30,11 +30,15 @@ export function SEO({
   dateModified,
   tags = [],
 }: SEOProps) {
+  const imageUrl = image.startsWith("http")
+    ? image
+    : new URL(image, defaultMeta.siteUrl).toString();
+  const url = new URL(pathname || "/", defaultMeta.siteUrl).toString();
   const seo = {
     title: title ? `${title} | ${defaultMeta.title}` : defaultMeta.title,
     description,
-    image: `${defaultMeta.siteUrl}${image}`,
-    url: `${defaultMeta.siteUrl}${pathname}`,
+    image: imageUrl,
+    url,
   };
 
   // Structured Data for SEO
@@ -85,6 +89,18 @@ export function SEO({
       <meta property="og:image" content={seo.image} />
       <meta property="og:url" content={seo.url} />
       <meta property="og:type" content={article ? "article" : "website"} />
+      <meta property="og:site_name" content="Sai Nimmagadda" />
+      <meta property="og:image:width" content="320" />
+      <meta property="og:image:height" content="320" />
+      {article && datePublished && (
+        <meta property="article:published_time" content={datePublished} />
+      )}
+      {article && (dateModified || datePublished) && (
+        <meta
+          property="article:modified_time"
+          content={dateModified || datePublished}
+        />
+      )}
 
       {/* Twitter Card */}
       <meta name="twitter:card" content="summary_large_image" />
@@ -97,6 +113,12 @@ export function SEO({
       <meta name="robots" content="index, follow" />
       <meta name="author" content="Sai Nimmagadda" />
       <link rel="canonical" href={seo.url} />
+      <link
+        rel="alternate"
+        type="application/rss+xml"
+        title="Sai Nimmagadda"
+        href={`${defaultMeta.siteUrl}/rss.xml`}
+      />
 
       {/* Structured Data */}
       <script type="application/ld+json">

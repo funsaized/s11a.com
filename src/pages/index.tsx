@@ -6,6 +6,7 @@ import { Hero } from "../components/home/Hero";
 import { ArticleList } from "../components/home/ArticleList";
 import { NoteCards } from "../components/home/NoteCards";
 import { Projects } from "../components/home/Projects";
+import { SEO } from "../components/layout/SEO";
 
 interface ArticleNode {
   id: string;
@@ -57,10 +58,7 @@ const IndexPage: React.FC<PageProps<IndexPageData>> = ({ data }) => {
   });
 
   return (
-    <Layout
-      title="Full-Stack Engineer • Healthcare Tech"
-      description="Full-stack engineer focused on healthcare, developer experience, and scalable systems. Building technology that improves patient outcomes."
-    >
+    <Layout>
       <Hero />
 
       {/* Articles Section */}
@@ -104,6 +102,7 @@ export const query = graphql`
         internal: { contentFilePath: { regex: "/content/(articles|notes)/" } }
       }
       sort: { frontmatter: { date: DESC } }
+      limit: 12
     ) {
       nodes {
         id
@@ -126,30 +125,9 @@ export const query = graphql`
 `;
 
 export const Head: HeadFC = () => (
-  <>
-    <title>Sai Nimmagadda - Full-Stack Engineer • Healthcare Tech</title>
-    <meta
-      name="description"
-      content="Full-stack engineer focused on healthcare, developer experience, and scalable systems. Building technology that improves patient outcomes."
-    />
-    <meta property="og:type" content="website" />
-    <meta
-      property="og:title"
-      content="Sai Nimmagadda - Full-Stack Engineer • Healthcare Tech"
-    />
-    <meta
-      property="og:description"
-      content="Full-stack engineer focused on healthcare, developer experience, and scalable systems. Building technology that improves patient outcomes."
-    />
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:creator" content="@FunSaized" />
-    <meta
-      name="twitter:title"
-      content="Sai Nimmagadda - Full-Stack Engineer • Healthcare Tech"
-    />
-    <meta
-      name="twitter:description"
-      content="Full-stack engineer focused on healthcare, developer experience, and scalable systems. Building technology that improves patient outcomes."
-    />
-  </>
+  <SEO
+    title="Full-Stack Engineer • Healthcare Tech"
+    description="Full-stack engineer focused on healthcare, developer experience, and scalable systems. Building technology that improves patient outcomes."
+    pathname="/"
+  />
 );

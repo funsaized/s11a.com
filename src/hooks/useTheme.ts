@@ -8,12 +8,13 @@ export function useTheme() {
 
   useEffect(() => {
     setMounted(true);
-    const stored =
-      typeof window !== "undefined"
-        ? (localStorage.getItem("theme") as Theme)
-        : null;
-    if (stored && ["light", "dark", "system"].includes(stored)) {
-      setTheme(stored);
+    try {
+      const stored = localStorage.getItem("theme") as Theme | null;
+      if (stored && ["light", "dark", "system"].includes(stored)) {
+        setTheme(stored);
+      }
+    } catch {
+      // System theme remains active when storage is blocked.
     }
   }, []);
 
@@ -22,19 +23,25 @@ export function useTheme() {
 
     const root = document.documentElement;
 
+    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+    const applyTheme = () => {
+      const resolvedTheme =
+        theme === "system" ? (mediaQuery.matches ? "dark" : "light") : theme;
+      root.classList.remove("light", "dark");
+      root.classList.add(resolvedTheme);
+    };
+
+    applyTheme();
     if (theme === "system") {
-      const systemTheme = window.matchMedia("(prefers-color-scheme: dark)")
-        .matches
-        ? "dark"
-        : "light";
-      root.classList.remove("light", "dark");
-      root.classList.add(systemTheme);
-    } else {
-      root.classList.remove("light", "dark");
-      root.classList.add(theme);
+      mediaQuery.addEventListener("change", applyTheme);
+    }
+    try {
+      localStorage.setItem("theme", theme);
+    } catch {
+      // Theme still works when storage is blocked.
     }
 
-    localStorage.setItem("theme", theme);
+    return () => mediaQuery.removeEventListener("change", applyTheme);
   }, [theme, mounted]);
 
   const toggleTheme = () => {

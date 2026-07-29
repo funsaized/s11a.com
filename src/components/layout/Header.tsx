@@ -1,6 +1,5 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "gatsby";
-import { StaticImage } from "gatsby-plugin-image";
 import { Button } from "../ui/button";
 import { ThemeToggle } from "./ThemeToggle";
 
@@ -50,16 +49,23 @@ export function Header() {
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
 
+  useEffect(() => {
+    if (!isMenuOpen) return undefined;
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setIsMenuOpen(false);
+    };
+    document.addEventListener("keydown", closeOnEscape);
+    return () => document.removeEventListener("keydown", closeOnEscape);
+  }, [isMenuOpen]);
+
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center justify-between px-4 mx-auto">
         {/* Logo */}
         <Link to="/" className="flex items-center space-x-2 text-xl font-bold">
-          <StaticImage
-            src="../../assets/images/face.png"
-            alt="Face"
-            placeholder="blurred"
-            layout="fixed"
+          <img
+            src="/images/face.png"
+            alt=""
             width={32}
             height={32}
             className="w-8 h-8"
@@ -91,6 +97,8 @@ export function Header() {
               variant="ghost"
               size="icon"
               onClick={toggleMenu}
+              aria-expanded={isMenuOpen}
+              aria-controls="mobile-navigation"
               className="h-9 w-9"
             >
               {isMenuOpen ? <CloseIcon /> : <MenuIcon />}
@@ -102,7 +110,7 @@ export function Header() {
 
       {/* Mobile Navigation */}
       {isMenuOpen && (
-        <div className="md:hidden">
+        <div id="mobile-navigation" className="md:hidden">
           <div className="border-t bg-background px-4 py-4 space-y-3">
             {navigation.map((item) => (
               <Link

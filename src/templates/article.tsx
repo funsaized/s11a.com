@@ -1,4 +1,5 @@
 import React from "react";
+import type { HeadFC } from "gatsby";
 import { graphql, Link } from "gatsby";
 import { MDXProvider } from "@mdx-js/react";
 import { Layout } from "../components/layout/Layout";
@@ -8,6 +9,7 @@ import { TableOfContents } from "../components/article/TableOfContents";
 import { SharingComponent } from "../components/article/SharingComponent";
 import { categoryIcons } from "../data/sampleData";
 import { headingComponents } from "../components/mdx/HeadingComponents";
+import { SEO } from "../components/layout/SEO";
 
 const BackArrowIcon = () => (
   <svg
@@ -99,14 +101,7 @@ const ArticleTemplate: React.FC<ArticleTemplateProps> = ({
   const articleUrl = `https://s11a.com${location.pathname}`;
 
   return (
-    <Layout
-      title={frontmatter.title}
-      description={frontmatter.excerpt}
-      article
-      pathname={location.pathname}
-      datePublished={frontmatter.date}
-      tags={frontmatter.tags}
-    >
+    <Layout>
       <article className="py-8">
         <div className="container mx-auto px-4 max-w-6xl">
           {/* Back Navigation */}
@@ -203,6 +198,20 @@ const ArticleTemplate: React.FC<ArticleTemplateProps> = ({
 };
 
 export default ArticleTemplate;
+
+export const Head: HeadFC<ArticleTemplateProps["data"]> = ({
+  data,
+  location,
+}) => (
+  <SEO
+    title={data.mdx.frontmatter.title}
+    description={data.mdx.frontmatter.excerpt}
+    article
+    pathname={location.pathname}
+    datePublished={data.mdx.frontmatter.date}
+    tags={data.mdx.frontmatter.tags}
+  />
+);
 
 export const query = graphql`
   query ArticleQuery($id: String!) {
