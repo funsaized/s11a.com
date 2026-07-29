@@ -29,14 +29,17 @@ interface ContentNode extends ArticleNode {
 }
 
 interface IndexPageData {
-  allMdx: {
+  articles: {
+    nodes: ContentNode[];
+  };
+  notes: {
     nodes: ContentNode[];
   };
 }
 
 const IndexPage: React.FC<PageProps<IndexPageData>> = ({ data }) => {
   // Transform the GraphQL data to match the Article interface
-  const articles = data.allMdx.nodes.map((node) => {
+  const content = [...data.articles.nodes, ...data.notes.nodes].map((node) => {
     // Extract content type from file path
     const contentType = node.internal.contentFilePath.includes("/articles/")
       ? "article"
@@ -69,7 +72,7 @@ const IndexPage: React.FC<PageProps<IndexPageData>> = ({ data }) => {
               <ArticleList
                 title="Blog"
                 subtitle="Guides, references, and tutorials."
-                articles={articles.filter(
+                articles={content.filter(
                   (article) => article.contentType === "article",
                 )}
                 viewAllLink="/articles"
@@ -77,7 +80,7 @@ const IndexPage: React.FC<PageProps<IndexPageData>> = ({ data }) => {
               />
               <div className="lg:pl-8">
                 <NoteCards
-                  notes={articles.filter(
+                  notes={content.filter(
                     (article) => article.contentType === "note",
                   )}
                 />
@@ -94,15 +97,34 @@ const IndexPage: React.FC<PageProps<IndexPageData>> = ({ data }) => {
 
 export default IndexPage;
 
-// TODO: limit this eventually...
 export const query = graphql`
   query {
-    allMdx(
-      filter: {
-        internal: { contentFilePath: { regex: "/content/(articles|notes)/" } }
-      }
+    articles: allMdx(
+      filter: { internal: { contentFilePath: { regex: "/content/articles/" } } }
       sort: { frontmatter: { date: DESC } }
-      limit: 12
+      limit: 10
+    ) {
+      nodes {
+        id
+        internal {
+          contentFilePath
+        }
+        frontmatter {
+          title
+          slug
+          excerpt
+          date
+          category
+          tags
+          readingTime
+          featured
+        }
+      }
+    }
+    notes: allMdx(
+      filter: { internal: { contentFilePath: { regex: "/content/notes/" } } }
+      sort: { frontmatter: { date: DESC } }
+      limit: 4
     ) {
       nodes {
         id

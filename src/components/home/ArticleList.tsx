@@ -15,6 +15,7 @@ interface ArticleListProps {
   articles: Article[];
   viewAllLink: string;
   viewAllText?: string;
+  limit?: number;
 }
 
 export function ArticleList({
@@ -23,7 +24,9 @@ export function ArticleList({
   articles,
   viewAllLink,
   viewAllText = "See All",
+  limit = 10,
 }: ArticleListProps) {
+  const visibleArticles = articles.slice(0, limit);
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleDateString("en-US", {
@@ -47,7 +50,7 @@ export function ArticleList({
       <p className="text-muted-foreground mb-8">{subtitle}</p>
 
       <div className="space-y-0">
-        {articles.slice(0, 6).map((article, index) => (
+        {visibleArticles.map((article, index) => (
           <article key={article.id} className="group -mx-3">
             <Link
               to={`/articles/${article.slug}`}
@@ -60,7 +63,7 @@ export function ArticleList({
                 {formatDate(article.date)}
               </time>
             </Link>
-            {index < articles.slice(0, 6).length - 1 && (
+            {index < visibleArticles.length - 1 && (
               <div className="border-b border-border mx-3" />
             )}
           </article>
