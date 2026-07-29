@@ -2,11 +2,11 @@
 
 [![Netlify Status](https://api.netlify.com/api/v1/badges/7221c3fe-992b-448e-ab3f-00124c3d8801/deploy-status)](https://app.netlify.com/projects/s11a/deploys)
 
-Modern Gatsby v5 blog built with TypeScript, Tailwind CSS v3, and shadcn/ui components. Features technical articles, project showcases, and optimized performance.
+Modern Gatsby v5 blog built with React 18, TypeScript, Tailwind CSS v4, and shadcn/ui components. Features technical articles, project showcases, and optimized performance.
 
 ## 🚀 Features
 
-- **Modern Stack**: Gatsby v5, TypeScript, Tailwind CSS v3, shadcn/ui
+- **Modern Stack**: Gatsby v5, React 18, TypeScript, Tailwind CSS v4, shadcn/ui
 - **Content Management**: MDX support with syntax highlighting and table of contents
 - **Performance Optimized**: Lighthouse scores >90, image optimization, code splitting
 - **SEO Ready**: Structured data, Open Graph, Twitter Cards, sitemap
@@ -35,8 +35,8 @@ src/
 
 ### Prerequisites
 
-- Node.js 18+
-- npm 9+
+- Node.js 22
+- npm 10+
 
 ### Setup
 
@@ -62,6 +62,8 @@ npm run build         # Build for production
 npm run serve         # Serve production build
 npm run clean         # Clean Gatsby cache
 npm run typecheck     # Run TypeScript checks
+npm test              # Run lightweight content pipeline tests
+npm run validate:content # Validate MDX metadata and local images
 npm run lighthouse    # Run Lighthouse performance tests
 npm run lighthouse:ci # Build and test performance
 npm run analyze       # Analyze bundle size
@@ -98,7 +100,7 @@ author: "Sai Nimmagadda"
 The `scripts/export-notes/` directory contains a TypeScript CLI for exporting Apple Notes to MDX format:
 
 - **Purpose**: Export Apple Notes to `src/content/notes/`, categorized by Apple Notes folder name
-- **How it works**: Accesses Notes.app via JXA/osascript, converts HTML to Markdown via Turndown, extracts images (including HEIC→JPEG), generates deterministic frontmatter
+- **How it works**: Accesses Notes.app via JXA/osascript, converts HTML to Markdown via Turndown, compresses images to content-hashed WebP files, and generates deterministic frontmatter
 - **Categorization**: Each Apple Notes folder maps to an export category:
 
   | Apple Notes Folder     | Export Category   | Directory                  |
@@ -155,8 +157,8 @@ All UI components are built with shadcn/ui and can be customized in `src/compone
 The site is optimized for performance with:
 
 - **Lighthouse Scores**: >90 for all metrics
-- **Core Web Vitals**: Optimized LCP, FID, CLS
-- **Image Optimization**: gatsby-plugin-image with WebP
+- **Core Web Vitals**: Tracks LCP, INP, and CLS
+- **Image Optimization**: Content-hashed WebP output from the Apple Notes exporter
 - **Code Splitting**: Automatic route-based splitting
 - **Caching**: Optimized cache headers
 - **Bundle Analysis**: webpack-bundle-analyzer integration
@@ -189,12 +191,12 @@ npm run analyze      # Bundle analysis
 2. **Build Settings**:
    - Build command: `npm run build`
    - Publish directory: `public`
-   - Node version: `18`
+   - Node version: `22.4.1`
 
 3. **Environment Variables** (Optional):
 
    ```
-   GA_MEASUREMENT_ID=your-google-analytics-id
+   GATSBY_GA_MEASUREMENT_ID=your-google-analytics-id
    ```
 
 4. **Deploy**: Push to your main branch
@@ -280,7 +282,7 @@ npm run typecheck
 
 - **Framework**: Gatsby v5
 - **Language**: TypeScript
-- **Styling**: Tailwind CSS v3
+- **Styling**: Tailwind CSS v4
 - **UI Components**: shadcn/ui (Radix UI + Tailwind)
 - **Content**: MDX with remark/rehype plugins
 - **Icons**: Lucide React

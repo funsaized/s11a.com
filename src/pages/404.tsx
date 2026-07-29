@@ -1,5 +1,5 @@
 import React from "react";
-import type { PageProps } from "gatsby";
+import type { HeadFC, PageProps } from "gatsby";
 import { Link } from "gatsby";
 import { Layout } from "../components/layout/Layout";
 import { Button } from "../components/ui/button";
@@ -9,13 +9,11 @@ import {
   CardHeader,
   CardTitle,
 } from "../components/ui/card";
+import { SEO } from "../components/layout/SEO";
 
 const NotFoundPage: React.FC<PageProps> = () => {
   return (
-    <Layout
-      title="404 - Page Not Found"
-      description="The page you're looking for doesn't exist."
-    >
+    <Layout>
       <div className="container mx-auto px-4 py-16">
         <div className="max-w-2xl mx-auto text-center">
           <div className="mb-8">
@@ -112,3 +110,11 @@ const NotFoundPage: React.FC<PageProps> = () => {
 };
 
 export default NotFoundPage;
+
+export const Head: HeadFC = () => (
+  <SEO
+    title="404 - Page Not Found"
+    description="The requested page could not be found."
+    pathname="/404"
+  />
+);

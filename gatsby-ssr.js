@@ -8,9 +8,14 @@ exports.onRenderBody = ({ setPreBodyComponents }) => {
       dangerouslySetInnerHTML: {
         __html: `
           (function() {
-            const theme = localStorage.getItem('theme') || 'system';
+            let theme = 'system';
+            try {
+              theme = localStorage.getItem('theme') || 'system';
+            } catch (_) {}
             if (theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
               document.documentElement.classList.add('dark');
+            } else {
+              document.documentElement.classList.add('light');
             }
           })();
         `,

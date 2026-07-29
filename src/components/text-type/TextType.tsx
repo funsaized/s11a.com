@@ -99,19 +99,31 @@ const TextType = ({
 
   useEffect(() => {
     if (showCursor && cursorRef.current) {
+      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        setDisplayedText(textArray[0]);
+        return undefined;
+      }
       gsap.set(cursorRef.current, { opacity: 1 });
-      gsap.to(cursorRef.current, {
+      const animation = gsap.to(cursorRef.current, {
         opacity: 0,
         duration: cursorBlinkDuration,
         repeat: -1,
         yoyo: true,
         ease: "power2.inOut",
       });
+      return () => {
+        animation.kill();
+      };
     }
-  }, [showCursor, cursorBlinkDuration]);
+    return undefined;
+  }, [showCursor, cursorBlinkDuration, textArray]);
 
   useEffect(() => {
     if (!isVisible) return undefined;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      setDisplayedText(textArray[0]);
+      return undefined;
+    }
 
     let timeout: ReturnType<typeof setTimeout>;
 
@@ -141,13 +153,10 @@ const TextType = ({
           }, deletingSpeed);
         }
       } else if (currentCharIndex < processedText.length) {
-        timeout = setTimeout(
-          () => {
-            setDisplayedText((prev) => prev + processedText[currentCharIndex]);
-            setCurrentCharIndex((prev) => prev + 1);
-          },
-          getRandomSpeed(),
-        );
+        timeout = setTimeout(() => {
+          setDisplayedText((prev) => prev + processedText[currentCharIndex]);
+          setCurrentCharIndex((prev) => prev + 1);
+        }, getRandomSpeed());
       } else if (textArray.length > 1) {
         timeout = setTimeout(() => {
           setIsDeleting(true);

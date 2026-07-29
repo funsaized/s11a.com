@@ -15,11 +15,13 @@ const urls = [
 const config = {
   extends: "lighthouse:default",
   settings: {
-    formFactor: "desktop",
-    throttling: {
-      rttMs: 40,
-      throughputKbps: 10 * 1024,
-      cpuSlowdownMultiplier: 1,
+    formFactor: "mobile",
+    screenEmulation: {
+      mobile: true,
+      width: 390,
+      height: 844,
+      deviceScaleFactor: 3,
+      disabled: false,
     },
   },
 };
@@ -60,7 +62,8 @@ async function runLighthouse() {
           fcp: lhr.audits["first-contentful-paint"].displayValue,
           lcp: lhr.audits["largest-contentful-paint"].displayValue,
           cls: lhr.audits["cumulative-layout-shift"].displayValue,
-          fid: lhr.audits["max-potential-fid"]?.displayValue || "N/A",
+          inp: lhr.audits["interaction-to-next-paint"]?.displayValue || "N/A",
+          tbt: lhr.audits["total-blocking-time"]?.displayValue || "N/A",
           ttfb: lhr.audits["server-response-time"]?.displayValue || "N/A",
         },
       };
@@ -78,6 +81,10 @@ async function runLighthouse() {
 
   await chrome.kill();
 
+  if (results.length === 0) {
+    throw new Error("Lighthouse did not produce any results.");
+  }
+
   // Generate report
   const reportPath = path.join(__dirname, "lighthouse-report.json");
   fs.writeFileSync(reportPath, JSON.stringify(results, null, 2));
@@ -85,28 +92,27 @@ async function runLighthouse() {
   console.log("📊 Performance Summary:");
   console.log("=".repeat(50));
 
-  const avgScores = results.reduce(
+  const lowestScores = results.reduce(
     (acc, result) => {
-      acc.performance += result.scores.performance;
-      acc.accessibility += result.scores.accessibility;
-      acc.bestPractices += result.scores.bestPractices;
-      acc.seo += result.scores.seo;
+      acc.performance = Math.min(acc.performance, result.scores.performance);
+      acc.accessibility = Math.min(
+        acc.accessibility,
+        result.scores.accessibility,
+      );
+      acc.bestPractices = Math.min(
+        acc.bestPractices,
+        result.scores.bestPractices,
+      );
+      acc.seo = Math.min(acc.seo, result.scores.seo);
       return acc;
     },
-    { performance: 0, accessibility: 0, bestPractices: 0, seo: 0 },
+    { performance: 100, accessibility: 100, bestPractices: 100, seo: 100 },
   );
 
-  const numResults = results.length;
-  console.log(
-    `Average Performance: ${Math.round(avgScores.performance / numResults)}/100`,
-  );
-  console.log(
-    `Average Accessibility: ${Math.round(avgScores.accessibility / numResults)}/100`,
-  );
-  console.log(
-    `Average Best Practices: ${Math.round(avgScores.bestPractices / numResults)}/100`,
-  );
-  console.log(`Average SEO: ${Math.round(avgScores.seo / numResults)}/100`);
+  console.log(`Lowest Performance: ${lowestScores.performance}/100`);
+  console.log(`Lowest Accessibility: ${lowestScores.accessibility}/100`);
+  console.log(`Lowest Best Practices: ${lowestScores.bestPractices}/100`);
+  console.log(`Lowest SEO: ${lowestScores.seo}/100`);
 
   console.log(`\n📄 Detailed report saved to: ${reportPath}`);
 
@@ -117,16 +123,9 @@ async function runLighthouse() {
     bestPractices: 90,
     seo: 95,
   };
-  const avgFinalScores = {
-    performance: Math.round(avgScores.performance / numResults),
-    accessibility: Math.round(avgScores.accessibility / numResults),
-    bestPractices: Math.round(avgScores.bestPractices / numResults),
-    seo: Math.round(avgScores.seo / numResults),
-  };
-
   let allPassed = true;
   console.log("\n🎯 Threshold Check:");
-  for (const [category, score] of Object.entries(avgFinalScores)) {
+  for (const [category, score] of Object.entries(lowestScores)) {
     const threshold = minThresholds[category];
     const passed = score >= threshold;
     allPassed = allPassed && passed;

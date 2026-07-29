@@ -13,6 +13,7 @@ import {
   CardTitle,
 } from "../components/ui/card";
 import { Badge } from "../components/ui/badge";
+import { SEO } from "../components/layout/SEO";
 
 const NOTES_PER_PAGE = 9;
 
@@ -293,10 +294,7 @@ const NotesPage: React.FC<PageProps<NotesPageData>> = ({ data }) => {
   };
 
   return (
-    <Layout
-      title="Notes"
-      description="Personal notes, jottings, and quick thoughts on various topics."
-    >
+    <Layout>
       <div className="container mx-auto px-4 py-8">
         <div className="mx-auto max-w-6xl">
           {/* Page Header */}
@@ -454,11 +452,9 @@ export const query = graphql`
 `;
 
 export const Head: HeadFC = () => (
-  <>
-    <title>Personal Notes - Sai Nimmagadda</title>
-    <meta
-      name="description"
-      content="Personal notes, jottings, and quick thoughts on various topics."
-    />
-  </>
+  <SEO
+    title="Personal Notes"
+    description="Personal notes, jottings, and quick thoughts on various topics."
+    pathname="/notes"
+  />
 );

@@ -1,4 +1,5 @@
 import { writeFileSync, mkdirSync, statSync } from "fs";
+import { createHash } from "crypto";
 import sharp from "sharp";
 import type { ProcessedImage } from "./types";
 
@@ -15,44 +16,26 @@ function isHeic(buffer: Buffer): boolean {
   );
 }
 
-/**
- * Detect image format from buffer magic bytes, with MIME type fallback.
- */
-function detectFormat(
-  buffer: Buffer,
-  mimeFromUrl?: string,
-): "jpeg" | "png" | "webp" {
-  // JPEG: FF D8 FF
-  if (
-    buffer.length >= 3 &&
-    buffer[0] === 0xff &&
-    buffer[1] === 0xd8 &&
-    buffer[2] === 0xff
-  ) {
-    return "jpeg";
+export function isSafeRemoteImageUrl(value: string): boolean {
+  try {
+    const url = new URL(value);
+    if (url.protocol !== "https:") return false;
+    const hostname = url.hostname.toLowerCase();
+    if (hostname === "localhost" || hostname === "::1") return false;
+    if (
+      /^(127|10)\./.test(hostname) ||
+      /^192\.168\./.test(hostname) ||
+      /^169\.254\./.test(hostname)
+    ) {
+      return false;
+    }
+    const private172 = hostname.match(/^172\.(\d+)\./);
+    return (
+      !private172 || Number(private172[1]) < 16 || Number(private172[1]) > 31
+    );
+  } catch {
+    return false;
   }
-  // PNG: 89 50 4E 47
-  if (
-    buffer.length >= 4 &&
-    buffer[0] === 0x89 &&
-    buffer[1] === 0x50 &&
-    buffer[2] === 0x4e &&
-    buffer[3] === 0x47
-  ) {
-    return "png";
-  }
-  // WebP: RIFF....WEBP
-  if (
-    buffer.length >= 12 &&
-    buffer.toString("ascii", 0, 4) === "RIFF" &&
-    buffer.toString("ascii", 8, 12) === "WEBP"
-  ) {
-    return "webp";
-  }
-  // Fallback to MIME type hint
-  if (mimeFromUrl?.includes("png")) return "png";
-  if (mimeFromUrl?.includes("webp")) return "webp";
-  return "jpeg";
 }
 
 /**
@@ -98,7 +81,7 @@ export async function extractImages(
         mimeHint = header.split(";")[0]; // e.g. "image/png"
         const b64 = src.slice(commaIdx + 1);
         rawBuffer = Buffer.from(b64, "base64");
-      } else if (src.startsWith("http://") || src.startsWith("https://")) {
+      } else if (isSafeRemoteImageUrl(src)) {
         // Web URL — download with fetch
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 30000);
@@ -115,6 +98,10 @@ export async function extractImages(
             continue;
           }
           rawBuffer = Buffer.from(await resp.arrayBuffer());
+          if (rawBuffer.length > 50 * 1024 * 1024) {
+            console.warn(`Image too large (>50MB), skipping: ${src}`);
+            continue;
+          }
           mimeHint = resp.headers.get("content-type") || undefined;
         } finally {
           clearTimeout(timeoutId);
@@ -129,17 +116,20 @@ export async function extractImages(
 
       if (!rawBuffer || rawBuffer.length === 0) continue;
 
-      // Convert HEIC to JPEG via sharp
-      let finalBuffer = rawBuffer;
-      let format: "jpeg" | "png" | "webp" = detectFormat(rawBuffer, mimeHint);
+      // Normalize and compress exported images to a web-friendly format.
+      let finalBuffer: Buffer;
+      const format = "webp" as const;
 
-      if (isHeic(rawBuffer)) {
-        finalBuffer = await sharp(rawBuffer).jpeg({ quality: 85 }).toBuffer();
-        format = "jpeg";
-      }
-
-      const ext = format === "jpeg" ? "jpg" : format;
-      const filename = `${noteSlug}-${indexStr}.${ext}`;
+      finalBuffer = await sharp(rawBuffer)
+        .rotate()
+        .resize({ width: 1600, withoutEnlargement: true })
+        .webp({ quality: isHeic(rawBuffer) ? 82 : 80, effort: 4 })
+        .toBuffer();
+      const digest = createHash("sha256")
+        .update(finalBuffer)
+        .digest("hex")
+        .slice(0, 10);
+      const filename = `${noteSlug}-${indexStr}-${digest}.${format}`;
       images.push({ filename, data: finalBuffer, format });
 
       // Replace <img> tag with placeholder token (to avoid Turndown escaping markdown syntax)

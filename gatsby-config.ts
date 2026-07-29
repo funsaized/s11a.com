@@ -1,5 +1,23 @@
 import type { GatsbyConfig } from "gatsby";
 
+const analyticsId = process.env.GATSBY_GA_MEASUREMENT_ID;
+const analyzeBundle = process.env.GATSBY_ANALYZE === "true";
+
+interface FeedQueryResult {
+  site: { siteMetadata: { siteUrl: string } };
+  allMdx: {
+    nodes: Array<{
+      excerpt: string;
+      frontmatter: {
+        title: string;
+        slug: string;
+        date: string;
+        excerpt?: string;
+      };
+    }>;
+  };
+}
+
 const config: GatsbyConfig = {
   siteMetadata: {
     title: `Sai Nimmagadda`,
@@ -8,9 +26,6 @@ const config: GatsbyConfig = {
     author: `@FunSaized`,
   },
   plugins: [
-    `gatsby-plugin-image`,
-    `gatsby-plugin-sharp`,
-    `gatsby-transformer-sharp`,
     {
       resolve: `gatsby-source-filesystem`,
       options: {
@@ -19,24 +34,10 @@ const config: GatsbyConfig = {
       },
     },
     {
-      resolve: `gatsby-source-filesystem`,
-      options: {
-        name: `images`,
-        path: `${__dirname}/static/images/`,
-      },
-    },
-    {
       resolve: `gatsby-plugin-mdx`,
       options: {
         extensions: [`.md`, `.mdx`],
         gatsbyRemarkPlugins: [
-          {
-            resolve: `gatsby-remark-images`,
-            options: {
-              maxWidth: 1200,
-              quality: 90,
-            },
-          },
           {
             resolve: `gatsby-remark-prismjs`,
             options: {
@@ -47,6 +48,7 @@ const config: GatsbyConfig = {
                 js: "javascript",
                 ts: "typescript",
                 yml: "yaml",
+                k8s: "yaml",
               },
               showLineNumbers: true,
               noInlineHighlight: false,
@@ -78,41 +80,76 @@ const config: GatsbyConfig = {
     `gatsby-plugin-sitemap`,
     `gatsby-plugin-robots-txt`,
     {
-      resolve: `gatsby-plugin-manifest`,
+      resolve: `gatsby-plugin-feed`,
       options: {
-        name: `s11a.com - Sai Nimmagadda`,
-        short_name: `s11a`,
-        start_url: `/`,
-        background_color: `#ffffff`,
-        theme_color: `#000000`,
-        display: `minimal-ui`,
-        icon: `static/images/face.png`,
-        cache_busting_mode: "none",
-      },
-    },
-    {
-      resolve: `gatsby-plugin-webpack-bundle-analyser-v2`,
-      options: {
-        devMode: false,
-        analyzerMode: "static",
-        reportFilename: "bundle-analyzer-report.html",
-        openAnalyzer: false,
-      },
-    },
-    {
-      resolve: `gatsby-plugin-google-gtag`,
-      options: {
-        trackingIds: [
-          "GA_MEASUREMENT_ID", // Replace with actual Google Analytics 4 ID
+        feeds: [
+          {
+            output: "/rss.xml",
+            title: "Sai Nimmagadda",
+            query: `
+              {
+                allMdx(
+                  filter: {
+                    internal: {
+                      contentFilePath: { regex: "/content/articles/" }
+                    }
+                  }
+                  sort: { frontmatter: { date: DESC } }
+                ) {
+                  nodes {
+                    excerpt
+                    frontmatter {
+                      title
+                      slug
+                      date
+                      excerpt
+                    }
+                  }
+                }
+              }
+            `,
+            serialize: ({
+              query: { site, allMdx },
+            }: {
+              query: FeedQueryResult;
+            }) =>
+              allMdx.nodes.map((node) => ({
+                title: node.frontmatter.title,
+                description: node.frontmatter.excerpt || node.excerpt,
+                date: node.frontmatter.date,
+                url: `${site.siteMetadata.siteUrl}/articles/${node.frontmatter.slug}`,
+                guid: `${site.siteMetadata.siteUrl}/articles/${node.frontmatter.slug}`,
+              })),
+          },
         ],
-        pluginConfig: {
-          head: false,
-          respectDNT: true,
-          exclude: ["/admin/**", "/do-not-track/me/too/"],
-        },
       },
     },
-    `gatsby-plugin-offline`,
+    ...(analyzeBundle
+      ? [
+          {
+            resolve: `gatsby-plugin-webpack-bundle-analyser-v2`,
+            options: {
+              analyzerMode: "static",
+              reportFilename: "bundle-analyzer-report.html",
+              openAnalyzer: false,
+            },
+          },
+        ]
+      : []),
+    ...(analyticsId
+      ? [
+          {
+            resolve: `gatsby-plugin-google-gtag`,
+            options: {
+              trackingIds: [analyticsId],
+              pluginConfig: {
+                head: false,
+                respectDNT: true,
+              },
+            },
+          },
+        ]
+      : []),
   ],
 };
 

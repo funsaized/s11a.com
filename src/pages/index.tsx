@@ -6,6 +6,7 @@ import { Hero } from "../components/home/Hero";
 import { ArticleList } from "../components/home/ArticleList";
 import { NoteCards } from "../components/home/NoteCards";
 import { Projects } from "../components/home/Projects";
+import { SEO } from "../components/layout/SEO";
 
 interface ArticleNode {
   id: string;
@@ -28,14 +29,17 @@ interface ContentNode extends ArticleNode {
 }
 
 interface IndexPageData {
-  allMdx: {
+  articles: {
+    nodes: ContentNode[];
+  };
+  notes: {
     nodes: ContentNode[];
   };
 }
 
 const IndexPage: React.FC<PageProps<IndexPageData>> = ({ data }) => {
   // Transform the GraphQL data to match the Article interface
-  const articles = data.allMdx.nodes.map((node) => {
+  const content = [...data.articles.nodes, ...data.notes.nodes].map((node) => {
     // Extract content type from file path
     const contentType = node.internal.contentFilePath.includes("/articles/")
       ? "article"
@@ -57,10 +61,7 @@ const IndexPage: React.FC<PageProps<IndexPageData>> = ({ data }) => {
   });
 
   return (
-    <Layout
-      title="Full-Stack Engineer • Healthcare Tech"
-      description="Full-stack engineer focused on healthcare, developer experience, and scalable systems. Building technology that improves patient outcomes."
-    >
+    <Layout>
       <Hero />
 
       {/* Articles Section */}
@@ -71,7 +72,7 @@ const IndexPage: React.FC<PageProps<IndexPageData>> = ({ data }) => {
               <ArticleList
                 title="Blog"
                 subtitle="Guides, references, and tutorials."
-                articles={articles.filter(
+                articles={content.filter(
                   (article) => article.contentType === "article",
                 )}
                 viewAllLink="/articles"
@@ -79,7 +80,7 @@ const IndexPage: React.FC<PageProps<IndexPageData>> = ({ data }) => {
               />
               <div className="lg:pl-8">
                 <NoteCards
-                  notes={articles.filter(
+                  notes={content.filter(
                     (article) => article.contentType === "note",
                   )}
                 />
@@ -96,14 +97,34 @@ const IndexPage: React.FC<PageProps<IndexPageData>> = ({ data }) => {
 
 export default IndexPage;
 
-// TODO: limit this eventually...
 export const query = graphql`
   query {
-    allMdx(
-      filter: {
-        internal: { contentFilePath: { regex: "/content/(articles|notes)/" } }
-      }
+    articles: allMdx(
+      filter: { internal: { contentFilePath: { regex: "/content/articles/" } } }
       sort: { frontmatter: { date: DESC } }
+      limit: 10
+    ) {
+      nodes {
+        id
+        internal {
+          contentFilePath
+        }
+        frontmatter {
+          title
+          slug
+          excerpt
+          date
+          category
+          tags
+          readingTime
+          featured
+        }
+      }
+    }
+    notes: allMdx(
+      filter: { internal: { contentFilePath: { regex: "/content/notes/" } } }
+      sort: { frontmatter: { date: DESC } }
+      limit: 4
     ) {
       nodes {
         id
@@ -126,30 +147,9 @@ export const query = graphql`
 `;
 
 export const Head: HeadFC = () => (
-  <>
-    <title>Sai Nimmagadda - Full-Stack Engineer • Healthcare Tech</title>
-    <meta
-      name="description"
-      content="Full-stack engineer focused on healthcare, developer experience, and scalable systems. Building technology that improves patient outcomes."
-    />
-    <meta property="og:type" content="website" />
-    <meta
-      property="og:title"
-      content="Sai Nimmagadda - Full-Stack Engineer • Healthcare Tech"
-    />
-    <meta
-      property="og:description"
-      content="Full-stack engineer focused on healthcare, developer experience, and scalable systems. Building technology that improves patient outcomes."
-    />
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:creator" content="@FunSaized" />
-    <meta
-      name="twitter:title"
-      content="Sai Nimmagadda - Full-Stack Engineer • Healthcare Tech"
-    />
-    <meta
-      name="twitter:description"
-      content="Full-stack engineer focused on healthcare, developer experience, and scalable systems. Building technology that improves patient outcomes."
-    />
-  </>
+  <SEO
+    title="Full-Stack Engineer • Healthcare Tech"
+    description="Full-stack engineer focused on healthcare, developer experience, and scalable systems. Building technology that improves patient outcomes."
+    pathname="/"
+  />
 );

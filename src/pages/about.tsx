@@ -1,5 +1,5 @@
 import React from "react";
-import type { PageProps } from "gatsby";
+import type { HeadFC, PageProps } from "gatsby";
 import { Layout } from "../components/layout/Layout";
 import {
   Card,
@@ -9,6 +9,7 @@ import {
 } from "../components/ui/card";
 import { Badge } from "../components/ui/badge";
 import { Button } from "../components/ui/button";
+import { SEO } from "../components/layout/SEO";
 
 const AboutPage: React.FC<PageProps> = () => {
   const skills = [
@@ -148,10 +149,7 @@ const AboutPage: React.FC<PageProps> = () => {
   ];
 
   return (
-    <Layout
-      title="About"
-      description="Learn more about Sai Nimmagadda, a full-stack and platform engineer focused on scalable web systems, healthcare technology, and AI-enabled products."
-    >
+    <Layout>
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto">
           {/* Header Section */}
@@ -577,3 +575,11 @@ const AboutPage: React.FC<PageProps> = () => {
 };
 
 export default AboutPage;
+
+export const Head: HeadFC = () => (
+  <SEO
+    title="About"
+    description="Learn more about Sai Nimmagadda, a full-stack and platform engineer focused on scalable web systems, healthcare technology, and AI-enabled products."
+    pathname="/about"
+  />
+);

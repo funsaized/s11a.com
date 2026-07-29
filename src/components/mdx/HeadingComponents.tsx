@@ -12,7 +12,7 @@ function createSlug(text: string): string {
 }
 
 interface HeadingProps {
-  children: React.ReactNode;
+  children?: React.ReactNode;
   id?: string;
 }
 

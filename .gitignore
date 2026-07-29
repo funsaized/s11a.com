@@ -59,6 +59,8 @@ public/
 
 # Bundle stats
 bundle-stats.json
+bundle-analyzer-report.html
+scripts/performance/lighthouse-report.json
 
 # Misc
 .DS_Store
