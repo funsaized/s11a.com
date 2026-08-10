@@ -47,6 +47,16 @@ const projects: Project[] = [
     status: "active",
   },
   {
+    icon: "🧑‍🍳",
+    title: "herdr-mise",
+    path: "https://github.com/funsaized/herdr-mise",
+    source: "https://github.com/funsaized/herdr-mise",
+    description: "A visualizer that renders AI coding agents as pixel-art line cooks. Run the pass, not the prompts!",
+    status: "active",
+    stars: 1,
+    forks: 0,
+  },
+  {
     icon: "🐍",
     title: "PowerSnek",
     path: "https://powersnek.s11a.com",
