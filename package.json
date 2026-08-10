@@ -63,7 +63,7 @@
     "gatsby-plugin-webpack-bundle-analyser-v2": "^1.1.32",
     "globals": "^17.8.0",
     "lighthouse": "^13.0.1",
-    "postcss": "^8.5.23",
+    "postcss": "^8.5.26",
     "prettier": "^3.9.6",
     "start-server-and-test": "^2.1.2",
     "tailwindcss": "^4.3.0",
