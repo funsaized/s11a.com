@@ -8,6 +8,292 @@
 >
 > A private operational document is retained outside this repository for fact-checking. Never link to or publish it from the finished article.
 
+# Implementation hardening gate
+
+> Author-only working section. Remove it from the finished article, but do not
+> remove it from the outline until the required work is implemented and the
+> evidence exists. The article should read like an engineering record, not a
+> stack tour. Do not describe the system as hardened, least-privilege,
+> recoverable, or unattended until the corresponding gate below passes.
+
+## Publication bar
+
+- **P0 is mandatory before publication.** Every item needs implementation
+  evidence and a negative test, not just a configuration screenshot.
+- **P1 is mandatory before calling the system operationally mature.** If an item
+  remains open, name the limitation plainly in the article.
+- **P2 is defense-in-depth.** These items can remain future work if the threat
+  model and current boundary make the tradeoff explicit.
+- Preserve the distinction between **implemented**, **verified**, **planned**,
+  and **accepted risk**. Never convert a TODO into past tense because the prose
+  sounds better that way.
+
+## P0: close before publishing
+
+### 1. Write and enforce the access matrix
+
+- [ ] Define the trust zones: approved client, Mac mini, native Windows, WSL
+  Ubuntu, container network, physical LAN, tailnet, and public internet.
+- [ ] Write the exact allowed flows by source identity, destination identity,
+  protocol, and port. Everything not listed is denied.
+- [ ] Put the Tailscale grants or ACL policy under private version control and
+  validate it before deployment.
+- [ ] Test every intended flow from an approved device and test the same port
+  from a non-approved tailnet identity or temporary test tag.
+
+**Done evidence:** a sanitized access matrix, policy-validation output, positive
+connection results, and denied negative probes for SSH, Mosh, HTTPS, and any
+AI-service ingress.
+
+### 2. Make remote login key-only and least-privilege
+
+- [ ] Use separate, passphrase-protected Ed25519 keys per client device. Do not
+  reuse one private key across the laptop and phones.
+- [ ] Disable password and keyboard-interactive SSH after proving key access on
+  the Mac mini, native Windows, and WSL Ubuntu.
+- [ ] Restrict SSH to explicit users and Tailscale source ranges or interfaces.
+- [ ] Replace routine Windows remote work under an Administrator account with a
+  dedicated non-admin account. Elevate only for explicit maintenance.
+- [ ] Review whether the macOS remote-editing account needs Full Disk Access to
+  all of `Documents`; narrow it to a dedicated project root if possible.
+- [ ] Document key enrollment, revocation, lost-device response, and a local
+  console recovery path before disabling fallback authentication.
+
+**Done evidence:** key login succeeds, password login fails, an unauthorized
+user fails, LAN-side SSH fails, a revoked test key fails, and administrative
+actions still require explicit elevation.
+
+### 3. Enforce host firewalls, not just application binding
+
+- [ ] Enable the macOS application firewall. Use `pf` for source-range and
+  interface restrictions that the application firewall cannot express.
+- [ ] Replace broad Windows inbound posture with explicit rules for the
+  Tailscale interface and intended SSH sources.
+- [ ] Enable and verify Ubuntu `nftables` or UFW rules for WSL SSH and the
+  selected Mosh UDP range on `tailscale0` only. Mirrored networking makes
+  negative testing mandatory; do not assume the interface rule works.
+- [ ] Keep application and container listeners on loopback unless a reviewed
+  ingress design requires otherwise.
+
+**Done evidence:** listener inventory plus LAN, tailnet, and localhost probes
+after a cold reboot. Required paths work; every unintended interface refuses or
+times out.
+
+### 4. Harden tailnet identity and policy
+
+- [ ] Require MFA on the identity provider and enable device approval.
+- [ ] Replace the implicit all-device/all-port posture with explicit grants for
+  the Mac mini, native Windows, WSL Ubuntu, and client devices.
+- [ ] Decide which unattended nodes may have key expiry disabled, document the
+  exception, and keep expiry enabled everywhere else.
+- [ ] Verify device-removal and credential-revocation procedures with a test
+  node.
+
+**Done evidence:** exported sanitized policy, approved-device inventory,
+documented expiry exceptions, and proof that a removed test node loses access.
+
+### 5. Choose one supported access path for AI services
+
+- [ ] Keep raw Ollama, Grafana, Prometheus, Dozzle, and exporter ports on
+  `127.0.0.1`.
+- [ ] Either document SSH tunneling as the supported path or build an
+  authenticated HTTPS ingress bound only to Tailscale. Do not support both by
+  accident.
+- [ ] If Open WebUI is exposed, enable its authentication before changing the
+  bind address.
+- [ ] Remove anonymous Grafana administration and require a real administrator
+  identity before any remote exposure.
+- [ ] Put Ollama behind an authenticated proxy with explicit origins. Never
+  expose the raw unauthenticated API directly to the LAN or tailnet.
+- [ ] Apply Tailscale policy to the user-facing ingress, not only to SSH.
+
+**Done evidence:** one documented URL or tunnel command works from an approved
+client; direct raw-service connections, unauthorized tailnet access, and LAN
+access all fail.
+
+### 6. Encrypt and prove recovery from backup
+
+- [ ] Verify FileVault on the Mac mini and BitLocker or Windows Device
+  Encryption on the gaming PC. Escrow recovery keys outside the encrypted
+  devices.
+- [ ] Create encrypted, versioned, off-host backups for Caddy configuration and
+  state, the tailnet policy, Compose files, Open WebUI data, Grafana dashboards,
+  critical container volumes, SSH configuration, and the WSL distro export.
+- [ ] Classify Ollama models and Prometheus history as backed up or reproducible.
+  Do not waste backup capacity without making the choice explicit.
+- [ ] Define recovery point and recovery time targets for the Mac mini and GPU
+  workhorse.
+- [ ] Restore onto a temporary location or clean test environment and exercise
+  the recovered configuration.
+
+**Done evidence:** backup inventory, encrypted off-host copy, freshness check,
+restore transcript, restored checksums, and a measured recovery time.
+
+### 7. Prove unattended lifecycle and cold-start recovery
+
+- [ ] Verify Tailscale, Caddy, SSH, Herdr, WSL systemd services, Docker Desktop,
+  and the Compose stack recover after host reboot and network loss.
+- [ ] Determine whether Docker Desktop requires interactive Windows login. If
+  it does, either automate a safe supported startup path or classify the GPU
+  workhorse as on-demand rather than always-on infrastructure.
+- [ ] Set explicit Windows sleep, restart, and update behavior so the gaming PC
+  does not silently disappear during expected compute windows.
+- [ ] Verify the system after a real cold boot, not only a process restart.
+
+**Done evidence:** timestamped boot-to-ready timeline, no manual repair steps,
+all expected health checks passing, and the first successful GPU inference.
+
+### 8. Make DNS and remote commands deterministic
+
+- [ ] Replace the pinned public-only WSL resolver with a tested
+  `systemd-resolved` split-DNS route for the tailnet suffix.
+- [ ] Define SSH client aliases with explicit users, ports, identity files,
+  keepalives, and host-key checking for the mini, Windows, and WSL targets.
+- [ ] Standardize the supported Herdr and Mosh commands so reconnecting does not
+  require remembering topology quirks.
+- [ ] Verify forward and reverse MagicDNS behavior after WSL and Windows reboot.
+- [ ] Add a consistency check that compares the mini's current Tailscale address,
+  the public DNS answer, and every Caddy `bind` value. Alert on any mismatch.
+
+**Done evidence:** a sanitized SSH configuration, repeatable one-command access
+to all three environments, DNS tests from Windows, WSL, and macOS, and a forced
+mismatch that causes the consistency check to fail.
+
+### 9. Put the system configuration under reproducible control
+
+- [ ] Store sanitized templates and private deployment configuration in the
+  appropriate repositories. Keep secrets external.
+- [ ] Pin every container image by version and digest, not only Ollama.
+- [ ] Make the custom Caddy build reproducible from a checked-in manifest and
+  verify the installed binary checksum and required modules.
+- [ ] Add deterministic validation for Compose rendering, Caddy configuration,
+  tailnet policy, firewall rules, and required environment variables.
+- [ ] Document rollback for Caddy, container images, Tailscale policy, firewall
+  policy, and WSL configuration.
+
+**Done evidence:** a clean-machine or isolated-environment rebuild reaches the
+same listener map and passes the acceptance suite without copying undocumented
+state.
+
+### 10. Build one end-to-end acceptance command
+
+- [ ] Automate DNS, certificate, HTTPS body, listener, SSH, Mosh, Herdr,
+  container-health, GPU-inference, firewall, and negative-access checks.
+- [ ] Run it from an approved client and include tests from the LAN and an
+  unauthorized tailnet identity.
+- [ ] Redact hostnames, addresses, usernames, tokens, and model prompts from the
+  publication artifact.
+- [ ] Run the final suite after every hardening change and once more after a
+  cold reboot.
+
+**Done evidence:** a versioned script exits nonzero on any failed boundary, plus
+a sanitized final report showing all positive and negative gates passing.
+
+### 11. Reconcile the documents with the verified state
+
+- [ ] Add a dated snapshot and explicit status language for each material
+  security and reliability claim: live, verified, planned, or accepted risk.
+- [ ] Update the private document with the deployed configuration and sanitized
+  evidence references immediately after each hardening change.
+- [ ] Update the public document only from verified facts. Do not copy private
+  hostnames, addresses, paths, account names, or active weakness details.
+- [ ] Run an independent final review against the exact post-hardening
+  configuration and resolve every blocking finding before drafting the article.
+
+**Done evidence:** public and private claims agree on architecture and status,
+the public privacy scan is clean, and an independent reviewer returns a
+publication-ready verdict with no blocking findings.
+
+## P1: operational maturity
+
+### Monitoring, alerts, and capacity
+
+- [ ] Add alerting for host/container downtime, repeated restarts, backup age,
+  certificate expiry, disk pressure, WSL virtual-disk growth, GPU temperature,
+  VRAM saturation, and failed black-box probes.
+- [ ] Send alerts through a channel that still works when the monitored host is
+  down. A dashboard alone is not alerting.
+- [ ] Set explicit Prometheus retention, Docker log rotation, and model-pruning
+  policies.
+- [ ] Define warning and critical thresholds, including a minimum free-space
+  floor before model pulls.
+- [ ] Publish a usable operator dashboard with, at minimum, service health,
+  request latency, GPU utilization and temperature, VRAM, WSL memory, disk free
+  space, container restart count, certificate lifetime, and backup age.
+
+### Patch, supply-chain, and rollback discipline
+
+- [ ] Define a maintenance cadence for macOS, Windows, Ubuntu, WSL, Tailscale,
+  Docker Desktop, NVIDIA drivers, Caddy, Herdr, Hermes, and container images.
+- [ ] Scan container images and the custom Caddy artifact for known
+  vulnerabilities before promotion.
+- [ ] Record checksums or an SBOM for custom and pinned artifacts.
+- [ ] Use a staged update procedure with a real rollback test, not automatic
+  latest-version deployment.
+
+### Secrets and service privilege
+
+- [ ] Use the narrowest DNS credential the provider supports and document the
+  blast radius if only an account-wide token is available.
+- [ ] Define secret rotation and emergency revocation procedures.
+- [ ] Evaluate running Caddy under a dedicated service identity instead of root.
+  If root remains necessary, document the accepted risk and harden ownership,
+  mutability, and the LaunchDaemon boundary.
+- [ ] Run containers as non-root where supported and drop unnecessary Linux
+  capabilities.
+
+### Failure model and service objectives
+
+- [ ] State plainly that the mini, gaming PC, and single NVMe are individual
+  failure domains. This is robust personal infrastructure, not high
+  availability.
+- [ ] Define availability expectations, recovery targets, and which services
+  are allowed to be on-demand.
+- [ ] Write short runbooks for expired certificates, lost tailnet access,
+  corrupt WSL disks, failed GPU passthrough, full storage, and bad upgrades.
+
+### Operator onboarding and change runbooks
+
+- [ ] Write a zero-to-ready runbook for admitting a new trusted device without
+  reusing keys or widening policy.
+- [ ] Write runbooks for exposing a new application, rotating SSH and DNS
+  credentials, rebuilding and rolling back Caddy, updating container images,
+  and restoring WSL and critical volumes.
+- [ ] Give each runbook prerequisites, exact validation commands, rollback, and
+  a clear completion signal.
+- [ ] Dry-run the runbooks from a clean client or temporary environment and fix
+  every step that depends on undocumented operator memory.
+
+## P2: defense-in-depth and future scaling
+
+- [ ] Enable Tailnet Lock after validating the signing-key recovery procedure.
+- [ ] Consider hardware-backed SSH keys or an SSH certificate authority if the
+  device count grows.
+- [ ] Add a UPS and tested graceful shutdown for the always-on mini and network
+  gear.
+- [ ] Add a second SSD or move model and telemetry data off the Windows system
+  disk before capacity becomes operational risk.
+- [ ] Segment untrusted home/IoT devices from development hosts at the LAN or
+  VLAN layer.
+- [ ] Revisit Docker Desktop as the service host if interactive startup,
+  upgrades, or desktop coupling prevent the documented recovery target. Native
+  Linux is the fallback, not a premature requirement.
+
+## Evidence bundle required before writing the final article
+
+- [ ] Sanitized architecture and trust-boundary diagram.
+- [ ] Sanitized access matrix and deployed tailnet policy.
+- [ ] Listener inventories from macOS, Windows, WSL, and Docker.
+- [ ] Positive and negative network-test report.
+- [ ] Key-only SSH and key-revocation evidence.
+- [ ] Cold-boot and network-interruption recovery timeline.
+- [ ] Backup freshness plus restore-drill report.
+- [ ] GPU inference proof and resource snapshot.
+- [ ] Monitoring and alert-delivery proof.
+- [ ] Reproducible build/configuration validation output.
+- [ ] Final acceptance-suite report against the exact configuration described in
+  the article.
+
 ## Working title options
 
 1. **I Turned a Mac mini Into My Private Development Cloud**
