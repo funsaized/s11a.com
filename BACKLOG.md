@@ -118,14 +118,14 @@ Goal: build throwaway muscle memory before touching the real repo. Resist the ur
 **Story:** As a learner, I want a disposable TanStack Start app outside this repo, so that I can break things without polluting the migration branch.
 
 **Tasks:**
-- [ ] `npx @tanstack/cli@latest create` into `~/scratch/start-spike` — select Tailwind + ESLint add-ons
-- [ ] Run `vite dev`; note cold-start time vs `gatsby develop`
-- [ ] Add a route by creating a file. Watch `routeTree.gen.ts` regenerate. **Add it to `.gitignore` mentally — it is generated, never hand-edited.**
-- [ ] Add a nested route and a dynamic route (`$param`) and read the param
-- [ ] Open TanStack Router Devtools; inspect the matched route tree
+- [x] `npx @tanstack/cli@latest create` into `~/scratch/start-spike` — select Tailwind + ESLint add-ons
+- [x] Run `vite dev`; note cold-start time vs `gatsby develop`
+- [x] Add a route by creating a file. Watch `routeTree.gen.ts` regenerate. **Add it to `.gitignore` mentally — it is generated, never hand-edited.**
+- [x] Add a nested route and a dynamic route (`$param`) and read the param
+- [x] Open TanStack Router Devtools; inspect the matched route tree
 
 **Acceptance:**
-- [ ] Can add a static route, a nested route, and a dynamic route from memory without docs
+- [x] Can add a static route, a nested route, and a dynamic route from memory without docs
 
 **Checkpoint questions:**
 1. What generates `routeTree.gen.ts`, and what happens if you edit it by hand?
