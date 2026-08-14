@@ -60,7 +60,7 @@ Listed so they don't creep in:
 - Redesign. The visual output should be indistinguishable at cutover. Design changes are a separate branch.
 - CMS, comments, auth, i18n, search-over-full-post-bodies.
 - Migrating the 20 `.mdx` files' prose. They move byte-for-byte except for the two fence fixes in **S3.5**.
-- Test framework. There isn't one today; adding one is not what this project is teaching. Quality gate is typecheck + lint + Lighthouse.
+- Test framework. There isn't one today; adding one is not what this project is teaching. Quality gate is typecheck + lint + a one-off accessibility/SEO smoke check.
 
 ---
 
@@ -70,7 +70,7 @@ Listed so they don't creep in:
 - [ ] `/`, `/articles`, `/about`, 404 all render
 - [ ] `npm run build` produces static HTML for every route in `.output/public`
 - [ ] `npm run typecheck` and `npm run lint` clean
-- [ ] Lighthouse ≥ current baseline on Performance, and 100 on SEO / Best Practices / Accessibility
+- [ ] No Lighthouse SEO or Accessibility failures (Performance not tracked)
 - [ ] `rss.xml`, `sitemap.xml`, `robots.txt` byte-comparable to current output
 - [ ] `gatsby*` fully removed from `package.json`; `overrides` block empty or gone
 - [ ] Netlify deploy preview green
@@ -844,21 +844,20 @@ Goal: prove the dynamic escape hatch works *before* cutover, so it isn't a leap 
 
 ---
 
-#### S10.3 — Performance gate
-**Story:** As a reader, I want the site at least as fast as it is today.
+#### S10.3 — Smoke check
+**Story:** As a reader, I want no broken metadata or accessibility regressions.
 
 **Depends on:** S10.2
 
 **Tasks:**
-- [ ] Capture a Lighthouse baseline from the **current production** site first (do this before cutover — you can't get it after)
-- [ ] Port `scripts/performance/lighthouse-test.js` to serve from `.output/public`
-- [ ] Run against the new build; compare
-- [ ] Check the JS payload delta — this is a hydrating framework, expect more JS than Gatsby's per-page split; verify it's within tolerance
-- [ ] Investigate anything that regressed >5 points
+- [ ] `npx lighthouse <preview-url> --view` on one article and the articles index
+- [ ] Fix anything flagged under SEO or Accessibility — those catch real bugs (missing meta, bad heading order, unlabelled controls)
+- [ ] Ignore the Performance score
 
 **Acceptance:**
-- [ ] SEO / Best Practices / Accessibility at 100
-- [ ] Performance ≥ baseline, or a written justification for the gap
+- [ ] No SEO or Accessibility failures
+
+> Not tracking performance. It's a hydrating framework on a 20-post blog served from a CDN — the score will be fine and chasing it isn't what this project is for.
 
 ---
 
@@ -879,6 +878,7 @@ The satisfying epic. Do not start it until E10 is green.
 - [ ] Remove `gatsby` + all 8 `gatsby-*` packages, `prismjs`, `@mdx-js/react` (if S3.4 dropped `MDXProvider`)
 - [ ] **Empty the `overrides` block** — re-audit with `npm audit` and only re-add what's still genuinely needed. This block existing solely to patch Gatsby's transitive deps is the most satisfying deletion in the project.
 - [ ] Delete `src/pages/`, `src/templates/`
+- [ ] Delete the Lighthouse harness — `scripts/performance/lighthouse-test.js`, the `lighthouse` / `chrome-launcher` / `start-server-and-test` devDeps, and the `lighthouse`, `lighthouse:ci`, `perf` scripts. Nothing tracks performance now (S10.3); an unused harness is just three more things to keep patched.
 - [ ] Delete the tracked `public/` build output; confirm `.gitignore` covers `.output/` and `public/`
 - [ ] Rename `dev:next`/`build:next` → `dev`/`build`
 - [ ] Delete `src/data/sampleData.ts` if only `categoryIcons` was live — move that constant somewhere honest
@@ -913,7 +913,6 @@ The satisfying epic. Do not start it until E10 is green.
 **Depends on:** S11.2
 
 **Tasks:**
-- [ ] Final Lighthouse run
 - [ ] Verify all 20 article URLs against the production sitemap — **any 404 here is a broken inbound link and lost SEO**
 - [ ] Confirm `rss.xml` GUIDs unchanged (S7.1)
 - [ ] Merge to `master`, watch the production deploy
@@ -949,13 +948,13 @@ The vertical slice de-risks the two things most likely to be dealbreakers (MDX p
 | Netlify cache headers stop matching new asset paths | High | Low | Called out in S10.2. Silent failure mode — check it, don't assume. |
 | URL shape changes (trailing slashes) break inbound links | Low | High | `autoSubfolderIndex` in S10.1; full URL verification in S11.3. |
 | E9 scope creep | High | Medium | Hard-capped at 2 sessions. Nothing depends on it. |
-| Lighthouse performance regression vs. Gatsby | Medium | Low | Expected — hydrating framework. Capture the baseline *before* cutover (S10.3) or you lose the comparison. |
+| Lighthouse performance regression vs. Gatsby | Medium | Low | Accepted, not tracked. Hydrating framework on a CDN-served 20-post blog. |
 
 ---
 
 ## 8. Dependency delta
 
-**Removing:** `gatsby`, `gatsby-plugin-feed`, `gatsby-plugin-google-gtag`, `gatsby-plugin-mdx`, `gatsby-plugin-robots-txt`, `gatsby-plugin-sitemap`, `gatsby-remark-prismjs`, `gatsby-source-filesystem`, `gatsby-plugin-webpack-bundle-analyser-v2`, `prismjs`, `@mdx-js/react`, `postcss`, `@tailwindcss/postcss`, and the entire `overrides` block.
+**Removing:** `gatsby`, `gatsby-plugin-feed`, `gatsby-plugin-google-gtag`, `gatsby-plugin-mdx`, `gatsby-plugin-robots-txt`, `gatsby-plugin-sitemap`, `gatsby-remark-prismjs`, `gatsby-source-filesystem`, `gatsby-plugin-webpack-bundle-analyser-v2`, `prismjs`, `@mdx-js/react`, `postcss`, `@tailwindcss/postcss`, `lighthouse`, `chrome-launcher`, `start-server-and-test`, and the entire `overrides` block.
 
 **Adding:** `@tanstack/react-router`, `@tanstack/react-start`, `vite`, `@vitejs/plugin-react`, `nitro`, `@tailwindcss/vite`, `@mdx-js/rollup`, `remark-frontmatter`, `remark-mdx-frontmatter`, `remark-gfm`, `rehype-pretty-code`, `rehype-slug`, `zod`. Plus `@tanstack/react-query` **only if S9.2 ships**.
 
