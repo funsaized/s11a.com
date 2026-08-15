@@ -8,6 +8,10 @@ import tailwindcss from '@tailwindcss/vite'
 import netlify from '@netlify/vite-plugin-tanstack-start'
 
 const config = defineConfig({
+  // DEV only tailscail + caddy
+  server: {
+    allowedHosts: ['blog-new.dev.s11a.com'],
+  },
   resolve: { tsconfigPaths: true },
   plugins: [devtools(), netlify(), tailwindcss(), tanstackStart(), viteReact()],
 })
