@@ -140,14 +140,14 @@ Goal: build throwaway muscle memory before touching the real repo. Resist the ur
 **Story:** As a learner, I want to import an `.mdx` file as a React component in the spike app, so that I understand the pipeline I'm about to own.
 
 **Tasks:**
-- [ ] `npm i @mdx-js/rollup remark-frontmatter remark-mdx-frontmatter`
-- [ ] Add `mdx()` to `vite.config.ts` plugins — **note it must come before `viteReact()`**
-- [ ] Drop one `.mdx` file with frontmatter into the spike; `import Post, { frontmatter } from './post.mdx'`
-- [ ] Render it. Log `frontmatter`.
-- [ ] Now do it with `import.meta.glob('./content/*.mdx', { eager: true })` and log the resulting object shape
+- [x] `npm i @mdx-js/rollup remark-frontmatter remark-mdx-frontmatter`
+- [x] Add `mdx()` to `vite.config.ts` plugins — **note it must come before `viteReact()`**
+- [x] Drop one `.mdx` file with frontmatter into the spike; `import Post, { frontmatter } from './post.mdx'`
+- [x] Render it. Log `frontmatter`.
+- [x] Now do it with `import.meta.glob('./content/*.mdx', { eager: true })` and log the resulting object shape
 
 **Acceptance:**
-- [ ] Can explain what `import.meta.glob` returns and why `eager: true` matters for prerendering
+- [x] Can explain what `import.meta.glob` returns and why `eager: true` matters for prerendering
 
 **Checkpoint questions:**
 1. Compare the `import.meta.glob` object to the `allMdx` GraphQL query in the current `src/pages/articles.tsx`. What did the GraphQL layer buy that the glob doesn't? (Honest answer: sorting and filtering syntax — which is 3 lines of JS.)

@@ -6,6 +6,9 @@ import { tanstackStart } from '@tanstack/react-start/plugin/vite'
 import viteReact from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import netlify from '@netlify/vite-plugin-tanstack-start'
+import mdx from '@mdx-js/rollup'
+import remarkFrontmatter from 'remark-frontmatter'
+import remarkMdxFrontmatter from 'remark-mdx-frontmatter'
 
 const config = defineConfig({
   // DEV only tailscail + caddy
@@ -13,7 +16,14 @@ const config = defineConfig({
     allowedHosts: ['blog-new.dev.s11a.com'],
   },
   resolve: { tsconfigPaths: true },
-  plugins: [devtools(), netlify(), tailwindcss(), tanstackStart(), viteReact()],
+  plugins: [
+    devtools(),
+    netlify(),
+    tailwindcss(),
+    tanstackStart(),
+    mdx({ remarkPlugins: [remarkFrontmatter, remarkMdxFrontmatter] }),
+    viteReact(),
+  ],
 })
 
 export default config

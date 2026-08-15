@@ -1,4 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
+import { MdxDemo } from '../content/MdxDemo'
 
 export const Route = createFileRoute('/')({ component: App })
 
@@ -82,6 +83,8 @@ function App() {
           </li>
         </ul>
       </section>
+
+      <MdxDemo />
     </main>
   )
 }
