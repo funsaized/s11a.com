@@ -234,16 +234,16 @@ Goal: a running TanStack Start app inside this repo, coexisting with Gatsby unti
 **Depends on:** S1.1
 
 **Tasks:**
-- [ ] Update `tsconfig.json`: `"moduleResolution": "bundler"`, `"module": "esnext"`, `"jsx": "react-jsx"`, `"target": "es2022"`
-- [ ] Confirm `paths: { "@/*": ["./src/*"] }` still present
-- [ ] Set `resolve.tsconfigPaths: true` in vite config (already in S1.1 — verify it works)
-- [ ] `npm run typecheck` passes on the new files
+- [x] Update `tsconfig.json`: `"moduleResolution": "bundler"`, `"module": "esnext"`, `"jsx": "react-jsx"`, `"target": "es2022"`
+- [x] Confirm `paths: { "@/*": ["./src/*"] }` still present
+- [x] Set `resolve.tsconfigPaths: true` in vite config (already in S1.1 — verify it works)
+- [x] `npm run typecheck` passes on the new files
 
 **Acceptance:**
-- [ ] `import { cn } from "@/utils/cn"` resolves in a route file with no vite alias config
+- [x] `import { cn } from "@/utils/cn"` resolves in a route file with no vite alias config
 
 **Checkpoint question:** The old `gatsby-node.js` duplicated these aliases into a webpack config by hand. Why is that no longer necessary?
-
+- B/C vite
 ---
 
 #### S1.3 — Root route: layout, head, error boundaries
