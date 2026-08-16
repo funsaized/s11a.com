@@ -1,8 +1,84 @@
 # TanStack Start Migration — Learning Backlog
 
 > **Branch:** `feat/tanstack-start-migration`
-> **Status:** Not started
+> **Status:** In progress — E0 and the initial fresh-project scaffold are complete
 > **Owner:** Sai (implementation) — this is a hands-on learning exercise, not a hand-off.
+
+### Workspace contract (read before every story)
+
+This is a **side-by-side rebuild**, not an in-place migration. The repository has two
+separate applications:
+
+| Name used below | Path from the repository root | Purpose |
+|---|---|---|
+| **SOURCE** | `./` | Existing Gatsby production blog; migration reference and comparison baseline |
+| **TARGET** | `scratch/s11a.com/` | Fresh, standalone TanStack Start project; all new implementation goes here |
+| **SPIKE** | `scratch/start-spike/` | Disposable learning project from E0; do not copy production code into it |
+
+Unless a task explicitly says **SOURCE**, every unqualified path (`src/`,
+`package.json`, `vite.config.ts`, `public/`, `dist/`, and so on) means a path under
+**TARGET**, and every command must be run from `scratch/s11a.com/`.
+
+The SOURCE app remains runnable and unchanged throughout the rebuild. Porting means
+copying or deliberately re-implementing a file in TARGET, never moving it out of or
+deleting it from SOURCE. SOURCE teardown is not part of this backlog. At cutover,
+Netlify changes its base directory to TARGET; it does not require TARGET to replace
+the repository root.
+
+Status convention:
+
+- `[x]` means Sai completed the task.
+- `**REVISIT:**` after a checked item means the work happened, but the corrected
+  two-project layout exposed follow-up work that must be done before its story is
+  considered closed.
+- `[ ]` remains outstanding. Existing checked state is preserved; unchecked tasks
+  are not inferred complete merely because the scaffold generated related files.
+
+### Observed migration baseline (audited 2026-08-16)
+
+- SOURCE has 20 MDX articles, 23 indexable sitemap URLs, and 24 rendered pages when
+  the 404 is included.
+- SOURCE's sitemap contract is `sitemap-index.xml` → `sitemap-0.xml`, and its
+  canonical page URLs have trailing slashes. `robots.txt` points at the sitemap
+  index. RSS item GUIDs omit the trailing slash and must remain unchanged.
+- SOURCE `public/` is generated/ignored output, not a committed golden fixture. A
+  clean SOURCE build must be captured before feed/sitemap comparisons.
+- Frontmatter slugs, not filenames, define article URLs. One file intentionally
+  differs: `how-to-be-productive-after-work.mdx` serves
+  `/articles/stop-wasting-time-how-to-be-productive-after-work/`.
+- The real category set is Backend, Cloud, Frontend, DevOps, Productivity, and
+  Writing. SOURCE `AGENTS.md` omits the last two and lists unused categories, so it
+  is not the validation enum.
+- The corpus has 105 fenced code blocks and 31 distinct referenced article-image
+  paths. Fence cleanup includes Prism metadata, `k8s`, and four uppercase language
+  labels—not only the two issues originally listed.
+- SOURCE `RecentArticles.tsx` and the commented `sampleArticles` fixture are dead;
+  do not port them. SOURCE `sampleData.ts` still contains live project data and
+  category icons, so split those values into honestly named TARGET modules instead
+  of copying the mixed fixture file.
+- TARGET is already scaffolded with React 19, Vite 8, Tailwind v4, Netlify,
+  TanStack Query/devtools, Oxfmt, and Oxlint. Its lockfile currently resolves Start
+  1.168.46, Router 1.170.29, React 19.2.8, Vite 8.2.1, and TypeScript 6.0.3.
+- TARGET's generated `routeTree.gen.ts` is ignored but still tracked by Git. This is
+  the only completed (`[x]`) item found to require explicit cleanup; see S1.1.
+
+### Modern-pattern audit (official docs reviewed 2026-08-16)
+
+Apply a capability only where the site has the matching problem:
+
+| Concern | Pattern for this blog | Explicit non-goal |
+|---|---|---|
+| Static article data | TanStack Router loaders returning **serializable metadata**, with Router caching and `staleTime: Infinity` | Do not put compiled MDX components/functions in loader data; do not put static content in Query |
+| Article rendering | Eager named-export globs for metadata/TOC; lazy full-module glob + one Suspense boundary for the selected MDX component | Do not eagerly bundle all article bodies or add a server function merely to read local build-time content |
+| Filters/pagination | Router `validateSearch` + `Route.useSearch()` + typed navigation | No Zustand, Jotai, Redux, or duplicate component state |
+| View counter | Query for runtime server state + mutation backed by validated Start server functions | Query is not the content layer and must not block article rendering/prerendering |
+| Head/analytics/theme boot | Route `head`, `<HeadContent />`, `<Scripts />`, `ScriptOnce`, and `router.subscribe("onResolved")` | No React Helmet and no component effect that polls router state |
+| Global CSS | Keep TARGET `src/styles.css` loaded through the root route; Tailwind v4 `@theme inline`, `@custom-variant`, and `@plugin` | No new JS Tailwind config, forced OKLCH conversion, or CSS-module migration |
+| React 19 | Fresh React 19 shadcn output, `ref` as a prop only where needed, and one earned Suspense boundary for lazy MDX | No forced `use()`, deferred loader, React Compiler, `useActionState`, or `useOptimistic` demos |
+
+TanStack Router already caches loader data. TanStack Query is retained only for the
+counter because it is asynchronous runtime server state with a mutation lifecycle.
+All other site data is local, immutable build input.
 
 ---
 
@@ -21,7 +97,7 @@ Gatsby 5 shipped its last major in November 2022. As of August 2026 the situatio
 | Transitive CVE burden | 5 entries in `overrides` (`cookie`, `immutable`, `lodash`, `path-to-regexp`, `webpack`) |
 | Recent commit history | Last two non-feature commits are both dependency-security patches |
 
-The blog works. The problem is that keeping it working is now an unbounded maintenance tax on a frozen framework, and the abstractions (a GraphQL data layer over 20 local files) cost more than they return.
+The SOURCE blog works. The problem is that keeping it working is now an unbounded maintenance tax on a frozen framework, and the abstractions (a GraphQL data layer over 20 local files) cost more than they return. The migration therefore builds TARGET from a clean TanStack Start scaffold and uses SOURCE only as a behavioural and visual specification.
 
 ### The learning driver
 
@@ -30,9 +106,9 @@ This migration is deliberately scoped as a **refresher project across four track
 | Track | What it covers | Why it's here |
 |---|---|---|
 | **A — TanStack Start** | File-based routing, typed loaders, `head` management, server functions, static prerendering, Netlify deployment | The framework being adopted |
-| **B — Tailwind v4** | CSS-first config (`@theme`, `@utility`, `@variant`), OKLCH, `color-mix()`, container queries, killing the JS config | The current setup is Tailwind v4 running through a v3 compatibility shim — this is a half-finished migration to close out |
-| **C — Modern state management** | URL-as-state via TanStack Router `validateSearch`, TanStack Query for server state, Zustand for client-global — **and knowing when each is unnecessary** | Current `articles.tsx` holds 4 `useState` hooks that should be URL state |
-| **D — Modern React 19** | `ref` as a prop (no `forwardRef`), `use()`, `useActionState`, `useOptimistic`, `<form action>`, Suspense boundaries, React Compiler | Codebase is React 18 idiom throughout: `React.FC<PageProps<T>>`, `forwardRef` in shadcn primitives |
+| **B — Tailwind v4** | CSS-first config with `@theme inline`, `@custom-variant`, `@plugin`, semantic CSS variables, and no JS config | SOURCE is Tailwind v4 through a v3 compatibility shim; TARGET should express only the theme the blog actually uses |
+| **C — State placement** | URL-as-state via Router `validateSearch`; Router loaders/cache for static route data; Query only for the runtime view counter | SOURCE `articles.tsx` holds 4 `useState` hooks that should be URL state; everything else should stay plain props/derived data |
+| **D — React 19 compatibility** | Fresh React 19 components, `ref` as a prop when needed, hydration-safe browser integrations | Avoid carrying React 18 framework typings and generated primitives into TARGET; do not manufacture use cases for new hooks |
 
 ---
 
@@ -42,16 +118,16 @@ These were researched and decided before this backlog was written. **Do not re-l
 
 | Decision | Choice | Rationale |
 |---|---|---|
-| Framework | **TanStack Start** `^1.168` | Vite 8 native, pure React (no `.astro`, no RSC/App Router), file-based routing, SSG since v1.138 (Dec 2025), server functions as the dynamic escape hatch |
+| Framework | **TanStack Start**, pinned to the version resolved in TARGET's lockfile | TARGET currently resolves `@tanstack/react-start` 1.168.46; keep the working lockfile stable during the migration rather than using moving `latest` ranges |
 | Build tool | **Vite 8** | Comes with Start; `@mdx-js/rollup` works natively on Vite 8 with no wrapper plugin |
 | React | **19.x** | Track D |
 | Styling | **Tailwind v4** via `@tailwindcss/vite` | Track B — CSS-first, no `tailwind.config.js` |
-| Components | **shadcn/ui**, re-initialised | Existing 5 primitives port over; re-init to get React 19 / Tailwind v4 output |
+| Components | **shadcn/ui**, initialised fresh in TARGET | Use TARGET's React 19 / Tailwind v4 output, then compare SOURCE's 5 primitives and reapply only intentional local behaviour/styles |
 | Content | **MDX v3** via `@mdx-js/rollup` + `import.meta.glob` | Replaces the entire Gatsby GraphQL layer with one Vite-native line |
 | Syntax highlighting | **`rehype-pretty-code`** (Shiki) | Dual light/dark themes as CSS vars — replaces `prismjs` + hand-maintained `prism-theme.css` |
 | Frontmatter validation | **Zod v4** at build time | Replaces/absorbs `scripts/validate-content.ts` |
 | URL state | **TanStack Router `validateSearch`** — *not* nuqs | nuqs' TanStack Router adapter is experimental and explicitly does not cover TanStack Start. Router has this built in and type-safe. |
-| Hosting | **Netlify** via `@netlify/vite-plugin-tanstack-start` | Prerender every content route to static HTML; deploy the view-counter server functions through the official Netlify integration. No Nitro layer. |
+| Hosting | **Netlify** via `@netlify/vite-plugin-tanstack-start` | Prerender content routes; deploy the view-counter server functions through the official integration. Netlify Blobs needs strong reads + ETag conditional writes because a counter is a concurrent read/modify/write workload. No Nitro layer. |
 
 ### Explicitly out of scope
 
@@ -59,22 +135,26 @@ Listed so they don't creep in:
 
 - Redesign. The visual output should be indistinguishable at cutover. Design changes are a separate branch.
 - CMS, comments, auth, i18n, search-over-full-post-bodies.
-- Migrating the 20 `.mdx` files' prose. They move byte-for-byte except for the two fence fixes in **S3.5**.
+- Editing the 20 `.mdx` files in SOURCE. Copy them into TARGET, then change only the known fence incompatibilities in the TARGET copies (see **S3.5**).
 - Test framework. There isn't one today; adding one is not what this project is teaching. Quality gate is typecheck + lint + a one-off accessibility/SEO smoke check.
+- Build-time server functions for reading time; the validated frontmatter value already exists.
+- Forced container-query rewrites, OKLCH colour conversion, React Compiler, deferred loaders, `use()`, `useActionState`, or optimistic UI exercises. Add them later only for a real product requirement.
+- Porting unused SOURCE tokens, starter demo styles/components, Gatsby type wrappers, or generated React 18 shadcn implementation details.
 
 ---
 
 ## 3. Definition of Done (project level)
 
-- [ ] All 20 articles render at their existing URLs (`/articles/<slug>`) with no redirects needed
+- [ ] All 20 articles render at their existing canonical URLs (`/articles/<slug>/`, including the trailing slash used by SOURCE's sitemap) with no slug redirects needed
 - [ ] `/`, `/articles`, `/about`, 404 all render
-- [ ] `npm run build` produces static HTML for every content route in `dist/client`
-- [ ] `npm run typecheck` and `npm run lint` clean
+- [ ] From TARGET, `npm run build` produces static HTML for every content route in `dist/client`
+- [ ] From TARGET, `npm run check` is clean (format check + Oxlint + TypeScript)
 - [ ] No Lighthouse SEO or Accessibility failures (Performance not tracked)
-- [ ] `rss.xml`, `sitemap.xml`, `robots.txt` byte-comparable to current output
-- [ ] `gatsby*` fully removed from `package.json`; `overrides` block empty or gone
+- [ ] `rss.xml`, `sitemap-index.xml`, `sitemap-0.xml`, and `robots.txt` preserve SOURCE's public URLs and semantics; GUIDs and listed canonical URLs are unchanged
+- [ ] TARGET contains no Gatsby dependency, Gatsby config, or Gatsby-only override (SOURCE is intentionally unchanged)
 - [ ] Netlify deploy preview green
 - [ ] Article view counts persist through Netlify server functions and Netlify Blobs
+- [ ] Netlify builds from base directory `scratch/s11a.com` and publishes TARGET's `dist/client`
 - [ ] §10 learning log filled in
 
 ---
@@ -83,16 +163,15 @@ Listed so they don't creep in:
 
 ```
 E0 Spike
- └─> E1 Bootstrap ──┬─> E2 Tailwind v4 ──┐
-                    │                     ├─> E4 Static routes ──> E5 Article route ──┬─> E7 SEO/Feeds ──┐
-                    └─> E3 MDX pipeline ──┘                                            └─> E6 URL state ──┤
-                                                                                                          │
-                                        E8 React 19 pass  <────────────────────────────────────────────────┤
-                                        E9 Server functions <───────────────────────────────────────────────┤
-                                                  │                                                       │
-                                                  └────────> E10 Prerender + Deploy <───────────────────────┘
-                                                                      │
-                                                                      └─> E11 Cutover & teardown
+ └─> E1 Fresh TARGET baseline ──┬─> E2 Tailwind v4 ──┐
+                                │                     ├─> E4 Static routes ──> E5 Article route ──┬─> E7 SEO/Feeds ──┐
+                                └─> E3 MDX pipeline ──┘                                            ├─> E6 URL state ──┤
+                                                                                                   ├─> E8 React 19 ───┤
+                                                                                                   └─> E9 View counter┤
+                                                                                                                     │
+                                                                                E10 Prerender + Deploy <──────────────┘
+                                                                                         │
+                                                                                         └─> E11 Cutover & docs
 ```
 
 **Critical path:** E0 → E1 → E3 → E5 → E9 → E10 → E11.
@@ -116,10 +195,10 @@ Goal: build throwaway muscle memory before touching the real repo. Resist the ur
 #### S0.1 — Scaffold a throwaway Start app
 **Learn (A):** the generated file layout, what `routeTree.gen.ts` is and who writes it, how `vite dev` differs from `gatsby develop`.
 
-**Story:** As a learner, I want a disposable TanStack Start app outside this repo, so that I can break things without polluting the migration branch.
+**Story:** As a learner, I want a disposable TanStack Start app isolated from both SOURCE and TARGET, so that I can break things without affecting either application.
 
 **Tasks:**
-- [x] `npx @tanstack/cli@latest create` into `~/scratch/start-spike` — select Tailwind + ESLint add-ons
+- [x] `npx @tanstack/cli@latest create` into `scratch/start-spike/` — select Tailwind + ESLint add-ons
 - [x] Run `vite dev`; note cold-start time vs `gatsby develop`
 - [x] Add a route by creating a file. Watch `routeTree.gen.ts` regenerate. **Add it to `.gitignore` mentally — it is generated, never hand-edited.**
 - [x] Add a nested route and a dynamic route (`$param`) and read the param
@@ -151,7 +230,7 @@ Goal: build throwaway muscle memory before touching the real repo. Resist the ur
 - [x] Can explain what `import.meta.glob` returns and why `eager: true` matters for prerendering
 
 **Checkpoint questions:**
-1. Compare the `import.meta.glob` object to the `allMdx` GraphQL query in the current `src/pages/articles.tsx`. What did the GraphQL layer buy that the glob doesn't? (Honest answer: sorting and filtering syntax — which is 3 lines of JS.)
+1. Compare the `import.meta.glob` object to the `allMdx` GraphQL query in SOURCE `src/pages/articles.tsx`. What did the GraphQL layer buy that the glob doesn't? (Honest answer: sorting and filtering syntax — which is 3 lines of JS.)
 2. Why must `mdx()` precede `viteReact()` in the plugin array?
 
 ---
@@ -180,87 +259,88 @@ Goal: build throwaway muscle memory before touching the real repo. Resist the ur
 
 ---
 
-### E1 — Bootstrap the Application Shell
+### E1 — Baseline the Fresh TARGET Application
 **Tracks:** A · **Est:** 2 sessions · **Depends on:** E0
 
-Goal: a running TanStack Start app inside this repo, coexisting with Gatsby until E11. **Do not delete anything Gatsby-related in this epic.**
+Goal: establish `scratch/s11a.com/` as an independent TanStack Start application.
+SOURCE and TARGET coexist permanently in the repository during this project. Do not
+install Start dependencies into SOURCE, do not add Start files to SOURCE's `src/`,
+and do not modify SOURCE merely to make TARGET work.
 
 ---
 
-#### S1.1 — Stand up Start alongside Gatsby
-**Story:** As a developer, I want the new app to build and run without removing the Gatsby app, so that I always have a working site to compare against and fall back to.
+#### S1.1 — Verify the fresh TARGET scaffold
+**Story:** As a developer, I want TARGET to build and run independently of SOURCE, so that I always have a working production reference and a clean new application.
 
 **Depends on:** S0.1
 
 **Tasks:**
-- [ ] Install: `@tanstack/react-router @tanstack/react-start react@19 react-dom@19`
-- [ ] Install dev: `@netlify/vite-plugin-tanstack-start @tanstack/react-router-devtools @vitejs/plugin-react @tailwindcss/vite tailwindcss vite @types/react@19 @types/react-dom@19`
-- [ ] Create `vite.config.ts`:
-  ```ts
-  import { tanstackStart } from '@tanstack/react-start/plugin/vite'
-  import netlify from '@netlify/vite-plugin-tanstack-start'
-  import { defineConfig } from 'vite'
-  import viteReact from '@vitejs/plugin-react'
-  import tailwindcss from '@tailwindcss/vite'
-
-  export default defineConfig({
-    resolve: { tsconfigPaths: true },
-    plugins: [
-      tailwindcss(),
-      tanstackStart({ srcDirectory: 'src' }),
-      netlify(),
-      viteReact(),
-    ],
-  })
-  ```
-- [x] Create `src/router.tsx` exporting `getRouter()`
-- [x] Create `src/routes/__root.tsx` with `<HeadContent />` + `<Scripts />`
-- [x] Create `src/routes/index.tsx` — "hello" placeholder only
-- [x] Add `"type": "module"` to `package.json`
-- [x] Add scripts: `"dev:next": "vite dev"`, `"build:next": "vite build"` (temporary names; renamed in E11)
-- [x] Add `src/routeTree.gen.ts` to `.gitignore`
+- [x] Audit TARGET's generated dependencies against the locked decisions. Retain Query and its SSR integration for E9, but remove unused demo/data packages and ensure Router/Query devtools render only in development.
+- [x] (IGNORED) Replace moving `latest` dependency ranges with the exact versions already resolved in `package-lock.json`, then run `npm install` once to keep manifest and lockfile aligned. Do not install any of these packages in SOURCE.
+- [x] Review TARGET's existing `vite.config.ts` rather than recreating it. Preserve the generated Netlify/devtools integration; keep `mdx()` before `viteReact()` when S3.1 adds it.
+- [x] TARGET has `src/router.tsx` exporting `getRouter()`
+- [x] TARGET has `src/routes/__root.tsx` with `<HeadContent />` + `<Scripts />`
+- [x] TARGET has `src/routes/index.tsx` with a hello placeholder
+- [x] TARGET has `"type": "module"` in its own `package.json`
+- [x] TARGET uses normal fresh-project scripts (`dev`, `build`, `preview`), not temporary `dev:next`/`build:next` aliases. No later rename is required.
+- [x] TARGET's `.gitignore` lists `src/routeTree.gen.ts`. **REVISIT:** the generated file was committed before it was ignored; remove it from Git's index without deleting the working copy, regenerate it with `npm run generate-routes`, and verify `git status` no longer tracks it.
 
 **Acceptance:**
-- [x] `npm run dev:next` serves a page on :3000
-- [x] `npm run develop` (Gatsby) still works untouched
+- [x] `npm run dev` from TARGET serves the app on its configured port (`:3001`)
+- [x] `npm run develop` from SOURCE still works untouched
+- [x] `npm run build` and `npm run check` pass from TARGET without depending on SOURCE's `node_modules`
 
-**Watch for:** adding `"type": "module"` will break `gatsby-node.js` / `gatsby-ssr.js` (CommonJS). If it does, rename them to `.cjs` — Gatsby only needs to survive until E11.
+**Watch for:** SOURCE and TARGET each own a `package.json`, lockfile, Node version, and
+`node_modules`. TARGET's `"type": "module"` cannot affect SOURCE's CommonJS Gatsby
+files. If a change to TARGET breaks SOURCE, it was made in the wrong directory.
 
 ---
 
 #### S1.2 — TypeScript & path aliases
-**Story:** As a developer, I want `@/*` imports to resolve in the new app, so that the existing components port over with zero import rewrites.
+**Story:** As a developer, I want `@/*` imports to resolve inside TARGET, so copied SOURCE components need only framework-specific import changes.
 
 **Depends on:** S1.1
 
 **Tasks:**
-- [x] Update `tsconfig.json`: `"moduleResolution": "bundler"`, `"module": "esnext"`, `"jsx": "react-jsx"`, `"target": "es2022"`
-- [x] Confirm `paths: { "@/*": ["./src/*"] }` still present
-- [x] Set `resolve.tsconfigPaths: true` in vite config (already in S1.1 — verify it works)
-- [x] `npm run typecheck` passes on the new files
+- [x] TARGET `tsconfig.json` uses `"moduleResolution": "bundler"`, `"module": "ESNext"`, `"jsx": "react-jsx"`, and `"target": "ES2022"`
+- [x] TARGET keeps both its generated `#/*` alias and compatibility alias `@/*`, each pointing to `./src/*`
+- [x] TARGET `vite.config.ts` sets `resolve.tsconfigPaths: true`
+- [x] `npm run typecheck` passes in TARGET (reverified while this backlog was corrected)
 
 **Acceptance:**
-- [x] `import { cn } from "@/utils/cn"` resolves in a route file with no vite alias config
+- [x] A TARGET route resolves an aliased utility import with no hand-written Vite alias map
 
 **Checkpoint question:** The old `gatsby-node.js` duplicated these aliases into a webpack config by hand. Why is that no longer necessary?
-- B/C vite
+- Vite reads TARGET's TypeScript path mappings directly; SOURCE's webpack-only alias duplication remains irrelevant to TARGET.
 ---
 
 #### S1.3 — Root route: layout, head, error boundaries
 **Story:** As a developer, I want the shell (`Header`/`Footer`/theme) rendering on every route, so that page work in later epics is pure content.
 
-**Depends on:** S1.2, S2.1
+**Depends on:** S1.2, S2.2
+
+**Execution note:** This story is grouped under E1 because it establishes the app
+shell, but do not complete its visual/theme work before E2. Execute the foundation
+in this order: capture the SOURCE shell in both themes → S2.1 tokens → S2.2 dark
+variant → S1.3 theme boot/toggle and shell components. This prevents copied
+components from being tuned against TARGET's temporary starter palette.
 
 **Tasks:**
-- [ ] Port `src/components/layout/Layout.tsx` into `__root.tsx`'s component
-- [ ] Port `Header.tsx` and `Footer.tsx`; swap Gatsby `<Link to>` → TanStack `<Link to>` (note: **`to` is type-checked against the route tree** — broken links become type errors)
-- [ ] Move the anti-flash theme script from `gatsby-ssr.js` into `__root.tsx` `head.scripts`
+- [ ] Use SOURCE `src/components/layout/Layout.tsx` as the reference for TARGET `src/routes/__root.tsx`; copy only the reusable layout behaviour and markup
+- [ ] Recreate the SOURCE page-height contract in the root shell (`min-height: 100dvh`, column layout, and a growing `<main>`); the footer must follow short content at the viewport bottom without `position: fixed` or `position: absolute`
+- [ ] Port SOURCE `Header.tsx` and `Footer.tsx` into TARGET; swap Gatsby `<Link to>` → TanStack `<Link to>` (note: **`to` is type-checked against the route tree** — broken links become type errors). Replace TARGET's generated demo `Header.tsx`; do not edit SOURCE's components.
+- [ ] Generate TARGET's Tailwind v4/React 19 shadcn `button` before porting `ThemeToggle`; compare it with SOURCE and reapply only intentional variants/classes rather than copying the generated React 18 primitive
+- [ ] Port the anti-flash theme logic from SOURCE `gatsby-ssr.js` with TanStack Router's `ScriptOnce` in TARGET's root document so it runs before hydration without duplicate execution
+- [ ] Port SOURCE's existing light/dark/system toggle behaviour, including the `matchMedia` change listener and guarded `localStorage`; its small state/effect implementation already models real browser synchronization and does not require a new global store
 - [ ] Wire `defaultErrorComponent` and `defaultNotFoundComponent` in `router.tsx`
-- [ ] Port `src/pages/404.tsx` as the not-found component
+- [ ] Port SOURCE `src/pages/404.tsx` into a TARGET not-found component
 
 **Acceptance:**
 - [ ] Header/footer render on `/`
+- [ ] With the one-line placeholder route, the footer rests at the viewport bottom; with long content it remains in normal document flow
 - [ ] No theme flash on hard reload in dark mode
+- [ ] Header, footer, theme control, focus states, and mobile navigation are visually compared with SOURCE at 375px and 1440px in light and dark mode before page-section porting begins
+- [ ] Root CSS is loaded once using TARGET's existing supported `styles.css?url` + `head.links` pattern; do not add a second global-style import
 - [ ] A deliberately broken `<Link to="/nope">` is a **compile** error, not a runtime 404
 
 **Checkpoint question:** Gatsby validated links at runtime (or not at all). What is TanStack Router doing differently, and what file makes it possible?
@@ -270,11 +350,21 @@ Goal: a running TanStack Start app inside this repo, coexisting with Gatsby unti
 ### E2 — Tailwind v4, CSS-First
 **Tracks:** B · **Est:** 2 sessions · **Depends on:** S1.1 · **Parallel with:** E3
 
-Goal: finish the Tailwind v4 migration that the current repo started and abandoned. Today `src/styles/globals.css` opens with `@config "../../tailwind.config.js"` — a v3 compatibility shim — and the theme lives in JS. Kill the shim.
+Goal: recreate SOURCE's appearance in TARGET using native Tailwind v4. SOURCE
+`src/styles/globals.css` opens with `@config "../../tailwind.config.js"` and SOURCE's
+theme lives in JS. Those files are inputs to inspect, not files to edit or delete.
+TARGET already has a generated/customised `src/styles.css`; reconcile it deliberately
+with the SOURCE design rather than assuming it is the production theme.
+
+E2 is a staged foundation, not a bulk stylesheet copy. S2.1 establishes only the
+tokens consumed by live UI; S2.2 makes class-based dark utilities valid; S1.3 then
+connects the runtime theme behavior and ports the shell against those tokens; S2.3
+adds article-only typography once an article can render; S2.4 removes temporary and
+unused CSS after parity checks. Keep TARGET runnable at every checkpoint.
 
 ---
 
-#### S2.1 — Port the theme to `@theme`
+#### S2.1 — Recreate the used theme tokens with `@theme inline`
 **Learn (B):** v4's CSS-first model. Design tokens become real CSS custom properties that also generate utilities — no JS object, no `theme()` function calls.
 
 **Story:** As a developer, I want the design tokens defined in CSS, so that there is one source of truth and no build-time JS config.
@@ -282,25 +372,23 @@ Goal: finish the Tailwind v4 migration that the current repo started and abandon
 **Depends on:** S1.1
 
 **Tasks:**
-- [ ] Create `src/styles/app.css`; `@import "tailwindcss";`
-- [ ] Move every colour from `tailwind.config.js` `theme.extend.colors` into an `@theme { }` block as `--color-*` tokens
-- [ ] Port the `:root` / `.dark` HSL custom properties from `globals.css`
+- [ ] Capture SOURCE reference screenshots of the home shell at 375px and 1440px in light and dark mode, and record the computed body/background/font values needed to distinguish intentional styling from starter defaults
+- [ ] Keep TARGET's existing `src/styles.css` path and existing root `?url` import; deleting a gratuitous rename avoids churn in `__root.tsx` and `components.json`
+- [ ] Inventory semantic classes used by the pages and the four required shadcn primitives, then map only those SOURCE colours through TARGET `@theme inline` `--color-*` tokens
+- [ ] Port the SOURCE `:root` / `.dark` HSL custom properties from `src/styles/globals.css`; do not substitute the starter's current teal/green theme if visual parity is still the goal
 - [ ] Port `--radius` and the `spotlight` keyframes/animation into `@theme`
-- [ ] Delete the `@config` directive
-- [ ] **Do not create `tailwind.config.js`.** If you find yourself wanting to, that's the lesson.
+- [ ] Do not port unused SOURCE `--chart-*` or `--sidebar-*` tokens; the blog has no chart or sidebar primitive using them
+- [ ] Ensure TARGET has no `@config` directive (SOURCE keeps its directive until/unless it is retired separately)
+- [ ] **Do not create a TARGET `tailwind.config.js`.** SOURCE's existing config remains as the parity reference.
 
 **Acceptance:**
 - [ ] `bg-background`, `text-muted-foreground`, `border-border` etc. all resolve
-- [ ] Dark mode toggles correctly
-- [ ] No `tailwind.config.js` in the new build path
+- [ ] Light and dark semantic values resolve correctly when `.dark` is manually applied; the persisted UI toggle is verified in S1.3
+- [ ] No `tailwind.config.js` in TARGET's build path
 
 **Checkpoint questions:**
 1. In v4, what's the difference between defining `--color-primary` inside `@theme` vs. inside `:root`?
 2. The old config used `theme("colors.foreground")` inside the typography plugin. What replaces that in v4?
-
-**Stretch:** convert the HSL triplets to OKLCH and use `color-mix()` for the hover-opacity variants. Note whether the rendered colours actually shift.
-
----
 
 #### S2.2 — Dark mode variant
 **Learn (B):** `@variant` / `@custom-variant` replaces `darkMode: "class"`.
@@ -312,10 +400,10 @@ Goal: finish the Tailwind v4 migration that the current repo started and abandon
 **Tasks:**
 - [ ] Declare the dark variant in CSS (v4 `@custom-variant dark (&:where(.dark, .dark *))`)
 - [ ] Verify `dark:` utilities compile
-- [ ] Confirm the `.dark` class toggle from the inline head script still drives it
+- [ ] Before S1.3 is complete, verify the variant independently by manually adding/removing `.dark` on `<html>`; runtime persistence and system synchronization belong to S1.3
 
 **Acceptance:**
-- [ ] `dark:bg-card` works; toggle flips it live
+- [ ] `dark:bg-card` responds to the `.dark` ancestor; after S1.3, the real toggle flips it live
 
 ---
 
@@ -324,44 +412,50 @@ Goal: finish the Tailwind v4 migration that the current repo started and abandon
 
 **Story:** As a reader, I want article prose to look exactly as it does today.
 
-**Depends on:** S2.1
+**Depends on:** S2.1, S5.1
 
 **Tasks:**
-- [ ] `@plugin "@tailwindcss/typography";` in `app.css`
-- [ ] Port the ~80 lines of `typography.DEFAULT.css` overrides from `tailwind.config.js` into CSS (`.prose { ... }` customisations or `@utility`)
+- [ ] `@plugin "@tailwindcss/typography";` in TARGET `src/styles.css`
+- [ ] Translate the ~80 lines of SOURCE `tailwind.config.js` `typography.DEFAULT.css` overrides into TARGET CSS (`.prose { ... }` customisations or `@utility`)
 - [ ] Keep the `max-width: 720px`, `font-size: 18px`, `line-height: 1.7` values exactly
 - [ ] Port the `--code-inline-*` / `--code-block-*` tokens
 
 **Acceptance:**
-- [ ] Side-by-side screenshot of one article at 1440px in both themes is pixel-comparable to the Gatsby build
+- [ ] Side-by-side screenshot of one TARGET article and the SOURCE Gatsby build at 1440px in both themes is pixel-comparable
 
 **Watch for:** the `code::before` / `code::after` `content: ""` resets. Losing them re-introduces backtick artifacts around inline code.
 
 ---
 
-#### S2.4 — Modern CSS refresher pass
-**Learn (B):** what v4 gives you that v3 didn't, applied to real components.
+#### S2.4 — CSS necessity and parity audit
+**Learn (B):** use modern CSS where it solves a present layout problem, not as a migration quota.
 
-**Story:** As a developer, I want to replace at least two responsive breakpoint hacks with modern CSS, so that the refresher produces something better rather than just equivalent.
+**Story:** As a developer, I want TARGET CSS to contain only styles the blog uses while preserving SOURCE behaviour and accessibility.
 
 **Depends on:** S2.3
 
 **Tasks:**
-- [ ] Convert the article page's `lg:grid-cols-6` sidebar layout to **container queries** (`@container` / `@lg:`) and evaluate whether it's actually better here
-- [ ] Replace any `space-x-*` usage with `gap-*` on flex/grid parents
-- [ ] Audit for `!important` and arbitrary values that v4 tokens now cover
-- [ ] Write down one thing container queries solved and one thing they didn't
+- [ ] Keep the article page's viewport-responsive grid unless the component is actually embedded in differently sized containers; do not force a container-query rewrite
+- [ ] When touching a flex/grid parent, prefer `gap-*` over SOURCE `space-x-*`, but do not create a repo-wide cosmetic rewrite
+- [ ] Remove TARGET starter-only fonts, teal/green theme variables, demo utilities, unused `!important`, and tokens with no consumer
+- [ ] Preserve SOURCE's reduced-motion rules and test keyboard focus visibility
 
 **Acceptance:**
 - [ ] Layout holds at 375 / 768 / 1024 / 1440
-- [ ] Notes captured in §10
+- [ ] `rg` confirms unused chart/sidebar and starter demo tokens are absent from TARGET
 
 ---
 
 ### E3 — MDX Content Pipeline
 **Tracks:** A · **Est:** 3 sessions · **Depends on:** S0.2, S1.1 · **Parallel with:** E2
 
-Goal: this is the epic that deletes Gatsby's reason to exist. The entire `gatsby-node.js` + `gatsby-config.ts` MDX plugin block + every page-level `graphql` template literal collapses into a Vite plugin config and one module.
+Goal: this is the epic that removes Gatsby's reason to exist **for TARGET**. The
+equivalent of SOURCE `gatsby-node.js`, `gatsby-config.ts` MDX configuration, and
+page-level GraphQL becomes a Vite plugin configuration and one TARGET module.
+
+First copy the content corpus and required static assets into TARGET so it builds
+without reaching across the subdirectory boundary. Runtime imports from SOURCE are
+not allowed; SOURCE is a reference, not a shared package.
 
 ---
 
@@ -371,10 +465,12 @@ Goal: this is the epic that deletes Gatsby's reason to exist. The entire `gatsby
 **Depends on:** S0.2, S1.1
 
 **Tasks:**
+- [ ] Create TARGET `src/content/articles/` and copy all 20 SOURCE `src/content/articles/*.mdx` files into it. Preserve SOURCE files byte-for-byte at this step.
+- [ ] Create TARGET `public/images/` and copy the SOURCE static image assets required by pages and articles. TARGET must own its deployable assets.
 - [ ] `npm i @mdx-js/rollup remark-frontmatter remark-mdx-frontmatter remark-gfm`
 - [ ] Add `mdx()` to `vite.config.ts` **before** `viteReact()`
 - [ ] Configure `remarkPlugins: [remarkFrontmatter, [remarkMdxFrontmatter, { name: 'frontmatter' }], remarkGfm]`
-- [ ] Add `providerImportSource` only if you keep `MDXProvider` (see S3.4 — you probably won't need it)
+- [ ] Do not configure `providerImportSource` or add `@mdx-js/react`; S3.4 uses rehype-generated heading IDs and needs no provider
 - [ ] Create `src/types/mdx.d.ts` declaring the `*.mdx` module shape so TS stops complaining
 
 **Acceptance:**
@@ -385,25 +481,32 @@ Goal: this is the epic that deletes Gatsby's reason to exist. The entire `gatsby
 #### S3.2 — Build the content module
 **Learn (A/C):** replacing a data layer with a plain module. This is the heart of the migration.
 
-**Story:** As a developer, I want a single `getArticles()` returning sorted, validated article metadata, so that every route reads from one typed source.
+**Story:** As a developer, I want one content registry with a serializable metadata API and a separate MDX-rendering API, so routes never try to dehydrate React components.
 
 **Depends on:** S3.1
 
 **Tasks:**
-- [ ] Create `src/lib/content.ts`
-- [ ] `const modules = import.meta.glob('../content/articles/*.mdx', { eager: true })`
+- [ ] Create TARGET `src/lib/content.ts`
+- [ ] Use eager **named-export** globs for `frontmatter` and `toc`, allowing Vite to tree-shake compiled article bodies out of metadata consumers
+- [ ] Use a separate lazy `import.meta.glob<ArticleModule>('../content/articles/*.mdx')` registry for full MDX modules; do not use `{ eager: true }` for article components
 - [ ] Define a Zod v4 schema matching the real frontmatter: `title, slug, excerpt, date, category, tags[], readingTime, featured, author`
+- [ ] Validate against SOURCE's actual category values, not the stale category list in SOURCE `AGENTS.md`: the corpus currently contains Backend (7), Cloud (5), Frontend (4), DevOps (2), Productivity (1), and Writing (1). Do not reject the last two.
+- [ ] Create a focused category presentation map for those six live values (including Productivity and Writing); do not copy unused Healthcare/Architecture/Database/Security entries merely because SOURCE's stale fixture contains them
 - [ ] Parse every module's frontmatter through the schema — **throw on failure**, so bad content fails the build
-- [ ] Export `getArticles()` (sorted `date` DESC), `getArticleBySlug(slug)`, `getCategories()`, `getAllTags()`
-- [ ] Derive the slug from the filename and **assert it matches the frontmatter `slug`** — the current repo trusts these agree
+- [ ] Define separate types: `ArticleMetadata` contains only serializable frontmatter/TOC data; `ArticleModule` additionally owns the compiled MDX component; cache stable `React.lazy` wrappers by slug outside render
+- [ ] Export `getArticles()` (metadata only, sorted `date` DESC), `getArticleMetadataBySlug(slug)`, `getArticleComponentBySlug(slug)`, `getCategories()`, and `getAllTags()`
+- [ ] Never return the MDX component, module object, functions, or VFile/plugin objects from a Router loader; loader data is dehydrated for the client
+- [ ] Treat validated frontmatter `slug` as the canonical URL key and assert slugs are unique. Do **not** derive URLs from filenames: SOURCE has one intentional mismatch, `how-to-be-productive-after-work.mdx` → `stop-wasting-time-how-to-be-productive-after-work`, and that production URL must remain unchanged.
 
 **Acceptance:**
 - [ ] `getArticles()` returns 20 fully-typed articles
+- [ ] Both metadata and lazy-component lookups for `stop-wasting-time-how-to-be-productive-after-work` resolve the differently named MDX file
+- [ ] Vite output contains separate lazy article chunks; `/` and `/articles` do not eagerly import all compiled MDX bodies
 - [ ] Deliberately corrupting one frontmatter date fails the build with a readable Zod error naming the file
 
 **Checkpoint questions:**
-1. Line-count `src/lib/content.ts` against `gatsby-node.js` + the three `graphql` blocks it replaces.
-2. `scripts/validate-content.ts` now overlaps this. Which one should survive? (Decide, don't keep both.)
+1. Line-count TARGET `src/lib/content.ts` against SOURCE `gatsby-node.js` + the three SOURCE `graphql` blocks it replaces.
+2. SOURCE `scripts/validate-content.ts` overlaps this functionality, but belongs to the other application. Does TARGET need its own separate validation script, or is build-time Zod validation sufficient? (Do not create duplicate TARGET validation paths.)
 
 ---
 
@@ -417,12 +520,12 @@ Goal: this is the epic that deletes Gatsby's reason to exist. The entire `gatsby
 **Tasks:**
 - [ ] `npm i rehype-pretty-code rehype-slug`
 - [ ] Configure with dual themes (e.g. `{ light: 'github-light', dark: 'github-dark' }`)
-- [ ] Add the CSS-variable switching rules to `app.css`
-- [ ] Verify every language in the corpus renders: `java` (28 blocks), `json` (18), `bash` (11), `typescript` (7), `go` (6), `yaml` (5), `python` (4), `css` (4), `javascript` (3), `jsx` (2), `docker` (2), `xml`, `log`, `http`, `js`
-- [ ] Delete `prismjs`, `gatsby-remark-prismjs`, `src/styles/prism-theme.css`
+- [ ] Add the CSS-variable switching rules to TARGET `src/styles.css`
+- [ ] Verify all 105 fenced blocks render. The 100 labelled blocks include `java` (28), `json` (18), `bash` (11), `typescript` (7), `go` (6), `yaml` (5), `python` (4), `css` (4), `javascript` (3), `jsx` (2), `docker` (2), plus single-use labels and case variants (`xml`, `log`, `http`, `js`, `dockerfile`, `SQL`, `JavaScript`, `Java`, `Docker`, `k8s`). Normalise unsupported/case-variant labels in S3.5.
+- [ ] Confirm TARGET does not install `prismjs` or `gatsby-remark-prismjs` and does not copy SOURCE `src/styles/prism-theme.css`. Do not uninstall or delete them in SOURCE.
 
 **Acceptance:**
-- [ ] All 109 fenced blocks render highlighted in both themes
+- [ ] All 105 fenced blocks render safely in both themes; supported languages are highlighted and deliberate plain-text fallbacks remain readable
 - [ ] No `prism` string remains in `src/` or `package.json`
 
 **Watch for:** ` ```log ` may not be a Shiki-supported language. Fall back to plain text rather than adding a custom grammar.
@@ -438,37 +541,39 @@ Goal: this is the epic that deletes Gatsby's reason to exist. The entire `gatsby
 
 **Tasks:**
 - [ ] `rehype-slug` for heading IDs (already installed in S3.3)
-- [ ] Extract headings — either a small rehype plugin exporting a `toc`, or parse `^##`/`^###` from the raw source in `content.ts`. **Pick the simpler one.**
+- [ ] Add a small remark/rehype plugin that exports a serializable `toc` named export from each compiled MDX module; use the same GitHub-style slug algorithm as `rehype-slug` (including duplicate headings), and consume the named export without bundling raw article source into the client
 - [ ] Cap at depth 3 to match current behaviour
-- [ ] Port `src/components/article/TableOfContents.tsx` to consume the new shape
-- [ ] Decide whether `src/components/mdx/HeadingComponents.tsx` + `MDXProvider` is still needed, or whether `rehype-slug` + `prose-headings:scroll-mt-8` covers it
+- [ ] Port the visual structure of SOURCE `TableOfContents.tsx`, but use ordinary `<a href="#...">` links plus CSS `scroll-margin`; remove the click handler that prevents native hash/history behaviour
+- [ ] Do not port SOURCE `HeadingComponents.tsx` or `MDXProvider`: those wrappers only generate IDs, which `rehype-slug` already owns
 
 **Acceptance:**
 - [ ] TOC renders for a long article (`building-a-batch-pipeline-01-crash-course-in-spring-batch.mdx` is a good test)
 - [ ] Anchor links scroll with correct offset
+- [ ] Clicking a TOC link updates the URL hash and works with copy-link, back/forward, keyboard activation, and JavaScript disabled
 
 ---
 
 #### S3.5 — Content corpus fixes
-**Story:** As a developer, I want the 20 `.mdx` files to compile unchanged except for two known incompatibilities.
+**Story:** As a developer, I want TARGET's 20 copied `.mdx` files to compile with prose unchanged and only fence metadata/labels normalised where MDX v3 or Shiki requires it.
 
 **Depends on:** S3.3
 
 **Tasks:**
-- [ ] `cloning-discords-login-form-to-mess-with-styled-components.mdx` line 46: ` ```jsx{7} ` is **Prism** line-highlight syntax. Convert to `rehype-pretty-code`'s meta format.
-- [ ] `k8s` fence language was a **custom alias** defined in the old `gatsby-config.ts` Prism options. Change to `yaml`.
+- [ ] In TARGET only, `cloning-discords-login-form-to-mess-with-styled-components.mdx` line 46: ` ```jsx{7} ` is **Prism** line-highlight syntax. Convert it to `rehype-pretty-code`'s meta format.
+- [ ] In TARGET only, change the `k8s` fence label to `yaml`; it was a custom alias in SOURCE `gatsby-config.ts`.
+- [ ] In TARGET only, normalise the case variants `SQL`, `JavaScript`, `Java`, and `Docker` to Shiki's canonical lowercase labels. Verify `dockerfile`; treat `log` as plain text if unsupported.
 - [ ] Verify all 20 files compile — every JSX-looking block in the corpus is inside a code fence, so no MDX v2→v3 component breakage is expected
 - [ ] Verify raw HTML in MDX (`<p>`, `<a href>` in the Discord article) still renders under MDX v3
-- [ ] Confirm all `/images/articles/*` references resolve from `public/`
+- [ ] Confirm all 31 distinct `/images/articles/*` references resolve from TARGET `public/`, with no fallback to SOURCE files
 
 **Acceptance:**
 - [ ] All 20 articles compile with zero warnings
-- [ ] Every image in every article loads (there are ~20 across the corpus)
+- [ ] Every image in every article loads (31 distinct article image paths are referenced)
 
 ---
 
 ### E4 — Static Routes
-**Tracks:** A · **Est:** 1 session · **Depends on:** S1.3, S2.3
+**Tracks:** A · **Est:** 1 session · **Depends on:** S1.3, S2.2
 
 ---
 
@@ -478,10 +583,11 @@ Goal: this is the epic that deletes Gatsby's reason to exist. The entire `gatsby
 **Depends on:** S3.2
 
 **Tasks:**
-- [ ] `src/routes/index.tsx` with a `loader` calling `getArticles().slice(0, 10)`
-- [ ] Port `Hero.tsx`, `ArticleList.tsx`, `Projects.tsx`
-- [ ] `TextType.tsx` (GSAP) is client-only — confirm it doesn't break prerendering; guard with a mount check if it does
-- [ ] `spotlight.tsx` likewise
+- [ ] TARGET `src/routes/index.tsx` loader returns `getArticles().slice(0, 10)` metadata only; set `staleTime: Infinity` because this data cannot change without a new build
+- [ ] Port SOURCE `Hero.tsx`, `ArticleList.tsx`, and `Projects.tsx` into TARGET
+- [ ] Do not port unused SOURCE `RecentArticles.tsx` or commented `sampleArticles`; move only live `projects` data to a focused TARGET module
+- [ ] Port SOURCE `TextType.tsx` typing behaviour, but replace its GSAP-only cursor blink with a CSS keyframe. Keep the timeout/observer logic that actually drives typing and remove the GSAP dependency.
+- [ ] Port SOURCE `spotlight.tsx` and test it the same way
 
 **Acceptance:**
 - [ ] `/` matches the Gatsby homepage visually
@@ -497,9 +603,10 @@ Goal: this is the epic that deletes Gatsby's reason to exist. The entire `gatsby
 **Depends on:** S1.3
 
 **Tasks:**
-- [ ] Port `src/pages/about.tsx` → `src/routes/about.tsx`
+- [ ] Port SOURCE `src/pages/about.tsx` → TARGET `src/routes/about.tsx`
+- [ ] Update the single factual sentence that says the site uses Gatsby so TARGET names TanStack Start; otherwise preserve About-page content and layout
 - [ ] Confirm the 404 wired in S1.3 renders for unknown paths
-- [ ] Check `netlify.toml`'s 404 redirect still points somewhere valid
+- [ ] Compare SOURCE's catch-all `netlify.toml` 404 redirect with Start/Netlify's generated routing. Do not blindly copy the Gatsby redirect into TARGET if it would intercept server functions; verify unknown paths return the TARGET not-found UI with status 404.
 
 **Acceptance:**
 - [ ] Both render; 404 returns a real 404 status on the deployed preview
@@ -520,10 +627,10 @@ The most important route on the site. 20 of 24 pages.
 
 **Tasks:**
 - [ ] Create `src/routes/articles.$slug.tsx`
-- [ ] `loader` resolves the article via `getArticleBySlug(params.slug)`; throw `notFound()` if missing
-- [ ] Render the MDX component + frontmatter header (category badge, title, excerpt, date, reading time, author, tags)
+- [ ] The loader resolves **serializable metadata/TOC only** via `getArticleMetadataBySlug(params.slug)`, throws `notFound()` if missing, and uses `staleTime: Infinity`
+- [ ] The route component resolves the cached lazy component for `params.slug` and renders it inside one focused Suspense boundary with a stable article-body fallback; never return the component from the loader
 - [ ] Port the two-sidebar grid layout (TOC left, sharing right)
-- [ ] Port `SharingComponent.tsx` — replace the hardcoded `https://s11a.com${location.pathname}` with the router's location
+- [ ] Port only the used behaviour from SOURCE `SharingComponent.tsx`. The hardcoded origin actually lives in SOURCE `src/templates/article.tsx`; build canonical/share URLs from one site-origin constant plus typed route params, not `window.location`
 
 **Acceptance:**
 - [ ] All 20 slugs render
@@ -543,8 +650,9 @@ The most important route on the site. 20 of 24 pages.
 
 **Tasks:**
 - [ ] Implement `head: ({ loaderData }) => ({ meta: [...], links: [...], scripts: [...] })`
-- [ ] Port every tag from `SEO.tsx`: title, description, canonical, OG (title/description/image/url/type/site_name/image dims), article published/modified time, Twitter card set, robots, author, RSS alternate
-- [ ] Port the `BlogPosting` JSON-LD including the `sameAs` social array
+- [ ] Recreate the tags with actual consumers: title, description, canonical, OG title/description/image/url/type/site name, article published/modified time, Twitter card fields, author, and RSS alternate
+- [ ] Do not port SOURCE's non-standard `<meta name="image">` or redundant default `robots="index, follow"`; emit OG image dimensions only when the selected image's dimensions are known
+- [ ] Recreate `BlogPosting` JSON-LD including the `sameAs` social array; use the article's real category/tags instead of hardcoded `articleSection: "Technology"`
 - [ ] Extract the shared bits into `src/lib/seo.ts` so E7 can reuse it
 
 **Acceptance:**
@@ -555,7 +663,7 @@ The most important route on the site. 20 of 24 pages.
 ### E6 — Articles Index & URL-as-State
 **Tracks:** A · C · **Est:** 2 sessions · **Depends on:** S5.1
 
-Goal: the state-management refresher, done on real code. Today `src/pages/articles.tsx` holds `searchQuery`, `selectedCategory`, `selectedTags`, and `currentPage` in four `useState` hooks — so filters are unshareable, un-bookmarkable, and lost on back-navigation.
+Goal: the state-management refresher, done on real code. SOURCE `src/pages/articles.tsx` holds `searchQuery`, `selectedCategory`, `selectedTags`, and `currentPage` in four `useState` hooks — so filters are unshareable, un-bookmarkable, and lost on back-navigation.
 
 ---
 
@@ -568,14 +676,16 @@ Goal: the state-management refresher, done on real code. Today `src/pages/articl
 
 **Tasks:**
 - [ ] Create `src/routes/articles.index.tsx`
-- [ ] Define a Zod schema: `{ q: string().default(''), category: string().optional(), tags: array(string()).default([]), page: number().default(1) }`
-- [ ] Wire `validateSearch`
+- [ ] Its loader returns the full serializable article-metadata list with `staleTime: Infinity`; filtering/pagination remain cheap derived values in the component and do not become loader dependencies or Query data
+- [ ] Define a Zod v4 schema with safe fallbacks: `q` string, optional validated category, string-array tags, and a coerced/clamped positive page. Use `.catch(...)` for malformed public URLs so a bad query parameter does not render the route error boundary.
+- [ ] Pass the Zod v4 schema directly to `validateSearch`; do not install the Zod v3 adapter
+- [ ] Use `stripSearchParams` for empty/default `q`, `tags`, and `page = 1` so generated links remain canonical and readable
 - [ ] Replace all four `useState` hooks with `Route.useSearch()`
 - [ ] Update filter controls to `navigate({ search: (prev) => ({ ...prev, ... }) })`
 - [ ] Reset `page` to 1 whenever `q`/`category`/`tags` change — note this replaces the current `useEffect`, which is a **React anti-pattern** (derived state in an effect)
 
 **Acceptance:**
-- [ ] `/articles?q=spring&category=Java&page=2` loads with those filters applied
+- [ ] `/articles?q=spring&category=Backend&page=2` loads with those filters applied
 - [ ] Browser back/forward moves through filter history
 - [ ] Zero `useEffect` in this route
 
@@ -585,8 +695,8 @@ Goal: the state-management refresher, done on real code. Today `src/pages/articl
 
 ---
 
-#### S6.2 — Derived state audit
-**Learn (C · D):** most "state" isn't state. The current file already gets this partly right (`useMemo` for categories/tags/filtering) and partly wrong (the page-reset effect).
+#### S6.2 — Derived state and dependency audit
+**Learn (C · D):** most "state" isn't state, and a small static list does not earn a cache/state library.
 
 **Story:** As a developer, I want every value in this route classified as URL state, derived value, or genuine local state.
 
@@ -594,13 +704,13 @@ Goal: the state-management refresher, done on real code. Today `src/pages/articl
 
 **Tasks:**
 - [ ] Write the classification table into §10
-- [ ] Remove `useMemo` wrappers where the computation is trivially cheap over 20 items — measure before assuming
-- [ ] **Try React Compiler** (`babel-plugin-react-compiler` via `@vitejs/plugin-react`) and check whether the remaining memos become redundant
+- [ ] Remove SOURCE `useMemo` wrappers where filtering/sorting 20 metadata objects is trivially cheap; keep memoization only if measurement shows a real issue
+- [ ] Do not add React Compiler for this route; the migration should first make the data flow simple and correct
 - [ ] Confirm the final route has zero `useEffect`
 
 **Acceptance:**
 - [ ] Classification table complete
-- [ ] A written answer to: "does this blog need Zustand, Jotai, or TanStack Query anywhere?" (Expected answer: **no** — and being able to defend that is the actual learning outcome. Track C is about recognising when the dependency isn't earned.)
+- [ ] A written answer to state placement: no Zustand/Jotai/Redux; Router search owns filters, local derivation owns filtered results, Router loaders own static metadata, and Query owns only the view counter
 
 ---
 
@@ -610,8 +720,8 @@ Goal: the state-management refresher, done on real code. Today `src/pages/articl
 **Depends on:** S6.1
 
 **Tasks:**
-- [ ] Port `SearchInput`, `CategoryFilter`, `TagFilter`, `Pagination` to read/write search params instead of props-and-callbacks
-- [ ] Debounce the search input against the URL (~200ms) so typing doesn't spam history entries — use `navigate({ replace: true })` for intermediate keystrokes
+- [ ] Keep `SearchInput`, `CategoryFilter`, `TagFilter`, and `Pagination` as controlled/presentational components; let the route translate their values/callbacks to typed search navigation instead of coupling every leaf component to Router
+- [ ] Keep only the search box's draft text as genuine local UI state, debounce it against the URL (~200ms), and use `navigate({ replace: true })` for intermediate keystrokes so typing does not spam history
 - [ ] Port the active-filter chips and "Clear all"
 
 **Acceptance:**
@@ -625,6 +735,13 @@ Goal: the state-management refresher, done on real code. Today `src/pages/articl
 
 Goal: replace four Gatsby plugins with owned code. This is where "bespoke" pays off — each of these is ~20 lines you fully understand.
 
+Before implementing this epic, run a clean SOURCE build and copy `rss.xml`,
+`robots.txt`, `sitemap-index.xml`, and `sitemap-0.xml` from SOURCE `public/` into a
+clearly named TARGET test-fixture directory such as `migration-baseline/`. SOURCE
+`public/` is generated and ignored, so do not describe those files as committed or
+assume a previous local build is the authoritative baseline. Record the SOURCE
+commit used to generate them.
+
 ---
 
 #### S7.1 — RSS feed
@@ -634,9 +751,9 @@ Goal: replace four Gatsby plugins with owned code. This is where "bespoke" pays 
 
 **Tasks:**
 - [ ] Create `src/routes/rss[.]xml.ts` as a server route (note the `[.]` escaping convention)
-- [ ] Generate the feed from `getArticles()` — replicate `gatsby-plugin-feed`'s `serialize` exactly: `title`, `description` (frontmatter `excerpt` || generated), `date`, `url`, `guid`
+- [ ] Generate the feed from `getArticles()` using validated frontmatter `title`, `excerpt`, and `date`, plus the unchanged URL/GUID format. All 20 posts require an excerpt, so do not build a second prose-excerpt generator.
 - [ ] Set `Content-Type: application/rss+xml`
-- [ ] Diff against the committed `public/rss.xml` from the last Gatsby build
+- [ ] Diff against the captured SOURCE `rss.xml` fixture from the same baseline build
 
 **Acceptance:**
 - [ ] Feed validates (W3C feed validator)
@@ -650,12 +767,13 @@ Goal: replace four Gatsby plugins with owned code. This is where "bespoke" pays 
 **Depends on:** S3.2
 
 **Tasks:**
-- [ ] `src/routes/sitemap[.]xml.ts` listing all 24 routes with `lastmod` from frontmatter dates
-- [ ] `src/routes/robots[.]txt.ts` matching current output, referencing the sitemap
-- [ ] Diff both against `public/sitemap-0.xml` and the current robots output
+- [ ] Create `src/routes/sitemap-0[.]xml.ts` listing the 23 canonical indexable pages (20 articles + `/`, `/articles/`, `/about/`); exclude the 404 and non-HTML resource routes. Preserve SOURCE's trailing-slash URL form.
+- [ ] Put the fixed SOURCE-compatible sitemap index at TARGET `public/sitemap-index.xml`; it only points to `https://s11a.com/sitemap-0.xml` and does not earn a server route
+- [ ] Put the fixed SOURCE-compatible robots content at TARGET `public/robots.txt`, including `Sitemap: https://s11a.com/sitemap-index.xml` and `Host: https://s11a.com`; it does not earn a server route
+- [ ] Diff all three outputs against the captured SOURCE sitemap and robots fixtures; preserve their public URL/shape or deliberately record any non-semantic serialization difference.
 
 **Acceptance:**
-- [ ] Both served correctly and present in `dist/client` after prerender
+- [ ] Sitemap index + sitemap document + robots are served correctly and present in `dist/client` after prerender
 
 ---
 
@@ -667,8 +785,8 @@ Goal: replace four Gatsby plugins with owned code. This is where "bespoke" pays 
 **Tasks:**
 - [ ] Add the gtag script via `__root.tsx` `head.scripts`, gated on the env var (currently `GATSBY_GA_MEASUREMENT_ID` — rename to `VITE_GA_MEASUREMENT_ID`)
 - [ ] Reimplement the `respectDNT` behaviour `gatsby-plugin-google-gtag` provided
-- [ ] Fire a pageview on router navigation — SPA route changes don't trigger it automatically
-- [ ] Update the Netlify env var name
+- [ ] Subscribe once to Router's `onResolved` event for SPA pageviews and return/unregister the subscription during teardown; use Router events for this imperative integration, not reactive render state
+- [ ] Add `VITE_GA_MEASUREMENT_ID` to TARGET's Netlify environment before removing/ignoring SOURCE's `GATSBY_GA_MEASUREMENT_ID`; never expose a secret by copying local `.env` files
 
 **Acceptance:**
 - [ ] Pageviews fire on client-side navigation, not just hard loads
@@ -677,129 +795,88 @@ Goal: replace four Gatsby plugins with owned code. This is where "bespoke" pays 
 
 ---
 
-### E8 — React 19 Refresher Pass
-**Tracks:** D · **Est:** 2 sessions · **Depends on:** E5
+### E8 — React 19 Compatibility Pass
+**Tracks:** D · **Est:** 1 session · **Depends on:** E5
 
-Goal: the codebase is React 18 idiom throughout. Modernise it deliberately rather than by accident.
+Goal: write TARGET-native React 19 code and avoid copying SOURCE's Gatsby/React 18
+wrappers. This is a compatibility audit, not a hook-demo epic.
 
 ---
 
-#### S8.1 — Re-init shadcn for React 19 + Tailwind v4
-**Story:** As a developer, I want shadcn primitives generated for the current stack rather than hand-patched.
+#### S8.1 — Generate TARGET shadcn primitives for React 19 + Tailwind v4
+**Story:** As a developer, I want TARGET-native shadcn primitives rather than copies of SOURCE's generated React 18 code.
 
 **Depends on:** S2.3
 
 **Tasks:**
-- [ ] Update `components.json` — remove the `tailwind.config` key, point `css` at `src/styles/app.css`
-- [ ] Re-add `button`, `card`, `badge`, `select` via the CLI; **diff against your existing versions** and reapply any local changes deliberately
-- [ ] `spotlight.tsx` is custom — port by hand
+- [ ] TARGET is already shadcn-initialised. Keep `components.json` pointed at `src/styles.css` and keep its empty Tailwind config value rather than inventing a JS config file.
+- [ ] Audit the `button` generated for S1.3, then add `card`, `badge`, and `select` via the CLI in TARGET; diff each against its SOURCE counterpart and reapply intentional local changes deliberately
+- [ ] SOURCE `spotlight.tsx` is custom — port it to TARGET by hand
 - [ ] Verify Radix Select works under React 19
 
 **Acceptance:**
-- [ ] All 5 primitives render; no React 19 console warnings
+- [ ] All four generated primitives plus custom `spotlight` render; no React 19 console warnings
 
 ---
 
-#### S8.2 — `ref` as a prop
-**Learn (D):** `forwardRef` is unnecessary in React 19 — `ref` is an ordinary prop on function components.
+#### S8.2 — React 19 compatibility audit
+**Learn (D):** React 19 accepts `ref` as a prop, but most blog components do not need a ref API at all.
 
-**Story:** As a developer, I want no `forwardRef` in the codebase.
+**Story:** As a developer, I want simple React 19 components without Gatsby types or artificial modern-hook examples.
 
 **Depends on:** S8.1
 
 **Tasks:**
-- [ ] Grep `src/` for `forwardRef`
-- [ ] Convert each to a plain `ref` prop
-- [ ] Remove the now-redundant `ElementRef` / `ComponentPropsWithoutRef` type gymnastics
-- [ ] Delete `React.FC<...>` annotations on the ported pages/templates — they were a Gatsby-typing convention with no remaining value
+- [ ] Do not copy SOURCE shadcn primitives into TARGET; generate the four used primitives so React 19/ref conventions come from the current generator
+- [ ] Grep TARGET for `forwardRef`; if a custom component genuinely exposes a ref, accept `ref` in its typed props, otherwise remove the unused ref plumbing entirely
+- [ ] Use plain function components for TARGET routes/components and omit SOURCE `React.FC<PageProps<...>>` Gatsby annotations
+- [ ] Keep effects only for real external synchronization (theme storage/media query, menu/DOM events, analytics, counter increment). Keep Suspense limited to the lazy MDX renderer; do not add deferred loaders, `use()`, `useActionState`, `useOptimistic`, or React Compiler.
+- [ ] Navigate between articles and confirm the existing synchronous local-content path has no flash before considering a `pendingComponent`; do not add a spinner that never appears in realistic use
 
 **Acceptance:**
 - [ ] Zero `forwardRef` in `src/`
-- [ ] Typecheck clean
-
----
-
-#### S8.3 — Suspense & modern data access
-**Learn (D):** `use()`, Suspense boundaries, and how they interact with router loaders.
-
-**Story:** As a reader, I want no layout shift or spinner flash on navigation.
-
-**Depends on:** S5.1
-
-**Tasks:**
-- [ ] Add a Suspense boundary around the MDX content render
-- [ ] Experiment with `use()` on a deferred loader promise — TanStack Router supports streaming deferred data
-- [ ] Decide honestly whether it's warranted here (prerendered content resolves instantly, so it may not be) and record the reasoning
-- [ ] Add `pendingComponent` on the article route for slow client-side navigations
-
-**Acceptance:**
-- [ ] Navigation between articles has no visible flash
-- [ ] Written note on when `use()` is and isn't worth it
-
----
-
-#### S8.4 — Theme toggle modernisation
-**Learn (D):** `useSyncExternalStore` for external state (system colour scheme).
-
-**Story:** As a reader, I want the theme toggle to track OS preference changes live.
-
-**Depends on:** S1.3
-
-**Tasks:**
-- [ ] Rewrite `src/hooks/useTheme.ts` with `useSyncExternalStore` subscribing to `matchMedia('(prefers-color-scheme: dark)')`
-- [ ] Ensure the server snapshot matches the inline head script so hydration doesn't mismatch
-- [ ] Verify the three-state cycle (light / dark / system) still works
-
-**Acceptance:**
-- [ ] Changing macOS appearance updates the site live when set to "system"
+- [ ] `npm run check` clean
 - [ ] No hydration warning in console
 
 ---
 
-### E9 — Dynamic Content via Server Functions
+### E9 — Runtime Article View Counter
 **Tracks:** A · C · **Est:** 2 sessions · **Depends on:** E5
 
-Goal: prove the dynamic escape hatch works *before* cutover, so it isn't a leap of faith later. **Ship exactly one dynamic feature.** Scope discipline is part of the exercise.
+Goal: ship the requested view counter as the only dynamic feature. Static article
+content stays in Router/local modules; Query and server functions do not become a
+second content architecture.
 
 ---
 
-#### S9.1 — Static server function (build-time)
-**Learn (A):** static server functions execute at build and get cached as JSON — the same primitive as runtime server functions, different execution phase.
+#### S9.1 — Server functions + Query + Netlify Blobs
+**Learn (A · C):** the one place on this site where Query is earned—runtime server state with reads, a mutation, cache updates, and failure isolation.
 
-**Story:** As a developer, I want to compute something at build time via `createServerFn`, so that I understand the build/runtime split.
+**Story:** As the site owner, I want a per-article view count, so that the framework's dynamic path is proven end-to-end.
 
 **Depends on:** S5.1
 
 **Tasks:**
-- [ ] Replace the frontmatter `readingTime` string with a build-time computed value via a static server function
-- [ ] Confirm the result is baked into the prerendered HTML with no client fetch
-- [ ] Inspect the emitted JSON artifact in `dist/client`
-
-**Acceptance:**
-- [ ] Reading times render in prerendered HTML
-- [ ] Network tab shows no runtime request for them
-
----
-
-#### S9.2 — Runtime server function: article view counter
-**Learn (A · C):** the one place on this site where TanStack Query is genuinely earned — real server state with caching, revalidation, and optimistic updates.
-
-**Story:** As the site owner, I want a per-article view count, so that the framework's dynamic path is proven end-to-end.
-
-**Depends on:** S9.1
-
-**Tasks:**
-- [ ] Install `@netlify/blobs` and create a dedicated `article-views` store
-- [ ] Implement `getViews(slug)` and `incrementViews(slug)` with `createServerFn`; keep all Blob access inside the server-function handlers
+- [ ] Install `@netlify/blobs`; create a shared Zod slug schema, `article-views.functions.ts` for the public server-function wrappers, and `article-views.server.ts` for Blob-only code
+- [ ] Implement validated `GET getViews(slug)` and `POST incrementViews(slug)` with `createServerFn().validator(schema)` and default strict serialization. Import server functions statically; never dynamically import them.
+- [ ] Mark counter RPC responses `Cache-Control: no-store`; Query owns the short-lived browser cache, while CDN/browser HTTP caching would serve stale counts
+- [ ] Keep all `getStore` access in `.server.ts`; use a site-wide `article-views` store with strong-consistency reads
+- [ ] Implement increment as a bounded compare-and-swap retry using Blob ETags plus `onlyIfMatch`/`onlyIfNew`. A naïve read-then-set loses concurrent increments because Blobs is last-write-wins.
+- [ ] Treat the metric as best-effort rather than billing-grade analytics; after bounded contention retries, fail without affecting the article page
 - [ ] Run the normal Vite dev server and verify the Netlify integration provides a sandboxed local Blob store without `netlify dev`
-- [ ] Render the count in `SharingComponent`, wrapped in Suspense so it never blocks prerender
-- [ ] Add `@tanstack/react-query` **only for this** and justify it in §10
-- [ ] Use `useOptimistic` for the increment (Track D)
-- [ ] Rate-limit or debounce the increment so a refresh loop can't inflate it
+- [ ] Keep TARGET's generated per-request Query client/SSR integration, but create a focused `viewCountQueryOptions(slug)` factory and mutation; Query keys include the slug
+- [ ] Do not call `ensureQueryData`/`prefetchQuery` from the article loader: this widget is non-critical, must not delay SEO content, and must never contact Blobs while prerendering
+- [ ] Render a small counter inside Router's `<ClientOnly fallback={...}>` so neither the GET nor POST executes during prerender/build and article HTML never waits for it
+- [ ] Increment once per slug per browser session after hydration using guarded `sessionStorage`; the POST returns the authoritative count and `onSuccess` writes it with `queryClient.setQueryData`
+- [ ] Do not add `useOptimistic`: a passive counter does not need speculative UI, and showing a false increment on failure is worse than briefly showing the previous value
+- [ ] Configure conservative Query behaviour for this non-critical widget (bounded retry, meaningful `staleTime`, and no unnecessary refetch-on-focus); log failures only in development
+- [ ] Enable Start's CSRF middleware for mutation server functions and verify same-origin production calls
 
 **Acceptance:**
 - [ ] Count displays and increments
 - [ ] Article pages still prerender to static HTML — the counter hydrates in, it does not block the build
+- [ ] A production build does not mutate or read the production view store
+- [ ] Two concurrent increment requests do not silently overwrite one another in the normal retry path
 - [ ] With the counter endpoint down, the page still renders
 - [ ] A production deploy persists counts in Netlify Blobs; local development does not read or mutate production counts
 
@@ -818,8 +895,9 @@ Goal: prove the dynamic escape hatch works *before* cutover, so it isn't a leap 
 **Depends on:** S5.1, S7.2
 
 **Tasks:**
-- [ ] Add to `tanstackStart()` options: `prerender: { enabled: true, crawlLinks: true, failOnError: true }`
+- [ ] TARGET's scaffold already has `enabled: true` and `crawlLinks: true`; add `failOnError: true` and remove the temporary novelty `onSuccess` logger once it stops serving the learning exercise
 - [ ] Confirm `crawlLinks` discovers all 20 article routes from `/articles` — if any are missed, add them explicitly via the `pages` array
+- [ ] Add explicit prerender entries for the generated `rss.xml` and `sitemap-0.xml` routes; `robots.txt` and `sitemap-index.xml` are fixed files copied from TARGET `public/`
 - [ ] Set `autoSubfolderIndex` to whichever matches the current URL shape (trailing slash behaviour must not change)
 - [ ] `vite build`, then verify `dist/client` contains 24 HTML files
 - [ ] View source on 3 articles — prose must be in the markup
@@ -836,15 +914,16 @@ Goal: prove the dynamic escape hatch works *before* cutover, so it isn't a leap 
 #### S10.2 — Netlify deploy
 **Story:** As the site owner, I want a green deploy preview from this branch.
 
-**Depends on:** S9.2, S10.1
+**Depends on:** S9.1, S10.1
 
 **Tasks:**
 - [ ] Confirm `@netlify/vite-plugin-tanstack-start` is active in `vite.config.ts`; do not add Nitro or a Nitro preset
-- [ ] Update `netlify.toml`: `publish` → `dist/client`, `command` → the new build script
+- [ ] Configure the Netlify site/branch deploy with **base directory `scratch/s11a.com`**. TARGET's existing `netlify.toml` already declares `command = "npm run check && npm run build"` and `publish = "dist/client"`; verify Netlify actually discovers that file from the configured base.
+- [ ] Keep SOURCE's root `netlify.toml` unchanged until the cutover switch. Do not make TARGET publish SOURCE `public/` or run SOURCE's root build command.
 - [ ] Confirm the integration emits the runtime server functions needed by the article view counter
 - [ ] Re-verify the CSP — the current policy is strict and hand-written; check `script-src`/`connect-src` still cover Start's hydration bootstrap and any server-function calls
 - [ ] Confirm the cache-control header rules still match the new asset paths and hashing scheme
-- [ ] Update the local and Netlify Node version from 22.4.1 to a Vite 8-supported 22.x release (22.12 or newer)
+- [ ] Verify TARGET's `.nvmrc`, `package.json` engines, and Netlify image agree on TARGET's chosen Node 24.19.x / npm 11.17.x toolchain. SOURCE remains on Node 22.4.1 because it is an independent app.
 - [ ] Deploy preview from the branch
 
 **Acceptance:**
@@ -874,46 +953,48 @@ Goal: prove the dynamic escape hatch works *before* cutover, so it isn't a leap 
 
 ---
 
-### E11 — Cutover & Teardown
+### E11 — Cutover, Isolation & Documentation
 **Tracks:** A · **Est:** 1 session · **Depends on:** E10
 
-The satisfying epic. Do not start it until E10 is green.
+Do not start this epic until E10 is green. Cutover changes which subdirectory Netlify
+deploys; it does not delete the SOURCE application.
 
 ---
 
-#### S11.1 — Remove Gatsby
-**Story:** As a maintainer, I want zero Gatsby code or dependencies in the repo.
+#### S11.1 — Prove TARGET is standalone
+**Story:** As a maintainer, I want TARGET to install, build, test, and deploy without importing or executing anything from SOURCE.
 
 **Depends on:** S10.3
 
 **Tasks:**
-- [ ] Delete `gatsby-config.ts`, `gatsby-node.js`, `gatsby-browser.js`, `gatsby-ssr.js`, `tailwind.config.js`, `postcss.config.js`
-- [ ] Remove `gatsby` + all 8 `gatsby-*` packages, `prismjs`, `@mdx-js/react` (if S3.4 dropped `MDXProvider`)
-- [ ] **Empty the `overrides` block** — re-audit with `npm audit` and only re-add what's still genuinely needed. This block existing solely to patch Gatsby's transitive deps is the most satisfying deletion in the project.
-- [ ] Delete `src/pages/`, `src/templates/`
-- [ ] Delete the Lighthouse harness — `scripts/performance/lighthouse-test.js`, the `lighthouse` / `chrome-launcher` / `start-server-and-test` devDeps, and the `lighthouse`, `lighthouse:ci`, `perf` scripts. Nothing tracks performance now (S10.3); an unused harness is just three more things to keep patched.
-- [ ] Delete the tracked `public/` build output; confirm `.gitignore` covers `dist/` and `public/`
-- [ ] Rename `dev:next`/`build:next` → `dev`/`build`
-- [ ] Delete `src/data/sampleData.ts` if only `categoryIcons` was live — move that constant somewhere honest
-- [ ] Retire `gatsby-browser.js`'s service-worker cleanup — that one-time fix has long since shipped to all visitors
+- [ ] Audit TARGET `package.json` and lockfile: no `gatsby`, `gatsby-*`, `prismjs`, Gatsby-specific override, or SOURCE-only Lighthouse harness should have been copied in
+- [ ] Audit TARGET source/config for cross-project paths such as `../../src`, `../../public`, or imports that resolve outside TARGET. Replace every one with a TARGET-owned file.
+- [ ] Confirm TARGET owns all 20 MDX files, all required images, feed/sitemap/robots generation, metadata, and configuration
+- [ ] Confirm TARGET did not copy SOURCE `RecentArticles.tsx`, commented `sampleArticles`, or the mixed `sampleData.ts`; keep live projects/category icons in focused modules and use `ArticleMetadata` from the content registry
+- [ ] Remove unused generated starter code and dependencies from TARGET (demo header, production devtools, placeholder styles, and placeholder README text). Retain the focused Query integration required by E9. Do not delete similarly named SOURCE files.
+- [ ] Ensure TARGET `.gitignore` covers `dist/`, `.netlify/`, and generated route-tree output; keep migration baselines only if they are deliberate fixtures
+- [ ] From a clean clone, run `cd scratch/s11a.com && npm ci && npm run check && npm run build`
+- [ ] Separately run SOURCE's normal validation/build once to confirm the reference app was not damaged by the migration branch
 
 **Acceptance:**
-- [ ] `grep -ri gatsby` returns nothing outside `BACKLOG.md` and git history
-- [ ] `npm audit` clean without overrides
-- [ ] Fresh `npm ci && npm run build` works from a clean clone
+- [ ] `rg -i gatsby scratch/s11a.com` returns no runtime code or dependency (historical migration notes may mention Gatsby)
+- [ ] TARGET `npm audit` is clean without Gatsby-era overrides
+- [ ] Fresh TARGET install/check/build works without installing SOURCE dependencies
+- [ ] SOURCE remains present and runnable as the migration reference
 
 ---
 
-#### S11.2 — Documentation
-**Story:** As my future self, I want `AGENTS.md` and `README.md` to describe the actual stack.
+#### S11.2 — Documentation for a two-project repository
+**Story:** As my future self, I want repository-level and TARGET documentation to make the application boundary unmistakable.
 
 **Depends on:** S11.1
 
 **Tasks:**
-- [ ] Rewrite `AGENTS.md` — every command, path, and convention in it currently describes Gatsby
-- [ ] Update `README.md`
+- [ ] Keep root `AGENTS.md` accurate for SOURCE, but add a short repository-layout note that TARGET has its own instructions. Do not rewrite Gatsby commands as if TARGET replaced the root app.
+- [ ] Create TARGET `AGENTS.md` describing TanStack Start, React 19, Vite, Tailwind v4, Oxfmt/Oxlint, TARGET-only commands, and the no-cross-project-import rule
+- [ ] Replace TARGET's generated `README.md` with project-specific setup/build/deploy instructions; update the root README only to explain the SOURCE/TARGET layout and which app Netlify deploys
 - [ ] Document the content pipeline: how to add an article, what the frontmatter schema requires, how prerendering picks it up
-- [ ] Update `eslint.config.mjs` — remove the `gatsby-node.js`/`gatsby-ssr.js` ignore entries
+- [ ] Document that TARGET uses Oxfmt/Oxlint while SOURCE keeps its ESLint configuration; do not edit SOURCE ignores as TARGET cleanup
 
 **Acceptance:**
 - [ ] A stranger could add an article and deploy it from the README alone
@@ -928,6 +1009,7 @@ The satisfying epic. Do not start it until E10 is green.
 **Tasks:**
 - [ ] Verify all 20 article URLs against the production sitemap — **any 404 here is a broken inbound link and lost SEO**
 - [ ] Confirm `rss.xml` GUIDs unchanged (S7.1)
+- [ ] Switch the production Netlify site's base directory to `scratch/s11a.com` (or apply the equivalent committed monorepo configuration) and confirm its publish path resolves to TARGET `dist/client`
 - [ ] Merge to `master`, watch the production deploy
 - [ ] Spot-check 5 articles on production
 - [ ] Fill in §10
@@ -943,7 +1025,7 @@ The satisfying epic. Do not start it until E10 is green.
 Two sensible sequences depending on how you like to work:
 
 **Vertical slice (recommended)** — get one article rendering end to end as early as possible, then widen:
-`S0.1 → S0.2 → S1.1 → S1.2 → S2.1 → S3.1 → S3.2 → S5.1 → S0.3 → S10.1` — you now have a real prerendered article. Everything after is filling in.
+`S0.1 → S0.2 → S1.1 → S1.2 → S2.1 → S2.2 → S1.3 → S3.1 → S3.2 → S5.1 → S2.3 → S0.3 → S10.1` — you now have a themed shell and a real prerendered article. Everything after is filling in.
 
 **Layered** — finish each subsystem before moving on: straight down E0 → E11.
 
@@ -955,40 +1037,64 @@ The vertical slice de-risks the two things most likely to be dealbreakers (MDX p
 
 | Risk | Likelihood | Impact | Mitigation |
 |---|---|---|---|
-| TanStack Start version churn (v1.168.45 shipped the day this was written) | High | Medium | Pin exact versions in `package.json`. Bump deliberately, never with `^` drift mid-project. |
+| TanStack Start/version-family drift (`latest` ranges currently resolve related TanStack packages to different 1.x patch lines) | High | Medium | Pin TARGET to its known-good lockfile versions; bump deliberately and verify together. |
+| Accidental edits or imports across SOURCE/TARGET | Medium | High | Workspace contract, TARGET-owned copies of content/assets, cross-boundary path audit in S11.1. |
+| Netlify builds the repository root instead of TARGET | High | High | Set and verify base directory `scratch/s11a.com` in the preview before production cutover. |
 | `crawlLinks` misses article routes | Medium | High | S10.1 verifies count = 24. Fall back to the explicit `pages` array. |
 | CSP breaks under Start's hydration bootstrap | Medium | High | S10.2 explicitly re-verifies. The existing policy already allows `script-src 'unsafe-inline'`. |
 | Netlify cache headers stop matching new asset paths | High | Low | Called out in S10.2. Silent failure mode — check it, don't assume. |
 | URL shape changes (trailing slashes) break inbound links | Low | High | `autoSubfolderIndex` in S10.1; full URL verification in S11.3. |
-| E9 scope creep | High | Medium | Preserve the Netlify-backed counter; cut optional UI polish or caching experiments if the epic exceeds 2 sessions. |
+| Blob counter loses concurrent increments | Medium | Medium | Strong reads plus bounded ETag compare-and-swap retries; document the counter as best-effort. |
+| E9 scope creep | High | Medium | Keep one counter widget; no dashboard, unique-user analytics, historical charts, or generalized data layer. |
 | Lighthouse performance regression vs. Gatsby | Medium | Low | Accepted, not tracked. Hydrating framework on a CDN-served 20-post blog. |
 
 ---
 
 ## 8. Dependency delta
 
-**Removing:** `gatsby`, `gatsby-plugin-feed`, `gatsby-plugin-google-gtag`, `gatsby-plugin-mdx`, `gatsby-plugin-robots-txt`, `gatsby-plugin-sitemap`, `gatsby-remark-prismjs`, `gatsby-source-filesystem`, `gatsby-plugin-webpack-bundle-analyser-v2`, `prismjs`, `@mdx-js/react`, `postcss`, `@tailwindcss/postcss`, `lighthouse`, `chrome-launcher`, `start-server-and-test`, and the entire `overrides` block.
+SOURCE and TARGET have independent manifests; there is no root-level package swap.
 
-**Adding:** `@tanstack/react-router`, `@tanstack/react-start`, `vite`, `@vitejs/plugin-react`, `@netlify/vite-plugin-tanstack-start`, `@tailwindcss/vite`, `@mdx-js/rollup`, `remark-frontmatter`, `remark-mdx-frontmatter`, `remark-gfm`, `rehype-pretty-code`, `rehype-slug`, `zod`, `@netlify/blobs`, and `@tanstack/react-query`. The last two are earned specifically by the S9.2 view counter; Nitro is not part of this architecture.
+**Intentionally not copied from SOURCE into TARGET:** `gatsby`, every `gatsby-*`
+package, `prismjs`, `@mdx-js/react`, `gsap` (cursor blink becomes CSS), `postcss`, `@tailwindcss/postcss`, SOURCE's Lighthouse harness packages,
+and SOURCE's Gatsby security overrides. They remain in SOURCE because SOURCE remains
+an intact reference application.
 
-**Unchanged:** `@radix-ui/*`, `class-variance-authority`, `clsx`, `tailwind-merge`, `tailwindcss`, `gsap`, `@tailwindcss/typography`.
+**Already present in the fresh TARGET scaffold:** `@tanstack/react-router`,
+`@tanstack/react-start`, Vite, React 19, `@vitejs/plugin-react`,
+`@netlify/vite-plugin-tanstack-start`, `@tailwindcss/vite`, Tailwind,
+`@tanstack/react-query`, shadcn support packages, Oxfmt, and Oxlint. Query is
+retained specifically for S9.1; unused starter integrations must be removed.
 
-Net: roughly flat on count, but every remaining dependency is actively maintained and the security-override block disappears.
+**Still to add to TARGET:** `@mdx-js/rollup`, `remark-frontmatter`,
+`remark-mdx-frontmatter`, `remark-gfm`, `rehype-pretty-code`, `rehype-slug`, Zod,
+`@netlify/blobs` and any Radix
+packages required by the selected shadcn components. Nitro is not part of this
+architecture.
 
 ---
 
 ## 9. Reference
 
 - TanStack Start — Static Prerendering: https://tanstack.com/start/latest/docs/framework/react/guide/static-prerendering
-- TanStack Start — Static Server Functions: https://tanstack.com/start/latest/docs/framework/react/guide/static-server-functions
+- TanStack Start — Server Functions: https://tanstack.com/start/latest/docs/framework/react/guide/server-functions
+- TanStack Start — Execution Model: https://tanstack.com/start/latest/docs/framework/react/guide/execution-model
+- TanStack Start — CSS Styling: https://tanstack.com/start/latest/docs/framework/react/guide/css-styling
 - TanStack Start — Hosting (Netlify): https://tanstack.com/start/latest/docs/framework/react/guide/hosting#netlify
 - Netlify — TanStack Start integration: https://docs.netlify.com/build/frameworks/framework-setup-guides/tanstack-start/
 - Netlify — Blobs: https://docs.netlify.com/build/data-and-storage/netlify-blobs/
 - TanStack Router — Search Params: https://tanstack.com/router/latest/docs/framework/react/guide/search-params
+- TanStack Router — Data Loading: https://tanstack.com/router/latest/docs/framework/react/guide/data-loading
+- TanStack Router — Document Head: https://tanstack.com/router/latest/docs/framework/react/guide/document-head-management
+- TanStack Router — Router Events: https://tanstack.com/router/latest/docs/framework/react/guide/router-events
+- TanStack Router — `ClientOnly`: https://tanstack.com/router/latest/docs/api/router/clientOnlyComponent
+- TanStack Query — Query Options: https://tanstack.com/query/latest/docs/framework/react/guides/query-options
 - Official example (config reference): https://github.com/TanStack/router/tree/main/examples/react/start-basic
 - `@mdx-js/rollup`: https://mdxjs.com/packages/rollup/
+- Tailwind v4 — Theme variables: https://tailwindcss.com/docs/theme
+- Tailwind v4 — Functions and directives: https://tailwindcss.com/docs/functions-and-directives
 - Tailwind v4 upgrade guide: https://tailwindcss.com/docs/upgrade-guide
 - shadcn/ui: https://ui.shadcn.com/docs/installation
+- React 19 — `forwardRef`: https://react.dev/reference/react/forwardRef
 
 ---
 
@@ -1000,13 +1106,13 @@ Net: roughly flat on count, but every remaining dependency is actively maintaine
 - File routing vs. `createPages`:
 - What `loader` gives you that a GraphQL page query didn't:
 - When prerendering surprised me:
-- Server functions — build-time vs. runtime:
+- Server-function validation/execution boundaries used by the counter:
+- Why local content did not earn a server function:
 
 ### Track B — Tailwind v4
 - `@theme` vs. `:root`:
 - What the JS config was actually doing that CSS now does:
-- Container queries — worth it here?
-- OKLCH observations:
+- Which unused SOURCE/starter tokens I intentionally did not port:
 
 ### Track C — State management
 - Classification table for `articles.index.tsx` (URL state / derived / local):
@@ -1016,9 +1122,8 @@ Net: roughly flat on count, but every remaining dependency is actively maintaine
 
 ### Track D — React 19
 - `forwardRef` removals:
-- Did React Compiler make my `useMemo`s redundant?
-- `use()` — worth it here?
-- `useSyncExternalStore` vs. the old `useTheme`:
+- React 18/Gatsby patterns I intentionally did not copy:
+- Effects retained for real external synchronization:
 
 ### Decisions I'd reverse
 -
