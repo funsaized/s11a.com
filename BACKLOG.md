@@ -213,16 +213,16 @@ Goal: a running TanStack Start app inside this repo, coexisting with Gatsby unti
     ],
   })
   ```
-- [ ] Create `src/router.tsx` exporting `getRouter()`
-- [ ] Create `src/routes/__root.tsx` with `<HeadContent />` + `<Scripts />`
-- [ ] Create `src/routes/index.tsx` — "hello" placeholder only
-- [ ] Add `"type": "module"` to `package.json`
-- [ ] Add scripts: `"dev:next": "vite dev"`, `"build:next": "vite build"` (temporary names; renamed in E11)
-- [ ] Add `src/routeTree.gen.ts` to `.gitignore`
+- [x] Create `src/router.tsx` exporting `getRouter()`
+- [x] Create `src/routes/__root.tsx` with `<HeadContent />` + `<Scripts />`
+- [x] Create `src/routes/index.tsx` — "hello" placeholder only
+- [x] Add `"type": "module"` to `package.json`
+- [x] Add scripts: `"dev:next": "vite dev"`, `"build:next": "vite build"` (temporary names; renamed in E11)
+- [x] Add `src/routeTree.gen.ts` to `.gitignore`
 
 **Acceptance:**
-- [ ] `npm run dev:next` serves a page on :3000
-- [ ] `npm run develop` (Gatsby) still works untouched
+- [x] `npm run dev:next` serves a page on :3000
+- [x] `npm run develop` (Gatsby) still works untouched
 
 **Watch for:** adding `"type": "module"` will break `gatsby-node.js` / `gatsby-ssr.js` (CommonJS). If it does, rename them to `.cjs` — Gatsby only needs to survive until E11.
 

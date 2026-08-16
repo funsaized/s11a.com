@@ -10,7 +10,21 @@ const config = defineConfig({
 		allowedHosts: ["blog-new.dev.s11a.com"],
 	},
 	resolve: { tsconfigPaths: true },
-	plugins: [devtools(), netlify(), tailwindcss(), tanstackStart(), viteReact()],
+	plugins: [
+		devtools(),
+		netlify(),
+		tailwindcss(),
+		tanstackStart({
+			prerender: {
+				enabled: true,
+				crawlLinks: true,
+				onSuccess: ({ page }) => {
+					console.log(`🫪 Wow dude! Rendered ${page.path}`);
+				},
+			},
+		}),
+		viteReact(),
+	],
 });
 
 export default config;
