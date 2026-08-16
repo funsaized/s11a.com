@@ -29,7 +29,7 @@ This migration is deliberately scoped as a **refresher project across four track
 
 | Track | What it covers | Why it's here |
 |---|---|---|
-| **A — TanStack Start** | File-based routing, typed loaders, `head` management, server functions, static prerendering, Nitro deploy targets | The framework being adopted |
+| **A — TanStack Start** | File-based routing, typed loaders, `head` management, server functions, static prerendering, Netlify deployment | The framework being adopted |
 | **B — Tailwind v4** | CSS-first config (`@theme`, `@utility`, `@variant`), OKLCH, `color-mix()`, container queries, killing the JS config | The current setup is Tailwind v4 running through a v3 compatibility shim — this is a half-finished migration to close out |
 | **C — Modern state management** | URL-as-state via TanStack Router `validateSearch`, TanStack Query for server state, Zustand for client-global — **and knowing when each is unnecessary** | Current `articles.tsx` holds 4 `useState` hooks that should be URL state |
 | **D — Modern React 19** | `ref` as a prop (no `forwardRef`), `use()`, `useActionState`, `useOptimistic`, `<form action>`, Suspense boundaries, React Compiler | Codebase is React 18 idiom throughout: `React.FC<PageProps<T>>`, `forwardRef` in shadcn primitives |
@@ -51,7 +51,7 @@ These were researched and decided before this backlog was written. **Do not re-l
 | Syntax highlighting | **`rehype-pretty-code`** (Shiki) | Dual light/dark themes as CSS vars — replaces `prismjs` + hand-maintained `prism-theme.css` |
 | Frontmatter validation | **Zod v4** at build time | Replaces/absorbs `scripts/validate-content.ts` |
 | URL state | **TanStack Router `validateSearch`** — *not* nuqs | nuqs' TanStack Router adapter is experimental and explicitly does not cover TanStack Start. Router has this built in and type-safe. |
-| Hosting | **Netlify**, static output | No change to the current deploy model; keeps the existing CSP |
+| Hosting | **Netlify** via `@netlify/vite-plugin-tanstack-start` | Prerender every content route to static HTML; deploy the view-counter server functions through the official Netlify integration. No Nitro layer. |
 
 ### Explicitly out of scope
 
@@ -68,12 +68,13 @@ Listed so they don't creep in:
 
 - [ ] All 20 articles render at their existing URLs (`/articles/<slug>`) with no redirects needed
 - [ ] `/`, `/articles`, `/about`, 404 all render
-- [ ] `npm run build` produces static HTML for every route in `.output/public`
+- [ ] `npm run build` produces static HTML for every content route in `dist/client`
 - [ ] `npm run typecheck` and `npm run lint` clean
 - [ ] No Lighthouse SEO or Accessibility failures (Performance not tracked)
 - [ ] `rss.xml`, `sitemap.xml`, `robots.txt` byte-comparable to current output
 - [ ] `gatsby*` fully removed from `package.json`; `overrides` block empty or gone
 - [ ] Netlify deploy preview green
+- [ ] Article view counts persist through Netlify server functions and Netlify Blobs
 - [ ] §10 learning log filled in
 
 ---
@@ -88,14 +89,14 @@ E0 Spike
                                                                                                           │
                                         E8 React 19 pass  <────────────────────────────────────────────────┤
                                         E9 Server functions <───────────────────────────────────────────────┤
-                                                                                                          │
-                                                            E10 Prerender + Deploy <─────────────────────────┘
+                                                  │                                                       │
+                                                  └────────> E10 Prerender + Deploy <───────────────────────┘
                                                                       │
                                                                       └─> E11 Cutover & teardown
 ```
 
-**Critical path:** E0 → E1 → E3 → E5 → E10 → E11.
-**Parallelisable:** E2 can run alongside E3. E8 and E9 can slot in anywhere after E5.
+**Critical path:** E0 → E1 → E3 → E5 → E9 → E10 → E11.
+**Parallelisable:** E2 can run alongside E3. E8 can slot in anywhere after E5.
 
 Estimates are in **sessions** (1 session ≈ 1–2 focused hours), not story points.
 
@@ -162,13 +163,13 @@ Goal: build throwaway muscle memory before touching the real repo. Resist the ur
 
 **Tasks:**
 - [x] Add `prerender: { enabled: true, crawlLinks: true }` to the `tanstackStart()` plugin options in `vite.config.ts`
-- [x] `vite build`, then inspect `.output/public/`
+- [x] `vite build`, then inspect `dist/client/`
 - [x] Confirm your dynamic route did **not** prerender automatically
 - [x] Link to it from the index page, rebuild, confirm `crawlLinks` picked it up
 - [x] Try the `pages` array config to prerender a path explicitly
 
 **Acceptance:**
-- [x] `.dist/public` contains real HTML (view source — content must be in the markup, not injected by JS)
+- [x] `dist/client` contains real HTML (view source — content must be in the markup, not injected by JS)
 
 **Checkpoint questions:**
 1. Why are routes with path params excluded from `autoStaticPathsDiscovery`?
@@ -193,18 +194,23 @@ Goal: a running TanStack Start app inside this repo, coexisting with Gatsby unti
 
 **Tasks:**
 - [ ] Install: `@tanstack/react-router @tanstack/react-start react@19 react-dom@19`
-- [ ] Install dev: `@tanstack/react-router-devtools @vitejs/plugin-react @tailwindcss/vite tailwindcss vite nitro @types/react@19 @types/react-dom@19`
+- [ ] Install dev: `@netlify/vite-plugin-tanstack-start @tanstack/react-router-devtools @vitejs/plugin-react @tailwindcss/vite tailwindcss vite @types/react@19 @types/react-dom@19`
 - [ ] Create `vite.config.ts`:
   ```ts
   import { tanstackStart } from '@tanstack/react-start/plugin/vite'
+  import netlify from '@netlify/vite-plugin-tanstack-start'
   import { defineConfig } from 'vite'
   import viteReact from '@vitejs/plugin-react'
   import tailwindcss from '@tailwindcss/vite'
-  import { nitro } from 'nitro/vite'
 
   export default defineConfig({
     resolve: { tsconfigPaths: true },
-    plugins: [tailwindcss(), tanstackStart({ srcDirectory: 'src' }), viteReact(), nitro()],
+    plugins: [
+      tailwindcss(),
+      tanstackStart({ srcDirectory: 'src' }),
+      netlify(),
+      viteReact(),
+    ],
   })
   ```
 - [ ] Create `src/router.tsx` exporting `getRouter()`
@@ -649,7 +655,7 @@ Goal: replace four Gatsby plugins with owned code. This is where "bespoke" pays 
 - [ ] Diff both against `public/sitemap-0.xml` and the current robots output
 
 **Acceptance:**
-- [ ] Both served correctly and present in `.output/public` after prerender
+- [ ] Both served correctly and present in `dist/client` after prerender
 
 ---
 
@@ -767,7 +773,7 @@ Goal: prove the dynamic escape hatch works *before* cutover, so it isn't a leap 
 **Tasks:**
 - [ ] Replace the frontmatter `readingTime` string with a build-time computed value via a static server function
 - [ ] Confirm the result is baked into the prerendered HTML with no client fetch
-- [ ] Inspect the emitted JSON artifact in `.output`
+- [ ] Inspect the emitted JSON artifact in `dist/client`
 
 **Acceptance:**
 - [ ] Reading times render in prerendered HTML
@@ -783,8 +789,9 @@ Goal: prove the dynamic escape hatch works *before* cutover, so it isn't a leap 
 **Depends on:** S9.1
 
 **Tasks:**
-- [ ] Pick a store (Netlify Blobs is zero-config on the existing host; a KV service is fine too)
-- [ ] `createServerFn` for `getViews(slug)` and `incrementViews(slug)`
+- [ ] Install `@netlify/blobs` and create a dedicated `article-views` store
+- [ ] Implement `getViews(slug)` and `incrementViews(slug)` with `createServerFn`; keep all Blob access inside the server-function handlers
+- [ ] Run the normal Vite dev server and verify the Netlify integration provides a sandboxed local Blob store without `netlify dev`
 - [ ] Render the count in `SharingComponent`, wrapped in Suspense so it never blocks prerender
 - [ ] Add `@tanstack/react-query` **only for this** and justify it in §10
 - [ ] Use `useOptimistic` for the increment (Track D)
@@ -794,13 +801,14 @@ Goal: prove the dynamic escape hatch works *before* cutover, so it isn't a leap 
 - [ ] Count displays and increments
 - [ ] Article pages still prerender to static HTML — the counter hydrates in, it does not block the build
 - [ ] With the counter endpoint down, the page still renders
+- [ ] A production deploy persists counts in Netlify Blobs; local development does not read or mutate production counts
 
-**Watch for:** this is the story most likely to expand. If it exceeds 2 sessions, cut it — E10 does not depend on it.
+**Watch for:** this is the story most likely to expand. Keep the persisted counter, but cut nonessential UI polish or caching experiments if the epic exceeds 2 sessions.
 
 ---
 
 ### E10 — Prerendering & Deployment
-**Tracks:** A · **Est:** 2 sessions · **Depends on:** E4, E5, E7
+**Tracks:** A · **Est:** 2 sessions · **Depends on:** E4, E5, E7, E9
 
 ---
 
@@ -813,7 +821,7 @@ Goal: prove the dynamic escape hatch works *before* cutover, so it isn't a leap 
 - [ ] Add to `tanstackStart()` options: `prerender: { enabled: true, crawlLinks: true, failOnError: true }`
 - [ ] Confirm `crawlLinks` discovers all 20 article routes from `/articles` — if any are missed, add them explicitly via the `pages` array
 - [ ] Set `autoSubfolderIndex` to whichever matches the current URL shape (trailing slash behaviour must not change)
-- [ ] `vite build`, then verify `.output/public` contains 24 HTML files
+- [ ] `vite build`, then verify `dist/client` contains 24 HTML files
 - [ ] View source on 3 articles — prose must be in the markup
 
 **Acceptance:**
@@ -828,18 +836,20 @@ Goal: prove the dynamic escape hatch works *before* cutover, so it isn't a leap 
 #### S10.2 — Netlify deploy
 **Story:** As the site owner, I want a green deploy preview from this branch.
 
-**Depends on:** S10.1
+**Depends on:** S9.2, S10.1
 
 **Tasks:**
-- [ ] Update `netlify.toml`: `publish` → `.output/public`, `command` → the new build script
-- [ ] Choose the Nitro preset (static vs. netlify) and record why
+- [ ] Confirm `@netlify/vite-plugin-tanstack-start` is active in `vite.config.ts`; do not add Nitro or a Nitro preset
+- [ ] Update `netlify.toml`: `publish` → `dist/client`, `command` → the new build script
+- [ ] Confirm the integration emits the runtime server functions needed by the article view counter
 - [ ] Re-verify the CSP — the current policy is strict and hand-written; check `script-src`/`connect-src` still cover Start's hydration bootstrap and any server-function calls
 - [ ] Confirm the cache-control header rules still match the new asset paths and hashing scheme
-- [ ] Update `NODE_VERSION` if needed
+- [ ] Update the local and Netlify Node version from 22.4.1 to a Vite 8-supported 22.x release (22.12 or newer)
 - [ ] Deploy preview from the branch
 
 **Acceptance:**
 - [ ] Preview URL live, all 24 pages reachable
+- [ ] View counts read and persist through the deployed Netlify server functions and Blob store
 - [ ] Zero CSP violations in console
 - [ ] Static assets served with `immutable` cache headers
 
@@ -882,7 +892,7 @@ The satisfying epic. Do not start it until E10 is green.
 - [ ] **Empty the `overrides` block** — re-audit with `npm audit` and only re-add what's still genuinely needed. This block existing solely to patch Gatsby's transitive deps is the most satisfying deletion in the project.
 - [ ] Delete `src/pages/`, `src/templates/`
 - [ ] Delete the Lighthouse harness — `scripts/performance/lighthouse-test.js`, the `lighthouse` / `chrome-launcher` / `start-server-and-test` devDeps, and the `lighthouse`, `lighthouse:ci`, `perf` scripts. Nothing tracks performance now (S10.3); an unused harness is just three more things to keep patched.
-- [ ] Delete the tracked `public/` build output; confirm `.gitignore` covers `.output/` and `public/`
+- [ ] Delete the tracked `public/` build output; confirm `.gitignore` covers `dist/` and `public/`
 - [ ] Rename `dev:next`/`build:next` → `dev`/`build`
 - [ ] Delete `src/data/sampleData.ts` if only `categoryIcons` was live — move that constant somewhere honest
 - [ ] Retire `gatsby-browser.js`'s service-worker cleanup — that one-time fix has long since shipped to all visitors
@@ -950,7 +960,7 @@ The vertical slice de-risks the two things most likely to be dealbreakers (MDX p
 | CSP breaks under Start's hydration bootstrap | Medium | High | S10.2 explicitly re-verifies. The existing policy already allows `script-src 'unsafe-inline'`. |
 | Netlify cache headers stop matching new asset paths | High | Low | Called out in S10.2. Silent failure mode — check it, don't assume. |
 | URL shape changes (trailing slashes) break inbound links | Low | High | `autoSubfolderIndex` in S10.1; full URL verification in S11.3. |
-| E9 scope creep | High | Medium | Hard-capped at 2 sessions. Nothing depends on it. |
+| E9 scope creep | High | Medium | Preserve the Netlify-backed counter; cut optional UI polish or caching experiments if the epic exceeds 2 sessions. |
 | Lighthouse performance regression vs. Gatsby | Medium | Low | Accepted, not tracked. Hydrating framework on a CDN-served 20-post blog. |
 
 ---
@@ -959,7 +969,7 @@ The vertical slice de-risks the two things most likely to be dealbreakers (MDX p
 
 **Removing:** `gatsby`, `gatsby-plugin-feed`, `gatsby-plugin-google-gtag`, `gatsby-plugin-mdx`, `gatsby-plugin-robots-txt`, `gatsby-plugin-sitemap`, `gatsby-remark-prismjs`, `gatsby-source-filesystem`, `gatsby-plugin-webpack-bundle-analyser-v2`, `prismjs`, `@mdx-js/react`, `postcss`, `@tailwindcss/postcss`, `lighthouse`, `chrome-launcher`, `start-server-and-test`, and the entire `overrides` block.
 
-**Adding:** `@tanstack/react-router`, `@tanstack/react-start`, `vite`, `@vitejs/plugin-react`, `nitro`, `@tailwindcss/vite`, `@mdx-js/rollup`, `remark-frontmatter`, `remark-mdx-frontmatter`, `remark-gfm`, `rehype-pretty-code`, `rehype-slug`, `zod`. Plus `@tanstack/react-query` **only if S9.2 ships**.
+**Adding:** `@tanstack/react-router`, `@tanstack/react-start`, `vite`, `@vitejs/plugin-react`, `@netlify/vite-plugin-tanstack-start`, `@tailwindcss/vite`, `@mdx-js/rollup`, `remark-frontmatter`, `remark-mdx-frontmatter`, `remark-gfm`, `rehype-pretty-code`, `rehype-slug`, `zod`, `@netlify/blobs`, and `@tanstack/react-query`. The last two are earned specifically by the S9.2 view counter; Nitro is not part of this architecture.
 
 **Unchanged:** `@radix-ui/*`, `class-variance-authority`, `clsx`, `tailwind-merge`, `tailwindcss`, `gsap`, `@tailwindcss/typography`.
 
@@ -971,6 +981,9 @@ Net: roughly flat on count, but every remaining dependency is actively maintaine
 
 - TanStack Start — Static Prerendering: https://tanstack.com/start/latest/docs/framework/react/guide/static-prerendering
 - TanStack Start — Static Server Functions: https://tanstack.com/start/latest/docs/framework/react/guide/static-server-functions
+- TanStack Start — Hosting (Netlify): https://tanstack.com/start/latest/docs/framework/react/guide/hosting#netlify
+- Netlify — TanStack Start integration: https://docs.netlify.com/build/frameworks/framework-setup-guides/tanstack-start/
+- Netlify — Blobs: https://docs.netlify.com/build/data-and-storage/netlify-blobs/
 - TanStack Router — Search Params: https://tanstack.com/router/latest/docs/framework/react/guide/search-params
 - Official example (config reference): https://github.com/TanStack/router/tree/main/examples/react/start-basic
 - `@mdx-js/rollup`: https://mdxjs.com/packages/rollup/
@@ -998,7 +1011,7 @@ Net: roughly flat on count, but every remaining dependency is actively maintaine
 ### Track C — State management
 - Classification table for `articles.index.tsx` (URL state / derived / local):
 - Why this project needs neither Zustand nor Jotai:
-- Where TanStack Query *was* earned (if S9.2 shipped):
+- Where TanStack Query was earned by the Netlify-backed view counter:
 - The `useEffect` I deleted and what replaced it:
 
 ### Track D — React 19
