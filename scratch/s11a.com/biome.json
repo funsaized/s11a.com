@@ -1,6 +1,6 @@
 {
-  "$schema": "https://biomejs.dev/schemas/2.4.5/schema.json",
- 	"vcs": {
+	"$schema": "https://biomejs.dev/schemas/2.4.5/schema.json",
+	"vcs": {
 		"enabled": false,
 		"clientKind": "git",
 		"useIgnoreFile": false

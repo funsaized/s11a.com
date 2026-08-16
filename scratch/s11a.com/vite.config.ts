@@ -12,7 +12,8 @@ const config = defineConfig({
     allowedHosts: ['blog-new.dev.s11a.com'],
   },
   resolve: { tsconfigPaths: true },
-  plugins: [devtools(), netlify(), tailwindcss(), tanstackStart(), viteReact()],
+  plugins: [devtools(), netlify(), tailwindcss(),
+   tanstackStart(), viteReact()],
 })
 
 export default config
