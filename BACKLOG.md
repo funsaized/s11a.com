@@ -161,18 +161,21 @@ Goal: build throwaway muscle memory before touching the real repo. Resist the ur
 **Story:** As a learner, I want to produce static HTML from the spike app, so that I trust the deploy model before committing to it.
 
 **Tasks:**
-- [ ] Add `prerender: { enabled: true, crawlLinks: true }` to the `tanstackStart()` plugin options in `vite.config.ts`
-- [ ] `vite build`, then inspect `.output/public/`
-- [ ] Confirm your dynamic route did **not** prerender automatically
-- [ ] Link to it from the index page, rebuild, confirm `crawlLinks` picked it up
-- [ ] Try the `pages` array config to prerender a path explicitly
+- [x] Add `prerender: { enabled: true, crawlLinks: true }` to the `tanstackStart()` plugin options in `vite.config.ts`
+- [x] `vite build`, then inspect `.output/public/`
+- [x] Confirm your dynamic route did **not** prerender automatically
+- [x] Link to it from the index page, rebuild, confirm `crawlLinks` picked it up
+- [x] Try the `pages` array config to prerender a path explicitly
 
 **Acceptance:**
-- [ ] `.output/public` contains real HTML (view source — content must be in the markup, not injected by JS)
+- [x] `.dist/public` contains real HTML (view source — content must be in the markup, not injected by JS)
 
 **Checkpoint questions:**
 1. Why are routes with path params excluded from `autoStaticPathsDiscovery`?
+    2. Dynamic routes are exlcuded because dynamic routes are route templates. Tanstack cannot know which concrete IDs should be generated, so routes containing `$` are skipped
 2. What are the two ways to get a dynamic route prerendered, and which will this blog use for `/articles/$slug`?
+    3. Linking to a concrete URL from another pre-rendered page w/ crawlLinks: true
+    4. Adding concrete URL to the pages array 
 
 ---
 

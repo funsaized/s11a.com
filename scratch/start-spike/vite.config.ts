@@ -20,7 +20,13 @@ const config = defineConfig({
     devtools(),
     netlify(),
     tailwindcss(),
-    tanstackStart(),
+    tanstackStart({
+      pages: [{ path: '/posts/explicit-check' }],
+      prerender: {
+        enabled: true,
+        crawlLinks: true,
+      },
+    }),
     mdx({ remarkPlugins: [remarkFrontmatter, remarkMdxFrontmatter] }),
     viteReact(),
   ],
