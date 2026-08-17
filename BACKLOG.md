@@ -328,10 +328,10 @@ components from being tuned against TARGET's temporary starter palette.
 **Tasks:**
 - [ ] Use SOURCE `src/components/layout/Layout.tsx` as the reference for TARGET `src/routes/__root.tsx`; copy only the reusable layout behaviour and markup
 - [x] Recreate the SOURCE page-height contract in the root shell (`min-height: 100dvh`, column layout, and a growing `<main>`); the footer must follow short content at the viewport bottom without `position: fixed` or `position: absolute`
-- [ ] Port SOURCE `Header.tsx` and `Footer.tsx` into TARGET; swap Gatsby `<Link to>` → TanStack `<Link to>` (note: **`to` is type-checked against the route tree** — broken links become type errors). Replace TARGET's generated demo `Header.tsx`; do not edit SOURCE's components.
-- [ ] Generate TARGET's Tailwind v4/React 19 shadcn `button` before porting `ThemeToggle`; compare it with SOURCE and reapply only intentional variants/classes rather than copying the generated React 18 primitive
+- [x] Port SOURCE `Header.tsx` and `Footer.tsx` into TARGET; swap Gatsby `<Link to>` → TanStack `<Link to>` (note: **`to` is type-checked against the route tree** — broken links become type errors). Replace TARGET's generated demo `Header.tsx`; do not edit SOURCE's components.
+- [x] Generate TARGET's Tailwind v4/React 19 shadcn `button` before porting `ThemeToggle`; compare it with SOURCE and reapply only intentional variants/classes rather than copying the generated React 18 primitive
 - [ ] Port the anti-flash theme logic from SOURCE `gatsby-ssr.js` with TanStack Router's `ScriptOnce` in TARGET's root document so it runs before hydration without duplicate execution
-- [ ] Port SOURCE's existing light/dark/system toggle behaviour, including the `matchMedia` change listener and guarded `localStorage`; its small state/effect implementation already models real browser synchronization and does not require a new global store
+- [x] Port SOURCE's existing light/dark/system toggle behaviour, including the `matchMedia` change listener and guarded `localStorage`; its small state/effect implementation already models real browser synchronization and does not require a new global store
 - [ ] Wire `defaultErrorComponent` and `defaultNotFoundComponent` in `router.tsx`
 - [ ] Port SOURCE `src/pages/404.tsx` into a TARGET not-found component
 
