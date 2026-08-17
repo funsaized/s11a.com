@@ -19,7 +19,7 @@
 		"lint": "oxlint --max-warnings 0",
 		"lint:fix": "oxlint --fix",
 		"typecheck": "tsc --noEmit",
-		"check": "npm run format:check && npm run lint && npm run typecheck"
+		"check": "npm run generate-routes && npm run format:check && npm run lint && npm run typecheck"
 	},
 	"dependencies": {
 		"@tailwindcss/vite": "^4.1.18",
