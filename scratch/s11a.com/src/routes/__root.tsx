@@ -50,10 +50,10 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 			</head>
 			<body>
 				<div className="flex min-h-dvh flex-col">
-					{/*Header*/}
+					{/* Header*/}
 					<Header />
 					<main className="flex-1">{children}</main>
-					{/*Footer*/}
+					{/* Footer*/}
 					<Footer />
 				</div>
 				<TanStackDevtools
