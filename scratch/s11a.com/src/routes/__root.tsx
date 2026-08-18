@@ -9,6 +9,7 @@ import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
 
 import { Footer } from "#/components/Footer";
 import { Header } from "#/components/Header";
+import { ThemeProvider } from "#/components/ThemeProvider";
 
 import TanStackQueryDevtools from "../integrations/tanstack-query/devtools";
 
@@ -44,31 +45,33 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
 
 function RootDocument({ children }: { children: React.ReactNode }) {
 	return (
-		<html lang="en">
+		<html lang="en" suppressHydrationWarning>
 			<head>
 				<HeadContent />
 			</head>
 			<body>
-				<div className="flex min-h-dvh flex-col">
-					{/* Header*/}
-					<Header />
-					<main className="flex-1">{children}</main>
-					{/* Footer*/}
-					<Footer />
-				</div>
-				<TanStackDevtools
-					config={{
-						position: "bottom-right",
-					}}
-					plugins={[
-						{
-							name: "Tanstack Router",
-							render: <TanStackRouterDevtoolsPanel />,
-						},
-						TanStackQueryDevtools,
-					]}
-				/>
-				<Scripts />
+				<ThemeProvider>
+					<div className="flex min-h-dvh flex-col">
+						{/* Header*/}
+						<Header />
+						<main className="flex-1">{children}</main>
+						{/* Footer*/}
+						<Footer />
+					</div>
+					<TanStackDevtools
+						config={{
+							position: "bottom-right",
+						}}
+						plugins={[
+							{
+								name: "Tanstack Router",
+								render: <TanStackRouterDevtoolsPanel />,
+							},
+							TanStackQueryDevtools,
+						]}
+					/>
+					<Scripts />
+				</ThemeProvider>
 			</body>
 		</html>
 	);
