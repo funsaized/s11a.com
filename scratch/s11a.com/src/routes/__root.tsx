@@ -54,7 +54,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 					<div className="flex min-h-dvh flex-col">
 						{/* Header*/}
 						<Header />
-						<main className="flex-1">{children}</main>
+						<main className="flex flex-1 flex-col">{children}</main>{" "}
 						{/* Footer*/}
 						<Footer />
 					</div>
