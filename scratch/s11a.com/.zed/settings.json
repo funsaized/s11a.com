@@ -1,0 +1,19 @@
+{
+	"languages": {
+		"TypeScript": {
+			"language_servers": ["vtsls", "oxfmt", "oxlint", "!eslint", "..."]
+		},
+		"TSX": {
+			"language_servers": ["vtsls", "oxfmt", "oxlint", "!eslint", "..."]
+		}
+	},
+	"lsp": {
+		"vtsls": {
+			"settings": {
+				"typescript": {
+					"tsdk": "node_modules/typescript/lib"
+				}
+			}
+		}
+	}
+}
