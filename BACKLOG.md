@@ -326,25 +326,25 @@ variant → S1.3 theme boot/toggle and shell components. This prevents copied
 components from being tuned against TARGET's temporary starter palette.
 
 **Tasks:**
-- [ ] Use SOURCE `src/components/layout/Layout.tsx` as the reference for TARGET `src/routes/__root.tsx`; copy only the reusable layout behaviour and markup
+- [x] Use SOURCE `src/components/layout/Layout.tsx` as the reference for TARGET `src/routes/__root.tsx`; copy only the reusable layout behaviour and markup
 - [x] Recreate the SOURCE page-height contract in the root shell (`min-height: 100dvh`, column layout, and a growing `<main>`); the footer must follow short content at the viewport bottom without `position: fixed` or `position: absolute`
 - [x] Port SOURCE `Header.tsx` and `Footer.tsx` into TARGET; swap Gatsby `<Link to>` → TanStack `<Link to>` (note: **`to` is type-checked against the route tree** — broken links become type errors). Replace TARGET's generated demo `Header.tsx`; do not edit SOURCE's components.
 - [x] Generate TARGET's Tailwind v4/React 19 shadcn `button` before porting `ThemeToggle`; compare it with SOURCE and reapply only intentional variants/classes rather than copying the generated React 18 primitive
 - [x] Port the anti-flash theme logic fro m SOURCE `gatsby-ssr.js` with TanStack Router's `ScriptOnce` in TARGET's root document so it runs before hydration without duplicate execution
 - [x] Port SOURCE's existing light/dark/system toggle behaviour, including the `matchMedia` change listener and guarded `localStorage`; its small state/effect implementation already models real browser synchronization and does not require a new global store
-- [ ] Wire `defaultErrorComponent` and `defaultNotFoundComponent` in `router.tsx`
-- [ ] Port SOURCE `src/pages/404.tsx` into a TARGET not-found component
+- [x] Wire `defaultErrorComponent` and `defaultNotFoundComponent` in `router.tsx`
+- [x] Port SOURCE `src/pages/404.tsx` into a TARGET not-found component
 
 **Acceptance:**
-- [ ] Header/footer render on `/`
-- [ ] With the one-line placeholder route, the footer rests at the viewport bottom; with long content it remains in normal document flow
-- [ ] No theme flash on hard reload in dark mode
-- [ ] Header, footer, theme control, focus states, and mobile navigation are visually compared with SOURCE at 375px and 1440px in light and dark mode before page-section porting begins
-- [ ] Root CSS is loaded once using TARGET's existing supported `styles.css?url` + `head.links` pattern; do not add a second global-style import
-- [ ] A deliberately broken `<Link to="/nope">` is a **compile** error, not a runtime 404
+- [x] Header/footer render on `/`
+- [x] With the one-line placeholder route, the footer rests at the viewport bottom; with long content it remains in normal document flow
+- [x] No theme flash on hard reload in dark mode
+- [x] Header, footer, theme control, focus states, and mobile navigation are visually compared with SOURCE at 375px and 1440px in light and dark mode before page-section porting begins
+- [x] Root CSS is loaded once using TARGET's existing supported `styles.css?url` + `head.links` pattern; do not add a second global-style import
+- [x] A deliberately broken `<Link to="/nope">` is a **compile** error, not a runtime 404
 
 **Checkpoint question:** Gatsby validated links at runtime (or not at all). What is TanStack Router doing differently, and what file makes it possible?
-
+  - build validation 
 ---
 
 ### E2 — Tailwind v4, CSS-First
