@@ -15,3 +15,7 @@ src/routeTree.gen.ts
 
 # Local Netlify folder
 .netlify
+
+# Root .gitignore has a Python "lib/" rule that swallows src/lib; un-ignore it here
+!/src/lib/
+!/src/lib/**
