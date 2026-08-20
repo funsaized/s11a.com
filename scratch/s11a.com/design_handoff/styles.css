@@ -1,0 +1,143 @@
+/* ============================================================
+   Coffee & Code — s11a.dev design tokens
+   Tailwind CSS v4 token sheet.
+   Import after tailwindcss:  @import "tailwindcss"; @import "./styles.css";
+   Theme switching: set data-theme="latte" | "espresso" on <html>.
+   (A Tailwind v3 config equivalent is at the bottom.)
+   ============================================================ */
+
+/* ---------- Base theme (theme-agnostic primitives) ---------- */
+:root {
+  /* type */
+  --font-display: "Lora", Georgia, serif;            /* headings, weight 550 */
+  --font-body: "Source Serif 4", Georgia, serif;     /* body copy */
+  --font-mono: "Spline Sans Mono", ui-monospace, monospace; /* labels, meta, UI */
+  --font-hand: "Caveat", cursive;                    /* napkin handwriting */
+
+  --text-base: 19px;
+  --leading-base: 1.65;
+
+  /* radii */
+  --radius-pill: 999px;
+  --radius-input: 10px;
+  --radius-code: 12px;
+  --radius-media: 14px;
+
+  /* signature dotted rule */
+  --rule-dotted: 2px dotted var(--line);
+
+  /* motion */
+  --ease-theme: 0.4s ease;      /* theme cross-fade */
+  --ease-rise: 0.7s ease;       /* page-load reveal */
+  --ease-liquid: 0.6s ease;     /* toggle cup fill */
+
+  /* selection */
+  --selection-bg: #d9c29b;
+  --selection-ink: #2b1a0c;
+}
+
+/* ---------- Latte (light, default) ---------- */
+:root, [data-theme="latte"] {
+  --bg: #f7f5f1;        /* page — porcelain */
+  --card: #fdfcfa;      /* raised surfaces, inputs, code blocks */
+  --line: #ddd8cf;      /* borders, dot leaders */
+  --ink: #2b2620;       /* primary text */
+  --dim: #5b554c;       /* secondary text */
+  --faint: #8a8378;     /* meta text, placeholders */
+  --accent: #95603c;    /* clay — links, active states */
+  --accent2: #6f7d60;   /* sage — quotes, code strings, ACTIVE status */
+  --glow: rgba(168, 156, 140, 0.16);
+  --stain-filter: opacity(0.85);
+}
+
+/* ---------- Espresso (dark) ---------- */
+[data-theme="espresso"] {
+  --bg: #171008;
+  --card: #221812;
+  --line: #3a2a1a;
+  --ink: #f2e7d3;
+  --dim: #c5ad8f;
+  --faint: #8f7a5f;
+  --accent: #dfa25b;    /* caramel */
+  --accent2: #a3b183;
+  --glow: rgba(224, 163, 92, 0.1);
+  --stain-filter: brightness(2.3) saturate(0.65) opacity(0.45);
+}
+
+/* ---------- Tailwind v4 theme mapping ---------- */
+@theme inline {
+  --color-bg: var(--bg);
+  --color-card: var(--card);
+  --color-line: var(--line);
+  --color-ink: var(--ink);
+  --color-dim: var(--dim);
+  --color-faint: var(--faint);
+  --color-accent: var(--accent);
+  --color-accent-2: var(--accent2);
+
+  --font-display: var(--font-display);
+  --font-body: var(--font-body);
+  --font-mono: var(--font-mono);
+  --font-hand: var(--font-hand);
+
+  --radius-pill: var(--radius-pill);
+  --radius-input: var(--radius-input);
+  --radius-code: var(--radius-code);
+  --radius-media: var(--radius-media);
+}
+/* Usage: bg-bg text-ink border-line text-accent font-display rounded-input … */
+
+/* ---------- Base styles ---------- */
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  line-height: var(--leading-base);
+  transition: background var(--ease-theme), color var(--ease-theme);
+}
+a { color: var(--accent); text-decoration: none; }
+a:hover { color: var(--ink); }
+::selection { background: var(--selection-bg); color: var(--selection-ink); }
+input::placeholder { color: var(--faint); }
+
+/* ---------- Keyframes ---------- */
+@keyframes rise {           /* page-load reveal; stagger with animation-delay */
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes steam {          /* logo + toggle steam wisps */
+  0%   { transform: translateY(2px); opacity: 0; }
+  35%  { opacity: 0.75; }
+  100% { transform: translateY(-9px) scaleX(1.7); opacity: 0; }
+}
+
+/* ============================================================
+   Tailwind v3 equivalent (if the codebase is still on v3):
+
+   // tailwind.config.js
+   module.exports = {
+     darkMode: ['selector', '[data-theme="espresso"]'],
+     theme: {
+       extend: {
+         colors: {
+           bg: 'var(--bg)', card: 'var(--card)', line: 'var(--line)',
+           ink: 'var(--ink)', dim: 'var(--dim)', faint: 'var(--faint)',
+           accent: 'var(--accent)', 'accent-2': 'var(--accent2)',
+         },
+         fontFamily: {
+           display: ['Lora', 'serif'],
+           body: ['"Source Serif 4"', 'serif'],
+           mono: ['"Spline Sans Mono"', 'monospace'],
+           hand: ['Caveat', 'cursive'],
+         },
+         borderRadius: { pill: '999px', input: '10px', code: '12px', media: '14px' },
+         keyframes: {
+           rise:  { from: { opacity: 0, transform: 'translateY(16px)' }, to: { opacity: 1, transform: 'none' } },
+           steam: { '0%': { transform: 'translateY(2px)', opacity: 0 }, '35%': { opacity: .75 }, '100%': { transform: 'translateY(-9px) scaleX(1.7)', opacity: 0 } },
+         },
+       },
+     },
+   };
+   ============================================================ */

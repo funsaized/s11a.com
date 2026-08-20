@@ -372,19 +372,19 @@ unused CSS after parity checks. Keep TARGET runnable at every checkpoint.
 **Depends on:** S1.1
 
 **Tasks:**
-- [ ] Capture SOURCE reference screenshots of the home shell at 375px and 1440px in light and dark mode, and record the computed body/background/font values needed to distinguish intentional styling from starter defaults
-- [ ] Keep TARGET's existing `src/styles.css` path and existing root `?url` import; deleting a gratuitous rename avoids churn in `__root.tsx` and `components.json`
-- [ ] Inventory semantic classes used by the pages and the four required shadcn primitives, then map only those SOURCE colours through TARGET `@theme inline` `--color-*` tokens
-- [ ] Port the SOURCE `:root` / `.dark` HSL custom properties from `src/styles/globals.css`; do not substitute the starter's current teal/green theme if visual parity is still the goal
-- [ ] Port `--radius` and the `spotlight` keyframes/animation into `@theme`
-- [ ] Do not port unused SOURCE `--chart-*` or `--sidebar-*` tokens; the blog has no chart or sidebar primitive using them
-- [ ] Ensure TARGET has no `@config` directive (SOURCE keeps its directive until/unless it is retired separately)
-- [ ] **Do not create a TARGET `tailwind.config.js`.** SOURCE's existing config remains as the parity reference.
+- [x] Capture SOURCE reference screenshots of the home shell at 375px and 1440px in light and dark mode, and record the computed body/background/font values needed to distinguish intentional styling from starter defaults
+- [x] Keep TARGET's existing `src/styles.css` path and existing root `?url` import; deleting a gratuitous rename avoids churn in `__root.tsx` and `components.json`
+- [x] Inventory semantic classes used by the pages and the four required shadcn primitives, then map only those SOURCE colours through TARGET `@theme inline` `--color-*` tokens
+- [x] Port the SOURCE `:root` / `.dark` HSL custom properties from `src/styles/globals.css`; do not substitute the starter's current teal/green theme if visual parity is still the goal
+- [x] Port `--radius` and the `spotlight` keyframes/animation into `@theme`
+- [x] Do not port unused SOURCE `--chart-*` or `--sidebar-*` tokens; the blog has no chart or sidebar primitive using them
+- [x] Ensure TARGET has no `@config` directive (SOURCE keeps its directive until/unless it is retired separately)
+- [x] **Do not create a TARGET `tailwind.config.js`.** SOURCE's existing config remains as the parity reference.
 
 **Acceptance:**
-- [ ] `bg-background`, `text-muted-foreground`, `border-border` etc. all resolve
-- [ ] Light and dark semantic values resolve correctly when `.dark` is manually applied; the persisted UI toggle is verified in S1.3
-- [ ] No `tailwind.config.js` in TARGET's build path
+- [x] `bg-background`, `text-muted-foreground`, `border-border` etc. all resolve
+- [x] Light and dark semantic values resolve correctly when `.dark` is manually applied; the persisted UI toggle is verified in S1.3
+- [x] No `tailwind.config.js` in TARGET's build path
 
 **Checkpoint questions:**
 1. In v4, what's the difference between defining `--color-primary` inside `@theme` vs. inside `:root`?
@@ -398,12 +398,12 @@ unused CSS after parity checks. Keep TARGET runnable at every checkpoint.
 **Depends on:** S2.1
 
 **Tasks:**
-- [ ] Declare the dark variant in CSS (v4 `@custom-variant dark (&:where(.dark, .dark *))`)
-- [ ] Verify `dark:` utilities compile
-- [ ] Before S1.3 is complete, verify the variant independently by manually adding/removing `.dark` on `<html>`; runtime persistence and system synchronization belong to S1.3
+- [x] Declare the dark variant in CSS (v4 `@custom-variant dark (&:where(.dark, .dark *))`)
+- [x] Verify `dark:` utilities compile
+- [x] Before S1.3 is complete, verify the variant independently by manually adding/removing `.dark` on `<html>`; runtime persistence and system synchronization belong to S1.3
 
 **Acceptance:**
-- [ ] `dark:bg-card` responds to the `.dark` ancestor; after S1.3, the real toggle flips it live
+- [x] `dark:bg-card` responds to the `.dark` ancestor; after S1.3, the real toggle flips it live
 
 ---
 
@@ -415,13 +415,13 @@ unused CSS after parity checks. Keep TARGET runnable at every checkpoint.
 **Depends on:** S2.1, S5.1
 
 **Tasks:**
-- [ ] `@plugin "@tailwindcss/typography";` in TARGET `src/styles.css`
-- [ ] Translate the ~80 lines of SOURCE `tailwind.config.js` `typography.DEFAULT.css` overrides into TARGET CSS (`.prose { ... }` customisations or `@utility`)
-- [ ] Keep the `max-width: 720px`, `font-size: 18px`, `line-height: 1.7` values exactly
-- [ ] Port the `--code-inline-*` / `--code-block-*` tokens
+- [x] `@plugin "@tailwindcss/typography";` in TARGET `src/styles.css`
+- [x] Translate the ~80 lines of SOURCE `tailwind.config.js` `typography.DEFAULT.css` overrides into TARGET CSS (`.prose { ... }` customisations or `@utility`)
+- [x] Keep the `max-width: 720px`, `font-size: 18px`, `line-height: 1.7` values exactly
+- [x] Port the `--code-inline-*` / `--code-block-*` tokens
 
 **Acceptance:**
-- [ ] Side-by-side screenshot of one TARGET article and the SOURCE Gatsby build at 1440px in both themes is pixel-comparable
+- [x] Side-by-side screenshot of one TARGET article and the SOURCE Gatsby build at 1440px in both themes is pixel-comparable
 
 **Watch for:** the `code::before` / `code::after` `content: ""` resets. Losing them re-introduces backtick artifacts around inline code.
 
