@@ -25,5 +25,5 @@
 	"rules": {
 		"react/react-in-jsx-scope": "off"
 	},
-	"ignorePatterns": ["src/routeTree.gen.ts"]
+	"ignorePatterns": ["src/routeTree.gen.ts", "design_handoff/**"]
 }

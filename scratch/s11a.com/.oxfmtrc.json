@@ -5,5 +5,9 @@
 	"singleQuote": false,
 	"sortImports": true,
 	"sortPackageJson": false,
-	"ignorePatterns": ["src/routeTree.gen.ts", "src/styles.css"]
+	"ignorePatterns": [
+		"src/routeTree.gen.ts",
+		"src/styles.css",
+		"design_handoff/**"
+	]
 }
