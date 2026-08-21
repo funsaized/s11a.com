@@ -1,8 +1,12 @@
+import mdx from "@mdx-js/rollup";
 import netlify from "@netlify/vite-plugin-tanstack-start";
 import tailwindcss from "@tailwindcss/vite";
 import { devtools } from "@tanstack/devtools-vite";
 import { tanstackStart } from "@tanstack/react-start/plugin/vite";
 import viteReact from "@vitejs/plugin-react";
+import remarkFrontmatter from "remark-frontmatter";
+import remarkGfm from "remark-gfm";
+import remarkMdxFrontmatter from "remark-mdx-frontmatter";
 import { defineConfig } from "vite";
 
 const config = defineConfig({
@@ -22,6 +26,13 @@ const config = defineConfig({
 					console.log(`🫪 Wow dude! Rendered ${page.path}`);
 				},
 			},
+		}),
+		mdx({
+			remarkPlugins: [
+				remarkFrontmatter,
+				[remarkMdxFrontmatter, { name: "frontmatter" }],
+				remarkGfm,
+			],
 		}),
 		viteReact(),
 	],

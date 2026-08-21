@@ -435,14 +435,14 @@ unused CSS after parity checks. Keep TARGET runnable at every checkpoint.
 **Depends on:** S2.3
 
 **Tasks:**
-- [ ] Keep the article page's viewport-responsive grid unless the component is actually embedded in differently sized containers; do not force a container-query rewrite
-- [ ] When touching a flex/grid parent, prefer `gap-*` over SOURCE `space-x-*`, but do not create a repo-wide cosmetic rewrite
-- [ ] Remove TARGET starter-only fonts, teal/green theme variables, demo utilities, unused `!important`, and tokens with no consumer
-- [ ] Preserve SOURCE's reduced-motion rules and test keyboard focus visibility
+- [x] Keep the article page's viewport-responsive grid unless the component is actually embedded in differently sized containers; do not force a container-query rewrite
+- [x] When touching a flex/grid parent, prefer `gap-*` over SOURCE `space-x-*`, but do not create a repo-wide cosmetic rewrite
+- [x] Remove TARGET starter-only fonts, teal/green theme variables, demo utilities, unused `!important`, and tokens with no consumer
+- [x] Preserve SOURCE's reduced-motion rules and test keyboard focus visibility
 
 **Acceptance:**
-- [ ] Layout holds at 375 / 768 / 1024 / 1440
-- [ ] `rg` confirms unused chart/sidebar and starter demo tokens are absent from TARGET
+- [x] Layout holds at 375 / 768 / 1024 / 1440
+- [x] `rg` confirms unused chart/sidebar and starter demo tokens are absent from TARGET
 
 ---
 
@@ -465,13 +465,13 @@ not allowed; SOURCE is a reference, not a shared package.
 **Depends on:** S0.2, S1.1
 
 **Tasks:**
-- [ ] Create TARGET `src/content/articles/` and copy all 20 SOURCE `src/content/articles/*.mdx` files into it. Preserve SOURCE files byte-for-byte at this step.
-- [ ] Create TARGET `public/images/` and copy the SOURCE static image assets required by pages and articles. TARGET must own its deployable assets.
-- [ ] `npm i @mdx-js/rollup remark-frontmatter remark-mdx-frontmatter remark-gfm`
-- [ ] Add `mdx()` to `vite.config.ts` **before** `viteReact()`
-- [ ] Configure `remarkPlugins: [remarkFrontmatter, [remarkMdxFrontmatter, { name: 'frontmatter' }], remarkGfm]`
-- [ ] Do not configure `providerImportSource` or add `@mdx-js/react`; S3.4 uses rehype-generated heading IDs and needs no provider
-- [ ] Create `src/types/mdx.d.ts` declaring the `*.mdx` module shape so TS stops complaining
+- [x] Create TARGET `src/content/articles/` and copy all 20 SOURCE `src/content/articles/*.mdx` files into it. Preserve SOURCE files byte-for-byte at this step.
+- [x] Create TARGET `public/images/` and copy the SOURCE static image assets required by pages and articles. TARGET must own its deployable assets.
+- [x] `npm i @mdx-js/rollup remark-frontmatter remark-mdx-frontmatter remark-gfm`
+- [x] Add `mdx()` to `vite.config.ts` **before** `viteReact()`
+- [x] Configure `remarkPlugins: [remarkFrontmatter, [remarkMdxFrontmatter, { name: 'frontmatter' }], remarkGfm]`
+- [x] Do not configure `providerImportSource` or add `@mdx-js/react`; S3.4 uses rehype-generated heading IDs and needs no provider
+- [x] Create `src/types/mdx.d.ts` declaring the `*.mdx` module shape so TS stops complaining
 
 **Acceptance:**
 - [ ] `import Post, { frontmatter } from '@/content/articles/some-post.mdx'` type-checks and renders
