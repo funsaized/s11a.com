@@ -12,6 +12,7 @@ export const mdxModules = import.meta.glob<MdxModule>("./content/*.mdx", {
 export const mdxModuleShape = Object.fromEntries(
 	Object.entries(mdxModules).map(([path, module]) => [
 		path,
+		// oxlint-disable-next-line unicorn/no-array-sort -- Object.keys returns a new array.
 		Object.keys(module).sort(),
 	]),
 );
