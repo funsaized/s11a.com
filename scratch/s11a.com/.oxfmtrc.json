@@ -8,6 +8,7 @@
 	"ignorePatterns": [
 		"src/routeTree.gen.ts",
 		"src/styles.css",
-		"design_handoff/**"
+		"design_handoff/**",
+		"src/content/**"
 	]
 }
