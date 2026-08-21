@@ -1,13 +1,15 @@
 import { Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 
+import { CoffeeCup } from "./CoffeeCup";
 import { ThemeToggle } from "./ThemeToggle";
 import { Button } from "./ui/button";
 
 const navigation = [
-	{ name: "Home", href: "/" },
-	{ name: "Articles", href: "/articles" },
-	{ name: "About", href: "/about" },
+	{ name: "home", href: "/" },
+	{ name: "articles", href: "/articles" },
+	{ name: "projects", href: "/projects" },
+	{ name: "about", href: "/about" },
 ];
 
 const MenuIcon = () => (
@@ -60,24 +62,20 @@ export function Header() {
 
 	return (
 		<header className="sticky top-0 z-50 w-full border-b  bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60">
-			<div className="container flex h-16 items-center mx-auto">
+			<div className="flex min-h-16 w-full flex-wrap items-center justify-between gap-x-3.5 gap-y-2.5 px-[clamp(16px,4vw,44px)] py-3.5">
 				<div className="flex flex-1 gap-4 justify-start">
 					<Link to="/" className="flex items-center space-x-2">
-						<img
-							src="face.png"
-							alt=""
-							width={32}
-							height={32}
-							className="w-8 h-8"
-						></img>
-						<span className="text-xxl font-bold">s11a</span>
+						<CoffeeCup />
+						<span className="text-xxl text-foreground hover:text-accent font-semibold font-mono">
+							s11a
+						</span>
 					</Link>
 				</div>
 
 				<nav className="flex-none">
-					<div className="hidden md:flex items-center space-x-4 text-sm font-medium">
+					<div className="hidden items-center gap-[clamp(13px,2.6vw,28px)] text-sm font-medium font-mono md:flex">
 						{navigation.map((item) => (
-							<Link key={item.name} to={item.href}>
+							<Link key={item.name} to={item.href} className="site-nav-link">
 								{item.name}
 							</Link>
 						))}

@@ -1,17 +1,40 @@
 export function Footer() {
 	return (
 		<footer className="w-full border-t bg-background">
-			<div className="w-full px-2 py-9">
-				<div className="flex flex-col items-center space-y-4 md:flex-row md:justify-between md:space-y-0">
+			<div className="w-full px-[clamp(16px,4vw,44px)] py-6">
+				<div className="flex flex-wrap items-center justify-between gap-2.5 font-mono text-xs text-faint">
 					{/* Copyright*/}
-					<div className="text-center text-sm text-muted-foreground">
-						© 2026 Sai Nimmagadda. All rights reserved.
-					</div>
+					<div>© 2026 Sai Nimmagadda. All rights reserved.</div>
 					{/* Social Links*/}
 					<div className="flex items-center space-x-4">
-						<div>Item1</div>
-						<div>Item2</div>
-						<div>Item3</div>
+						<a
+							href="https://github.com/funsaized"
+							target="_blank"
+							rel="noreferrer"
+							className="text-faint no-underline hover:text-accent"
+						>
+							github
+						</a>
+						<a
+							href="https://www.linkedin.com/in/sainimmagadda/"
+							target="_blank"
+							rel="noreferrer"
+							className="text-faint no-underline hover:text-accent"
+						>
+							linkedin
+						</a>
+						<a
+							href="/rss.xml"
+							className="text-faint no-underline hover:text-accent"
+						>
+							rss
+						</a>
+						<a
+							href="/404"
+							className="text-faint no-underline hover:text-accent"
+						>
+							404
+						</a>
 					</div>
 				</div>
 			</div>

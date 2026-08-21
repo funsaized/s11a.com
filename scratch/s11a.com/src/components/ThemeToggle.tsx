@@ -1,31 +1,7 @@
 import { useTheme } from "#/hooks/useTheme";
 
+import { CoffeeCup } from "./CoffeeCup";
 import { Button } from "./ui/button";
-
-const SunIcon = () => (
-	<svg
-		className="h-[1.2rem] w-[1.2rem]"
-		fill="none"
-		stroke="currentColor"
-		viewBox="0 0 24 24"
-		xmlns="http://www.w3.org/2000/svg"
-	>
-		<circle cx="12" cy="12" r="5" />
-		<path d="M12 1v2M12 21v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M1 12h2M21 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4" />
-	</svg>
-);
-
-const MoonIcon = () => (
-	<svg
-		className="h-[1.2rem] w-[1.2rem]"
-		fill="none"
-		stroke="currentColor"
-		viewBox="0 0 24 24"
-		xmlns="http://www.w3.org/2000/svg"
-	>
-		<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
-	</svg>
-);
 
 const SystemIcon = () => (
 	<svg
@@ -56,13 +32,26 @@ export function ThemeToggle() {
 	const getIcon = () => {
 		switch (theme) {
 			case "light":
-				return <SunIcon />;
+				return <CoffeeCup variant="filled" />;
 			case "dark":
-				return <MoonIcon />;
+				return <CoffeeCup variant="filled" />;
 			case "system":
 				return <SystemIcon />;
 			default:
 				return <SystemIcon />;
+		}
+	};
+
+	const getThemeLabel = () => {
+		switch (theme) {
+			case "light":
+				return "espresso";
+			case "dark":
+				return "latte";
+			case "system":
+				return "system";
+			default:
+				return "system";
 		}
 	};
 
@@ -80,8 +69,13 @@ export function ThemeToggle() {
 	};
 
 	return (
-		<Button variant="ghost" size="icon" onClick={toggleTheme}>
+		<Button
+			variant="ghost"
+			onClick={toggleTheme}
+			className="h-auto w-auto rounded-full border border-input bg-transparent px-3 py-1.5 font-mono text-xs text-muted-foreground hover:border-accent hover:bg-transparent hover:text-accent"
+		>
 			{getIcon()}
+			<span aria-hidden="true">{getThemeLabel()}</span>
 			<span className="sr-only">{getLabel()}</span>
 		</Button>
 	);
