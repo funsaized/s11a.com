@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Suspense, useState } from "react";
+import { useState } from "react";
 
 import { getArticlesMetadata } from "#/lib/article-metadata";
 export const Route = createFileRoute("/articles/")({
@@ -7,7 +7,8 @@ export const Route = createFileRoute("/articles/")({
 });
 
 function RouteComponent() {
-	const [selectedArticles, setSelectedArticles] = useState(
+	// WIP: keep article state around while the listing UI is migrated.
+	const [_selectedArticles, _setSelectedArticles] = useState(
 		getArticlesMetadata(),
 	);
 
