@@ -1,10 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 
-import Post, {
-	frontmatter,
-} from "#/content/articles/building-a-batch-pipeline-01-crash-course-in-spring-batch.mdx";
-import { mdxModuleShape } from "#/mdx-glob";
-
+import Post from "#/content/articles/building-a-batch-pipeline-01-crash-course-in-spring-batch.mdx";
+import { frontmatterByPath } from "#/lib/content";
 export const Route = createFileRoute("/articles/")({
 	component: RouteComponent,
 });
@@ -17,7 +14,7 @@ function RouteComponent() {
 					Imported metadata
 				</summary>
 				<pre className="mt-3 overflow-x-auto rounded-xl bg-black/5 p-4 text-xs text-[var(--sea-ink-soft)]">
-					{JSON.stringify({ frontmatter, mdxModuleShape }, null, 2)}
+					{JSON.stringify({ frontmatterByPath }, null, 2)}
 				</pre>
 			</details>
 			<Post />

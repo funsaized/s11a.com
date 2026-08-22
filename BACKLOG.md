@@ -490,9 +490,9 @@ not allowed; SOURCE is a reference, not a shared package.
 - [x] Use eager **named-export** globs for `frontmatter` and `toc`, allowing Vite to tree-shake compiled article bodies out of metadata consumers
 - [x] Use a separate lazy `import.meta.glob<ArticleModule>('../content/articles/*.mdx')` registry for full MDX modules; do not use `{ eager: true }` for article components
 - [x] Define a Zod v4 schema matching the real frontmatter: `title, slug, excerpt, date, category, tags[], readingTime, featured, author`
-- [ ] Validate against SOURCE's actual category values, not the stale category list in SOURCE `AGENTS.md`: the corpus currently contains Backend (7), Cloud (5), Frontend (4), DevOps (2), Productivity (1), and Writing (1). Do not reject the last two.
-- [ ] Create a focused category presentation map for those six live values (including Productivity and Writing); do not copy unused Healthcare/Architecture/Database/Security entries merely because SOURCE's stale fixture contains them
-- [ ] Parse every module's frontmatter through the schema — **throw on failure**, so bad content fails the build
+- [x] Validate against SOURCE's actual category values, not the stale category list in SOURCE `AGENTS.md`: the corpus currently contains Backend (7), Cloud (5), Frontend (4), DevOps (2), Productivity (1), and Writing (1). Do not reject the last two.
+- [x] Create a focused category presentation map for those six live values (including Productivity and Writing); do not copy unused Healthcare/Architecture/Database/Security entries merely because SOURCE's stale fixture contains them
+- [x] Parse every module's frontmatter through the schema — **throw on failure**, so bad content fails the build
 - [ ] Define separate types: `ArticleMetadata` contains only serializable frontmatter/TOC data; `ArticleModule` additionally owns the compiled MDX component; cache stable `React.lazy` wrappers by slug outside render
 - [ ] Export `getArticles()` (metadata only, sorted `date` DESC), `getArticleMetadataBySlug(slug)`, `getArticleComponentBySlug(slug)`, `getCategories()`, and `getAllTags()`
 - [ ] Never return the MDX component, module object, functions, or VFile/plugin objects from a Router loader; loader data is dehydrated for the client
