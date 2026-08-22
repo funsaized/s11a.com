@@ -493,7 +493,7 @@ not allowed; SOURCE is a reference, not a shared package.
 - [x] Validate against SOURCE's actual category values, not the stale category list in SOURCE `AGENTS.md`: the corpus currently contains Backend (7), Cloud (5), Frontend (4), DevOps (2), Productivity (1), and Writing (1). Do not reject the last two.
 - [x] Create a focused category presentation map for those six live values (including Productivity and Writing); do not copy unused Healthcare/Architecture/Database/Security entries merely because SOURCE's stale fixture contains them
 - [x] Parse every module's frontmatter through the schema — **throw on failure**, so bad content fails the build
-- [ ] Define separate types: `ArticleMetadata` contains only serializable frontmatter/TOC data; `ArticleModule` additionally owns the compiled MDX component; cache stable `React.lazy` wrappers by slug outside render
+- [x] Define separate types: `ArticleMetadata` contains only serializable frontmatter/TOC data; `ArticleModule` additionally owns the compiled MDX component; cache stable `React.lazy` wrappers by slug outside render
 - [ ] Export `getArticles()` (metadata only, sorted `date` DESC), `getArticleMetadataBySlug(slug)`, `getArticleComponentBySlug(slug)`, `getCategories()`, and `getAllTags()`
 - [ ] Never return the MDX component, module object, functions, or VFile/plugin objects from a Router loader; loader data is dehydrated for the client
 - [ ] Treat validated frontmatter `slug` as the canonical URL key and assert slugs are unique. Do **not** derive URLs from filenames: SOURCE has one intentional mismatch, `how-to-be-productive-after-work.mdx` → `stop-wasting-time-how-to-be-productive-after-work`, and that production URL must remain unchanged.
