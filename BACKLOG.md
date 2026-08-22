@@ -494,12 +494,12 @@ not allowed; SOURCE is a reference, not a shared package.
 - [x] Create a focused category presentation map for those six live values (including Productivity and Writing); do not copy unused Healthcare/Architecture/Database/Security entries merely because SOURCE's stale fixture contains them
 - [x] Parse every module's frontmatter through the schema — **throw on failure**, so bad content fails the build
 - [x] Define separate types: `ArticleMetadata` contains only serializable frontmatter/TOC data; `ArticleModule` additionally owns the compiled MDX component; cache stable `React.lazy` wrappers by slug outside render
-- [ ] Export `getArticles()` (metadata only, sorted `date` DESC), `getArticleMetadataBySlug(slug)`, `getArticleComponentBySlug(slug)`, `getCategories()`, and `getAllTags()`
-- [ ] Never return the MDX component, module object, functions, or VFile/plugin objects from a Router loader; loader data is dehydrated for the client
-- [ ] Treat validated frontmatter `slug` as the canonical URL key and assert slugs are unique. Do **not** derive URLs from filenames: SOURCE has one intentional mismatch, `how-to-be-productive-after-work.mdx` → `stop-wasting-time-how-to-be-productive-after-work`, and that production URL must remain unchanged.
+- [x] Export `getArticlesMetadata()` (metadata only, sorted `date` DESC), `getArticleMetadataBySlug(slug)`, `getArticleComponentBySlug(slug)`, `getCategories()`, and `getAllTags()`
+- [x] Never return the MDX component, module object, functions, or VFile/plugin objects from a Router loader; loader data is dehydrated for the client
+- [x] Treat validated frontmatter `slug` as the canonical URL key and assert slugs are unique. Do **not** derive URLs from filenames: SOURCE has one intentional mismatch, `how-to-be-productive-after-work.mdx` → `stop-wasting-time-how-to-be-productive-after-work`, and that production URL must remain unchanged.
 
 **Acceptance:**
-- [ ] `getArticles()` returns 20 fully-typed articles
+- [ ] `getArticlesMetadata()` returns 20 fully-typed articles
 - [ ] Both metadata and lazy-component lookups for `stop-wasting-time-how-to-be-productive-after-work` resolve the differently named MDX file
 - [ ] Vite output contains separate lazy article chunks; `/` and `/articles` do not eagerly import all compiled MDX bodies
 - [ ] Deliberately corrupting one frontmatter date fails the build with a readable Zod error naming the file
@@ -583,7 +583,7 @@ not allowed; SOURCE is a reference, not a shared package.
 **Depends on:** S3.2
 
 **Tasks:**
-- [ ] TARGET `src/routes/index.tsx` loader returns `getArticles().slice(0, 10)` metadata only; set `staleTime: Infinity` because this data cannot change without a new build
+- [ ] TARGET `src/routes/index.tsx` loader returns `getArticlesMetadata().slice(0, 10)` metadata only; set `staleTime: Infinity` because this data cannot change without a new build
 - [ ] Port SOURCE `Hero.tsx`, `ArticleList.tsx`, and `Projects.tsx` into TARGET
 - [ ] Do not port unused SOURCE `RecentArticles.tsx` or commented `sampleArticles`; move only live `projects` data to a focused TARGET module
 - [ ] Port SOURCE `TextType.tsx` typing behaviour, but replace its GSAP-only cursor blink with a CSS keyframe. Keep the timeout/observer logic that actually drives typing and remove the GSAP dependency.
@@ -751,7 +751,7 @@ commit used to generate them.
 
 **Tasks:**
 - [ ] Create `src/routes/rss[.]xml.ts` as a server route (note the `[.]` escaping convention)
-- [ ] Generate the feed from `getArticles()` using validated frontmatter `title`, `excerpt`, and `date`, plus the unchanged URL/GUID format. All 20 posts require an excerpt, so do not build a second prose-excerpt generator.
+- [ ] Generate the feed from `getArticlesMetadata()` using validated frontmatter `title`, `excerpt`, and `date`, plus the unchanged URL/GUID format. All 20 posts require an excerpt, so do not build a second prose-excerpt generator.
 - [ ] Set `Content-Type: application/rss+xml`
 - [ ] Diff against the captured SOURCE `rss.xml` fixture from the same baseline build
 

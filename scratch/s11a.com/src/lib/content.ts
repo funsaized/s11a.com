@@ -10,6 +10,12 @@ const category = [
 	"Misc",
 ] as const;
 
+export type ArticleCategory = (typeof category)[number];
+
+export function getCategories() {
+	return category;
+}
+
 interface TocEntry {
 	title: string;
 	items?: TocEntry[];
@@ -42,11 +48,6 @@ export interface ArticleMetadata {
 	frontmatter: ArticleFrontmatter;
 }
 
-interface ArticleModule {
-	default: ComponentType<Record<string, unknown>>;
-	frontmatter: Record<string, unknown>;
-}
-
 const rawFrontmatterByPath = import.meta.glob<Record<string, unknown>>(
 	"../content/articles/*.mdx",
 	{
@@ -55,7 +56,7 @@ const rawFrontmatterByPath = import.meta.glob<Record<string, unknown>>(
 	},
 );
 
-export const frontmatterByPath = Object.fromEntries(
+const frontmatterByPath = Object.fromEntries(
 	Object.entries(rawFrontmatterByPath).map(([path, frontmatter]) => {
 		try {
 			return [path, articleFrontmatterSchema.parse(frontmatter)];
@@ -71,26 +72,55 @@ export const frontmatterByPath = Object.fromEntries(
 	}),
 ) as Record<string, ArticleFrontmatter>;
 
-export function getArticlesMeta(): ArticleMetadata[] {
-	return Object.entries(frontmatterByPath).map(([path, frontmatter]) => ({
-		path,
-		frontmatter,
-	}));
+export function getArticlesMetadata(): ArticleMetadata[] {
+	const metadata: ArticleMetadata[] = Object.entries(frontmatterByPath).map(
+		([path, frontmatter]) => ({
+			path,
+			frontmatter,
+		}),
+	);
+
+	return metadata.toSorted((a, b) =>
+		b.frontmatter.date.localeCompare(a.frontmatter.date),
+	);
 }
 
+export function getArticleMetadataBySlug(slug: string): ArticleMetadata {
+	const metadata = getArticlesMetadata().find(
+		(meta) => meta.frontmatter.slug === slug,
+	);
+
+	if (!metadata) {
+		throw new Error(`No article found for slug: ${slug}`);
+	}
+
+	return metadata;
+}
+
+export function getAllTags() {
+	return Object.values(frontmatterByPath).flatMap(
+		(frontmatter) => frontmatter.tags ?? [],
+	);
+}
+
+interface ArticleModule {
+	default: ComponentType<Record<string, unknown>>;
+	frontmatter: Record<string, unknown>;
+}
+
+// Vite article loaders
 const articleModulesByPath = import.meta.glob<ArticleModule>(
 	"../content/articles/*.mdx",
 );
 
-// Define lazy article loading
 type ArticleModuleLoader = () => Promise<ArticleModule>;
 
 type LazyArticleComponent = LazyExoticComponent<ArticleModule["default"]>;
 
-// loaders by slug to be called by eager load client
+// Define lazy article loading client interfaces
 const articleModuleLoadersBySlug = new Map<string, ArticleModuleLoader>();
 
-for (const { path, frontmatter } of getArticlesMeta()) {
+for (const { path, frontmatter } of getArticlesMetadata()) {
 	const loadModuleFunc = articleModulesByPath[path];
 
 	if (!loadModuleFunc) {
