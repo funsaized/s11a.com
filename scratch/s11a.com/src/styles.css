@@ -43,6 +43,14 @@
   --selection-bg: #d9c29b;
   --selection-ink: #2b1a0c;
 
+  /* Page layout choices
+    Home, articles, index, projects: 820px
+    Article, about: 680px
+    Nav, footer: none
+  */
+  --width-page: 820px;
+  --width-prose: 680px;
+
   --background: #f7f5f1;
   --foreground: #2b2620;
   --card: #fdfcfa;
@@ -95,7 +103,17 @@
   --ring: var(--accent);
 }
 
+/* Layout model
+    w-full: fill the parent ._____
+    max-w-page / max-w-prose: stop at the page token we want ._____
+    mx-auto: center
+    px-[clamp(18px,4vw,24px)]: gutter
+*/
+
 @theme inline {
+  --container-page: var(--width-page);
+  --container-prose: var(--width-prose);
+
   /* 'Spro theme typography */
   --font-display: var(--font-display);
   --font-body: var(--font-body);
@@ -184,6 +202,7 @@ body::after {
 
 .stain {
   filter: var(--stain-filter);
+  mask: radial-gradient(closest-side,black 62%,rgba(0,0,0,.5) 82%,transparent 98%)
 }
 
 h1, h2, h3, h4 {

@@ -1,4 +1,3 @@
-import { lazy, type ComponentType, type LazyExoticComponent } from "react";
 import { z } from "zod";
 
 const category = [
@@ -32,7 +31,7 @@ const articleFrontmatterSchema = z.object({
 	title: z.string(),
 	slug: z.string(),
 	excerpt: z.string(),
-	date: z.string(),
+	date: z.iso.date(),
 	category: z.enum(category),
 	tags: z.array(z.string()),
 	readingTime: z.string(),
@@ -72,6 +71,16 @@ const frontmatterByPath = Object.fromEntries(
 	}),
 ) as Record<string, ArticleFrontmatter>;
 
+const seenSlugs = new Set<string>();
+
+for (const [path, frontmatter] of Object.entries(frontmatterByPath)) {
+	if (seenSlugs.has(frontmatter.slug)) {
+		throw new Error(`😵 Duplicate slug ${frontmatter.slug} in ${path}`);
+	}
+
+	seenSlugs.add(frontmatter.slug);
+}
+
 export function getArticlesMetadata(): ArticleMetadata[] {
 	const metadata: ArticleMetadata[] = Object.entries(frontmatterByPath).map(
 		([path, frontmatter]) => ({
@@ -101,59 +110,4 @@ export function getAllTags() {
 	return Object.values(frontmatterByPath).flatMap(
 		(frontmatter) => frontmatter.tags ?? [],
 	);
-}
-
-interface ArticleModule {
-	default: ComponentType<Record<string, unknown>>;
-	frontmatter: Record<string, unknown>;
-}
-
-// Vite article loaders
-const articleModulesByPath = import.meta.glob<ArticleModule>(
-	"../content/articles/*.mdx",
-);
-
-type ArticleModuleLoader = () => Promise<ArticleModule>;
-
-type LazyArticleComponent = LazyExoticComponent<ArticleModule["default"]>;
-
-// Define lazy article loading client interfaces
-const articleModuleLoadersBySlug = new Map<string, ArticleModuleLoader>();
-
-for (const { path, frontmatter } of getArticlesMetadata()) {
-	const loadModuleFunc = articleModulesByPath[path];
-
-	if (!loadModuleFunc) {
-		throw new Error(`😵 Missing MDX module for ${path}`);
-	}
-
-	if (articleModuleLoadersBySlug.has(frontmatter.slug)) {
-		throw new Error(`😵 Duplicate slug ${frontmatter.slug}`);
-	}
-
-	articleModuleLoadersBySlug.set(frontmatter.slug, loadModuleFunc);
-}
-
-const lazyComponentsBySlug = new Map<string, LazyArticleComponent>();
-
-export function getArticleComponentBySlug(
-	slug: string,
-): LazyArticleComponent | undefined {
-	const cachedComponent = lazyComponentsBySlug.get(slug);
-
-	if (cachedComponent) {
-		return cachedComponent;
-	}
-
-	const loadModule = articleModuleLoadersBySlug.get(slug);
-
-	if (!loadModule) {
-		return undefined;
-	}
-
-	const component = lazy(loadModule);
-
-	lazyComponentsBySlug.set(slug, component);
-
-	return component;
 }

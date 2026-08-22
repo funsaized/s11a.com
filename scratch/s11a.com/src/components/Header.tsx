@@ -61,8 +61,8 @@ export function Header() {
 	}, [isMenuOpen]);
 
 	return (
-		<header className="sticky top-0 z-50 w-full border-b  bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60">
-			<div className="flex min-h-16 w-full flex-wrap items-center justify-between gap-x-3.5 gap-y-2.5 px-[clamp(16px,4vw,44px)] py-3.5">
+		<header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60">
+			<div className="flex min-h-16 w-full flex-wrap items-center gap-x-3.5 gap-y-2.5 px-[clamp(16px,4vw,44px)] py-3.5">
 				<div className="flex flex-1 gap-4 justify-start">
 					<Link to="/" className="flex items-center space-x-2">
 						<CoffeeCup />

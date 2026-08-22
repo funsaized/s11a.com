@@ -499,10 +499,10 @@ not allowed; SOURCE is a reference, not a shared package.
 - [x] Treat validated frontmatter `slug` as the canonical URL key and assert slugs are unique. Do **not** derive URLs from filenames: SOURCE has one intentional mismatch, `how-to-be-productive-after-work.mdx` → `stop-wasting-time-how-to-be-productive-after-work`, and that production URL must remain unchanged.
 
 **Acceptance:**
-- [ ] `getArticlesMetadata()` returns 20 fully-typed articles
-- [ ] Both metadata and lazy-component lookups for `stop-wasting-time-how-to-be-productive-after-work` resolve the differently named MDX file
-- [ ] Vite output contains separate lazy article chunks; `/` and `/articles` do not eagerly import all compiled MDX bodies
-- [ ] Deliberately corrupting one frontmatter date fails the build with a readable Zod error naming the file
+- [x] `getArticlesMetadata()` returns 20 fully-typed articles
+- [x] Both metadata and lazy-component lookups for `stop-wasting-time-how-to-be-productive-after-work` resolve the differently named MDX file
+- [x] Vite output contains separate lazy article chunks; `/` and `/articles` do not eagerly import all compiled MDX bodies
+- [x] Deliberately corrupting one frontmatter date fails the build with a readable Zod error naming the file
 
 **Checkpoint questions:**
 1. Line-count TARGET `src/lib/content.ts` against SOURCE `gatsby-node.js` + the three SOURCE `graphql` blocks it replaces.

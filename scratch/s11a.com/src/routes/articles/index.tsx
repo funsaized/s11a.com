@@ -1,26 +1,27 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Suspense } from "react";
+import { Suspense, useState } from "react";
 
-import { getArticleComponentBySlug, getArticlesMetadata } from "#/lib/content";
+import { getArticlesMetadata } from "#/lib/article-metadata";
 export const Route = createFileRoute("/articles/")({
 	component: RouteComponent,
 });
 
 function RouteComponent() {
+	const [selectedArticles, setSelectedArticles] = useState(
+		getArticlesMetadata(),
+	);
+
 	return (
-		<section className="island-shell mt-8 rounded-2xl p-6">
-			{getArticlesMetadata().map((meta) => {
-				const slug = meta.frontmatter.slug;
-				const Article = getArticleComponentBySlug(slug);
-				if (!Article) {
-					return null;
-				}
-				return (
-					<Suspense key={slug} fallback={<div>Loading article…</div>}>
-						<Article />
-					</Suspense>
-				);
-			})}
-		</section>
+		<div className="mx-auto w-full max-w-page px-[clamp(18px,4vw,24px)] pt-[clamp(44px,7vw,72px)] pb-4">
+			<div className="flex flex-col">
+				<div className="font-mono">(mostly)</div>
+			</div>
+			<div className="flex flex-col">
+				<div className="flex-1">Item1</div>
+				<div className="flex-1">Item1</div>
+				<div className="flex-1">Item1</div>
+				<div className="flex-1">Item1</div>
+			</div>
+		</div>
 	);
 }

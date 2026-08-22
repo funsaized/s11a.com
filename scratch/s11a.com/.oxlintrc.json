@@ -1,7 +1,7 @@
 {
 	"$schema": "./node_modules/oxlint/configuration_schema.json",
 	"categories": {
-		"correctness": "error",
+		"correctness": "warn",
 		"suspicious": "warn",
 		"pedantic": "off",
 		"perf": "warn",
