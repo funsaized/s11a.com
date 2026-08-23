@@ -1,7 +1,16 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-export const Route = createFileRoute("/")({ component: Home });
+
+import { ArticleList } from "#/components/ArticleList";
+import { getArticlesMetadata } from "#/lib/article-metadata";
+export const Route = createFileRoute("/")({
+	loader: () => getArticlesMetadata().slice(0, 6),
+	staleTime: Infinity,
+	component: Home,
+});
 
 function Home() {
+	const articles = Route.useLoaderData();
+
 	return (
 		<div className="mx-auto w-full max-w-page px-[clamp(18px,4vw,24px)] pt-[clamp(40px,7vw,64px)]">
 			<section className="flex flex-wrap items-start justify-center gap-10">
@@ -63,10 +72,8 @@ function Home() {
 					</div>
 				</div>
 			</section>
-			<section className="flex flex-wrap justify-start gap-10 pt-[clamp(36px,6vw,52px)] pb-40px">
-				<h2 className="mt-4 max-w-prose text-3xl leading-[1.28]">
-					From the journal
-				</h2>
+			<section className="w-full pt-[clamp(36px,6vw,52px)] pb-10">
+				<ArticleList articles={articles} />
 			</section>
 		</div>
 	);

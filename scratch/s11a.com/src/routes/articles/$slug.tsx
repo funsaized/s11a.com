@@ -5,6 +5,7 @@ import { TableOfContents } from "#/components/TableOfContents";
 import { Button } from "#/components/ui/button";
 import { getArticleMetadataBySlug } from "#/lib/article-metadata";
 import { getArticleComponentBySlug } from "#/lib/article-modules";
+import { formatLongDate } from "#/lib/dates";
 
 export const Route = createFileRoute("/articles/$slug")({
 	loader: ({ params }) => getArticleMetadataBySlug(params.slug),
@@ -36,7 +37,7 @@ function RouteComponent() {
 				<div className="max-w-prose">
 					<div className="font-mono text-faint text-xs font-medium lowercase">
 						{category} {" · "}
-						{date} {" · "}
+						{formatLongDate(date)} {" · "}
 						{readingTime}
 					</div>
 					<h1 className="text-[clamp(34px,5vw,48px)] leading-[1.15] my-4">
