@@ -587,11 +587,11 @@ not allowed; SOURCE is a reference, not a shared package.
 - [x] Port SOURCE `Hero.tsx`, `ArticleList.tsx`, and `Projects.tsx` into TARGET
 - [x] Do not port unused SOURCE `RecentArticles.tsx` or commented `sampleArticles`; move only live `projects` data to a focused TARGET module
 - [x] Port SOURCE `TextType.tsx` typing behaviour, but replace its GSAP-only cursor blink with a CSS keyframe. Keep the timeout/observer logic that actually drives typing and remove the GSAP dependency. **Override:** wired into the redesigned home `h1` greeting (`Hi, I'm Sai`), not a SOURCE `Hero.tsx` clone. Caret blink is `.text-type-caret` in TARGET `src/styles.css`. No GSAP in TARGET.
-- [ ] Port SOURCE `spotlight.tsx` and test it the same way
+- [NA] Port SOURCE `spotlight.tsx` and test it the same way
 
 **Acceptance:**
-- [ ] `/` matches the Gatsby homepage visually
-- [ ] View source on the prerendered build: article titles are present in the HTML
+- [x] `/` matches the Gatsby homepage visually
+- [x] View source on the prerendered build: article titles are present in the HTML
 
 **Checkpoint question:** What's the difference between a TanStack Router `loader` and a `beforeLoad`, and which runs during prerender?
 
