@@ -5,4 +5,5 @@ declare module "*.mdx" {
 
 	export default MDXComponent;
 	export const frontmatter: Record<string, unknown>;
+	export const toc: import("#/lib/rehype-mdx-toc").TocItem[];
 }

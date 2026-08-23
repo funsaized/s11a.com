@@ -268,6 +268,18 @@ pre code {
   color: var(--foreground);
 }
 
+/* Dual-theme Shiki (rehype-pretty-code). Toggle is .dark on <html>, not prefers-color-scheme.
+   keepBackground: false — pane stays --card; these rules only switch token colors. */
+code[data-theme*=" "],
+code[data-theme*=" "] span {
+  color: var(--shiki-light);
+}
+
+.dark code[data-theme*=" "],
+.dark code[data-theme*=" "] span {
+  color: var(--shiki-dark);
+}
+
 input::placeholder {
   color: var(--faint);
 }

@@ -518,15 +518,15 @@ not allowed; SOURCE is a reference, not a shared package.
 **Depends on:** S3.1, S2.2
 
 **Tasks:**
-- [ ] `npm i rehype-pretty-code rehype-slug`
-- [ ] Configure with dual themes (e.g. `{ light: 'github-light', dark: 'github-dark' }`)
-- [ ] Add the CSS-variable switching rules to TARGET `src/styles.css`
-- [ ] Verify all 105 fenced blocks render. The 100 labelled blocks include `java` (28), `json` (18), `bash` (11), `typescript` (7), `go` (6), `yaml` (5), `python` (4), `css` (4), `javascript` (3), `jsx` (2), `docker` (2), plus single-use labels and case variants (`xml`, `log`, `http`, `js`, `dockerfile`, `SQL`, `JavaScript`, `Java`, `Docker`, `k8s`). Normalise unsupported/case-variant labels in S3.5.
-- [ ] Confirm TARGET does not install `prismjs` or `gatsby-remark-prismjs` and does not copy SOURCE `src/styles/prism-theme.css`. Do not uninstall or delete them in SOURCE.
+- [x] `npm i rehype-pretty-code rehype-slug`
+- [x] Configure with dual themes (e.g. `{ light: 'github-light', dark: 'github-dark' }`)
+- [x] Add the CSS-variable switching rules to TARGET `src/styles.css`
+- [x] Verify all 105 fenced blocks render. The 100 labelled blocks include `java` (28), `json` (18), `bash` (11), `typescript` (7), `go` (6), `yaml` (5), `python` (4), `css` (4), `javascript` (3), `jsx` (2), `docker` (2), plus single-use labels and case variants (`xml`, `log`, `http`, `js`, `dockerfile`, `SQL`, `JavaScript`, `Java`, `Docker`, `k8s`). Normalise unsupported/case-variant labels in S3.5.
+- [x] Confirm TARGET does not install `prismjs` or `gatsby-remark-prismjs` and does not copy SOURCE `src/styles/prism-theme.css`. Do not uninstall or delete them in SOURCE.
 
 **Acceptance:**
-- [ ] All 105 fenced blocks render safely in both themes; supported languages are highlighted and deliberate plain-text fallbacks remain readable
-- [ ] No `prism` string remains in `src/` or `package.json`
+- [x] All 105 fenced blocks render safely in both themes; supported languages are highlighted and deliberate plain-text fallbacks remain readable
+- [x] No `prism` string remains in `src/` or `package.json`
 
 **Watch for:** ` ```log ` may not be a Shiki-supported language. Fall back to plain text rather than adding a custom grammar.
 

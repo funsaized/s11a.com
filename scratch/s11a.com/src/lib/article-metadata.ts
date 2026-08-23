@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import type { TocItem } from "./rehype-mdx-toc";
+
 const category = [
 	"Backend",
 	"Cloud",
@@ -15,18 +17,6 @@ export function getCategories() {
 	return category;
 }
 
-interface TocEntry {
-	title: string;
-	items?: TocEntry[];
-}
-
-const tocEntrySchema: z.ZodType<TocEntry> = z.lazy(() =>
-	z.object({
-		title: z.string(),
-		items: z.array(tocEntrySchema).optional(),
-	}),
-);
-
 const articleFrontmatterSchema = z.object({
 	title: z.string(),
 	slug: z.string(),
@@ -37,7 +27,6 @@ const articleFrontmatterSchema = z.object({
 	readingTime: z.string(),
 	featured: z.boolean(),
 	author: z.string(),
-	toc: z.array(tocEntrySchema),
 });
 
 type ArticleFrontmatter = z.infer<typeof articleFrontmatterSchema>;
@@ -45,6 +34,7 @@ type ArticleFrontmatter = z.infer<typeof articleFrontmatterSchema>;
 export interface ArticleMetadata {
 	path: string;
 	frontmatter: ArticleFrontmatter;
+	toc: TocItem[];
 }
 
 const rawFrontmatterByPath = import.meta.glob<Record<string, unknown>>(
@@ -81,12 +71,22 @@ for (const [path, frontmatter] of Object.entries(frontmatterByPath)) {
 	seenSlugs.add(frontmatter.slug);
 }
 
+const tocByPath = import.meta.glob<TocItem[]>("../content/articles/*.mdx", {
+	eager: true,
+	import: "toc",
+});
+
 export function getArticlesMetadata(): ArticleMetadata[] {
 	const metadata: ArticleMetadata[] = Object.entries(frontmatterByPath).map(
-		([path, frontmatter]) => ({
-			path,
-			frontmatter,
-		}),
+		([path, frontmatter]) => {
+			const toc = tocByPath[path];
+
+			if (!toc) {
+				throw new Error(`😵 Missing toc export for ${path}`);
+			}
+
+			return { path, frontmatter, toc };
+		},
 	);
 
 	return metadata.toSorted((a, b) =>

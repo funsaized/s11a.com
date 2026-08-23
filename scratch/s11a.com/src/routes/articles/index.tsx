@@ -3,6 +3,7 @@ import { useState } from "react";
 
 import { getArticlesMetadata } from "#/lib/article-metadata";
 export const Route = createFileRoute("/articles/")({
+	loader: () => getArticlesMetadata(),
 	component: RouteComponent,
 });
 
@@ -12,16 +13,21 @@ function RouteComponent() {
 		getArticlesMetadata(),
 	);
 
+	const articles = Route.useLoaderData();
+
 	return (
 		<div className="mx-auto w-full max-w-page px-[clamp(18px,4vw,24px)] pt-[clamp(44px,7vw,72px)] pb-12">
 			<div className="flex flex-col">
 				<div className="font-mono">(mostly)</div>
 			</div>
 			<div className="flex flex-col">
-				<div className="flex-1">Item1</div>
-				<div className="flex-1">Item1</div>
-				<div className="flex-1">Item1</div>
-				<div className="flex-1">Item1</div>
+				{articles.map((article) => {
+					return (
+						<div key={article.path} className="flex-1">
+							{article.path}
+						</div>
+					);
+				})}
 			</div>
 		</div>
 	);
