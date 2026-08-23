@@ -52,13 +52,13 @@ Cosmos DB stored procedures are written in JavaScript. This allows for a wide ra
 
 Within a partition the stored procedure be doing the equivalent SQL query (with pagination):
 
-```SQL
+```sql
 SELECT i.address FROM items i;
 ```
 
 Using the SDK the procedure definition can be written as follows:
 
-```JavaScript
+```javascript
 function getItems(continuation) {
     var container = getContext().getCollection();
 
@@ -90,7 +90,7 @@ On the client side, we will call the stored procedure to fetch all the addresses
 
 Using the Java client SDK, that pattern looks like the following in the function `runProcedureContinuation`:
 
-```Java
+```java
 private void runProcedureContinuation() throws Exception {
   storedProcedure = container
           .getScripts()

@@ -270,7 +270,7 @@ The last steps to create a running app is to start a HTTP server using the `Hand
 
 Docker and kubernetes makes deploying an app like this quick. The Dockerfile definition is below. Pretty standard:
 
-```Docker
+```docker
 FROM golang
 ENV GO111MODULE=on
 
@@ -298,7 +298,7 @@ CMD ["/app/main"]
 
 For the deployment manifest, I've included an example. The bot will need some environment variables set specific to where it is being run (Organization name, repos, keys, etc). If you want to view the full definition, you can do so [here](https://github.com/funsaized/github-PR-automation/blob/master/deploy/k8s.yaml). Notably we chose to mount the app's private key as a secret named `github-rsa-keypair` and the mountPath `/app/keys`.
 
-```k8s
+```yaml
 .
 .
 .

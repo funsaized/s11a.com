@@ -216,6 +216,11 @@ h1, h2, h3, h4 {
   font-weight: 550;
 }
 
+/* TOC scroll tuning */
+h1, h2, h3 {
+    @apply scroll-mt-20
+}
+
 a {
   color: var(--accent);
   text-decoration-color: var(--line);

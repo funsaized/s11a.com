@@ -540,16 +540,16 @@ not allowed; SOURCE is a reference, not a shared package.
 **Depends on:** S3.3
 
 **Tasks:**
-- [ ] `rehype-slug` for heading IDs (already installed in S3.3)
-- [ ] Add a small remark/rehype plugin that exports a serializable `toc` named export from each compiled MDX module; use the same GitHub-style slug algorithm as `rehype-slug` (including duplicate headings), and consume the named export without bundling raw article source into the client
-- [ ] Cap at depth 3 to match current behaviour
-- [ ] Port the visual structure of SOURCE `TableOfContents.tsx`, but use ordinary `<a href="#...">` links plus CSS `scroll-margin`; remove the click handler that prevents native hash/history behaviour
-- [ ] Do not port SOURCE `HeadingComponents.tsx` or `MDXProvider`: those wrappers only generate IDs, which `rehype-slug` already owns
+- [x] `rehype-slug` for heading IDs (already installed in S3.3)
+- [x] Add a small remark/rehype plugin that exports a serializable `toc` named export from each compiled MDX module; use the same GitHub-style slug algorithm as `rehype-slug` (including duplicate headings), and consume the named export without bundling raw article source into the client
+- [x] Cap at depth 3 to match current behaviour
+- [x] Port the visual structure of SOURCE `TableOfContents.tsx`, but use ordinary `<a href="#...">` links plus CSS `scroll-margin`; remove the click handler that prevents native hash/history behaviour
+- [x] Do not port SOURCE `HeadingComponents.tsx` or `MDXProvider`: those wrappers only generate IDs, which `rehype-slug` already owns
 
 **Acceptance:**
-- [ ] TOC renders for a long article (`building-a-batch-pipeline-01-crash-course-in-spring-batch.mdx` is a good test)
-- [ ] Anchor links scroll with correct offset
-- [ ] Clicking a TOC link updates the URL hash and works with copy-link, back/forward, keyboard activation, and JavaScript disabled
+- [x] TOC renders for a long article (`building-a-batch-pipeline-01-crash-course-in-spring-batch.mdx` is a good test)
+- [x] Anchor links scroll with correct offset
+- [x] Clicking a TOC link updates the URL hash and works with copy-link, back/forward, keyboard activation, and JavaScript disabled
 
 ---
 
@@ -559,16 +559,16 @@ not allowed; SOURCE is a reference, not a shared package.
 **Depends on:** S3.3
 
 **Tasks:**
-- [ ] In TARGET only, `cloning-discords-login-form-to-mess-with-styled-components.mdx` line 46: ` ```jsx{7} ` is **Prism** line-highlight syntax. Convert it to `rehype-pretty-code`'s meta format.
-- [ ] In TARGET only, change the `k8s` fence label to `yaml`; it was a custom alias in SOURCE `gatsby-config.ts`.
-- [ ] In TARGET only, normalise the case variants `SQL`, `JavaScript`, `Java`, and `Docker` to Shiki's canonical lowercase labels. Verify `dockerfile`; treat `log` as plain text if unsupported.
-- [ ] Verify all 20 files compile — every JSX-looking block in the corpus is inside a code fence, so no MDX v2→v3 component breakage is expected
-- [ ] Verify raw HTML in MDX (`<p>`, `<a href>` in the Discord article) still renders under MDX v3
-- [ ] Confirm all 31 distinct `/images/articles/*` references resolve from TARGET `public/`, with no fallback to SOURCE files
+- [x] In TARGET only, `cloning-discords-login-form-to-mess-with-styled-components.mdx` line 46: ` ```jsx{7} ` is **Prism** line-highlight syntax. Convert it to `rehype-pretty-code`'s meta format.
+- [x] In TARGET only, change the `k8s` fence label to `yaml`; it was a custom alias in SOURCE `gatsby-config.ts`.
+- [x] In TARGET only, normalise the case variants `SQL`, `JavaScript`, `Java`, and `Docker` to Shiki's canonical lowercase labels. Verify `dockerfile`; treat `log` as plain text if unsupported.
+- [x] Verify all 20 files compile — every JSX-looking block in the corpus is inside a code fence, so no MDX v2→v3 component breakage is expected
+- [x] Verify raw HTML in MDX (`<p>`, `<a href>` in the Discord article) still renders under MDX v3
+- [x] Confirm all 31 distinct `/images/articles/*` references resolve from TARGET `public/`, with no fallback to SOURCE files
 
 **Acceptance:**
-- [ ] All 20 articles compile with zero warnings
-- [ ] Every image in every article loads (31 distinct article image paths are referenced)
+- [x] All 20 articles compile with zero warnings
+- [x] Every image in every article loads (31 distinct article image paths are referenced)
 
 ---
 
