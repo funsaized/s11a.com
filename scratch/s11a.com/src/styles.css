@@ -104,10 +104,16 @@
 }
 
 /* Layout model
-    w-full: fill the parent ._____
-    max-w-page / max-w-prose: stop at the page token we want ._____
+    w-full: fill the parent
+    max-w-page / max-w-prose: stop at the page token we want
     mx-auto: center
     px-[clamp(18px,4vw,24px)]: gutter
+*/
+
+/* Page layouts (pt)
+    list - 44 b/ 7vw / 72 -> articles, projects, about
+    reading - 40 / 6vw /  56 -> article slug
+    home intro - 40 / 7v2 / 64
 */
 
 @theme inline {

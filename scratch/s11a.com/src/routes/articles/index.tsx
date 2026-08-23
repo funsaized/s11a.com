@@ -13,7 +13,7 @@ function RouteComponent() {
 	);
 
 	return (
-		<div className="mx-auto w-full max-w-page px-[clamp(18px,4vw,24px)] pt-[clamp(44px,7vw,72px)] pb-4">
+		<div className="mx-auto w-full max-w-page px-[clamp(18px,4vw,24px)] pt-[clamp(44px,7vw,72px)] pb-12">
 			<div className="flex flex-col">
 				<div className="font-mono">(mostly)</div>
 			</div>
