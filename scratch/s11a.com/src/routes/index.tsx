@@ -1,6 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 
-import { ArticleList } from "#/components/ArticleList";
+import { Articles } from "#/components/Articles";
+import { Projects } from "#/components/Projects";
+import { TextType } from "#/components/TextType";
 import { getArticlesMetadata } from "#/lib/article-metadata";
 export const Route = createFileRoute("/")({
 	loader: () => getArticlesMetadata().slice(0, 6),
@@ -19,9 +21,7 @@ function Home() {
 						{"// morning pour — thoughts on software & life"}
 					</div>
 					<h1 className="mt-4 max-w-prose text-[clamp(28px,4vw,40px)] leading-[1.28]">
-						Hi, I&apos;m Sai &mdash; a{" "}
-						<span className="whitespace-nowrap">full-stack</span> engineer
-						writing about healthcare tech, AI, and whatever else is brewing.
+						<TextType text="Hi, I'm Sai — a full‑stack engineer writing about healthcare tech, AI, and whatever else is brewing." />
 					</h1>
 					<div className="mt-6 flex flex-wrap items-baseline gap-8 font-mono text-[13px]">
 						<Link
@@ -73,7 +73,10 @@ function Home() {
 				</div>
 			</section>
 			<section className="w-full pt-[clamp(36px,6vw,52px)] pb-10">
-				<ArticleList articles={articles} />
+				<Articles articles={articles} />
+			</section>
+			<section className="w-full pb-10">
+				<Projects />
 			</section>
 		</div>
 	);

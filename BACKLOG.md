@@ -583,10 +583,10 @@ not allowed; SOURCE is a reference, not a shared package.
 **Depends on:** S3.2
 
 **Tasks:**
-- [ ] TARGET `src/routes/index.tsx` loader returns `getArticlesMetadata().slice(0, 10)` metadata only; set `staleTime: Infinity` because this data cannot change without a new build
-- [ ] Port SOURCE `Hero.tsx`, `ArticleList.tsx`, and `Projects.tsx` into TARGET
-- [ ] Do not port unused SOURCE `RecentArticles.tsx` or commented `sampleArticles`; move only live `projects` data to a focused TARGET module
-- [ ] Port SOURCE `TextType.tsx` typing behaviour, but replace its GSAP-only cursor blink with a CSS keyframe. Keep the timeout/observer logic that actually drives typing and remove the GSAP dependency.
+- [x] TARGET `src/routes/index.tsx` loader returns `getArticlesMetadata().slice(0, 10)` metadata only; set `staleTime: Infinity` because this data cannot change without a new build
+- [x] Port SOURCE `Hero.tsx`, `ArticleList.tsx`, and `Projects.tsx` into TARGET
+- [x] Do not port unused SOURCE `RecentArticles.tsx` or commented `sampleArticles`; move only live `projects` data to a focused TARGET module
+- [x] Port SOURCE `TextType.tsx` typing behaviour, but replace its GSAP-only cursor blink with a CSS keyframe. Keep the timeout/observer logic that actually drives typing and remove the GSAP dependency. **Override:** wired into the redesigned home `h1` greeting (`Hi, I'm Sai`), not a SOURCE `Hero.tsx` clone. Caret blink is `.text-type-caret` in TARGET `src/styles.css`. No GSAP in TARGET.
 - [ ] Port SOURCE `spotlight.tsx` and test it the same way
 
 **Acceptance:**

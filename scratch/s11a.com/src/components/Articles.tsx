@@ -7,7 +7,7 @@ interface ArticleListProps {
 	articles: ArticleMetadata[];
 }
 
-export function ArticleList({ articles }: ArticleListProps) {
+export function Articles({ articles }: ArticleListProps) {
 	return (
 		<div className="w-full">
 			<div className="grid grid-cols-[1fr_auto] items-baseline">
@@ -28,7 +28,7 @@ export function ArticleList({ articles }: ArticleListProps) {
 							key={slug}
 							to="/articles/$slug"
 							params={{ slug }}
-							className="flex flex-wrap items-baseline gap-x-3.5 gap-y-2 px-0.5 py-3.75 text-foreground no-underline hover:text-accent"
+							className="flex flex-wrap items-baseline gap-x-3.5 gap-y-2 px-0.5 py-3.75 text-foreground no-underline row-link"
 						>
 							<span className="min-w-0 font-body text-[21px] font-medium text-inherit">
 								{title}
