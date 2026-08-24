@@ -603,8 +603,8 @@ not allowed; SOURCE is a reference, not a shared package.
 **Depends on:** S1.3
 
 **Tasks:**
-- [ ] Port SOURCE `src/pages/about.tsx` → TARGET `src/routes/about.tsx`
-- [ ] Update the single factual sentence that says the site uses Gatsby so TARGET names TanStack Start; otherwise preserve About-page content and layout
+- [x] Port SOURCE `src/pages/about.tsx` → TARGET `src/routes/about.tsx`
+- [x] Update the single factual sentence that says the site uses Gatsby so TARGET names TanStack Start; otherwise preserve About-page content and layout
 - [ ] Confirm the 404 wired in S1.3 renders for unknown paths
 - [ ] Compare SOURCE's catch-all `netlify.toml` 404 redirect with Start/Netlify's generated routing. Do not blindly copy the Gatsby redirect into TARGET if it would intercept server functions; verify unknown paths return the TARGET not-found UI with status 404.
 

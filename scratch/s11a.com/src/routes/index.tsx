@@ -14,7 +14,7 @@ function Home() {
 	const articles = Route.useLoaderData();
 
 	return (
-		<div className="mx-auto w-full max-w-page px-[clamp(18px,4vw,24px)] pt-[clamp(40px,7vw,64px)]">
+		<div className="mx-auto w-full max-w-page  pt-[clamp(40px,7vw,64px)]">
 			<section className="flex flex-wrap items-start justify-center gap-10">
 				<div className="min-w-70 flex-1">
 					<div className="font-mono text-[13px] font-medium tracking-[0.14em] text-accent">

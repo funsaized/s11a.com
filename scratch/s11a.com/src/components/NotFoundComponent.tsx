@@ -1,3 +1,5 @@
+import { Link } from "@tanstack/react-router";
+
 import { Button } from "./ui/button";
 
 export function NotFoundComponent() {
@@ -12,11 +14,21 @@ export function NotFoundComponent() {
 					consolation menu of pages that definitely exist.
 				</p>
 				<div className="flex items-center justify-center gap-4">
-					<Button>
-						<span>Browse Articles</span>
+					<Button asChild>
+						<Link
+							className="!text-primary-foreground hover:!text-primary-foreground"
+							to="/articles"
+						>
+							Browse Articles
+						</Link>
 					</Button>
-					<Button variant="outline">
-						<span className="font-mono">Take me home</span>
+					<Button variant="outline" asChild>
+						<Link
+							to="/"
+							className="font-mono !text-foreground hover:!text-foreground"
+						>
+							Take me home
+						</Link>
 					</Button>
 				</div>
 				<p className="text-sm text-muted-foreground">

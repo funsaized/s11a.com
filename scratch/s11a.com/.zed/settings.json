@@ -4,10 +4,20 @@
 			"language_servers": ["tailwindcss-intellisense-css"]
 		},
 		"TypeScript": {
-			"language_servers": ["vtsls", "oxfmt", "oxlint", "!eslint", "..."]
+			"language_servers": ["vtsls", "oxfmt", "oxlint", "!eslint"],
+			"formatter": {
+				"language_server": {
+					"name": "oxfmt"
+				}
+			}
 		},
 		"TSX": {
-			"language_servers": ["vtsls", "oxfmt", "oxlint", "!eslint", "..."]
+			"language_servers": ["vtsls", "oxfmt", "oxlint", "!eslint"],
+			"formatter": {
+				"language_server": {
+					"name": "oxfmt"
+				}
+			}
 		}
 	},
 	"lsp": {
