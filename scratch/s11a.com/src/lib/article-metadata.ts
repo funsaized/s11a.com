@@ -94,16 +94,10 @@ export function getArticlesMetadata(): ArticleMetadata[] {
 	);
 }
 
-export function getArticleMetadataBySlug(slug: string): ArticleMetadata {
-	const metadata = getArticlesMetadata().find(
-		(meta) => meta.frontmatter.slug === slug,
-	);
-
-	if (!metadata) {
-		throw new Error(`No article found for slug: ${slug}`);
-	}
-
-	return metadata;
+export function getArticleMetadataBySlug(
+	slug: string,
+): ArticleMetadata | undefined {
+	return getArticlesMetadata().find((meta) => meta.frontmatter.slug === slug);
 }
 
 export function getAllTags() {

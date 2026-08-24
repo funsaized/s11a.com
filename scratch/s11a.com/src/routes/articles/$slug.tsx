@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { Suspense } from "react";
 
 import { Prose } from "#/components/Prose";
@@ -9,7 +9,12 @@ import { getArticleComponentBySlug } from "#/lib/article-modules";
 import { formatLongDate } from "#/lib/dates";
 
 export const Route = createFileRoute("/articles/$slug")({
-	loader: ({ params }) => getArticleMetadataBySlug(params.slug),
+	loader: ({ params }) => {
+		const meta = getArticleMetadataBySlug(params.slug);
+		if (!meta) throw notFound();
+		return meta;
+	},
+	staleTime: Infinity,
 	component: RouteComponent,
 });
 
@@ -21,7 +26,9 @@ function RouteComponent() {
 	} = meta;
 
 	const Article = getArticleComponentBySlug(slug);
-	if (!Article) throw new Error("Article not found");
+	if (!Article) {
+		throw new Error(`Missing MDX module for published slug: ${slug}`);
+	}
 
 	return (
 		<div className="mx-auto w-full max-w-6xl px-[clamp(18px,4vw,24px)] pt-[clamp(40px,6vw,56px)] pb-12">
