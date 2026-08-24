@@ -45,9 +45,9 @@ export function ThemeToggle() {
 	const getThemeLabel = () => {
 		switch (theme) {
 			case "light":
-				return "espresso";
-			case "dark":
 				return "latte";
+			case "dark":
+				return "espresso";
 			case "system":
 				return "system";
 			default:

@@ -15,7 +15,7 @@ import { rehypeMdxToc } from "#/lib/rehype-mdx-toc";
 
 const config = defineConfig({
 	server: {
-		allowedHosts: ["blog-new.dev.s11a.com"],
+		allowedHosts: ["blog-new.dev.s11a.com", "blog-new.omarchy.dev.s11a.com"],
 	},
 	resolve: { tsconfigPaths: true },
 	plugins: [
@@ -41,7 +41,7 @@ const config = defineConfig({
 				[
 					rehypePrettyCode,
 					{
-						theme: { light: "github-light", dark: "github-dark" },
+						theme: { light: "kanagawa-lotus", dark: "kanagawa-dragon" },
 						keepBackground: false,
 						defaultLang: "plaintext",
 					},

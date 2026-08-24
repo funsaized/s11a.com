@@ -1,5 +1,8 @@
 {
 	"languages": {
+		"CSS": {
+			"language_servers": ["tailwindcss-intellisense-css"]
+		},
 		"TypeScript": {
 			"language_servers": ["vtsls", "oxfmt", "oxlint", "!eslint", "..."]
 		},
@@ -8,6 +11,17 @@
 		}
 	},
 	"lsp": {
+		"tailwindcss-language-server": {
+			"binary": {
+				"path": "./node_modules/.bin/tailwindcss-language-server",
+				"arguments": ["--stdio"]
+			},
+			"settings": {
+				"tailwindCSS": {
+					"classFunctions": ["cva", "cn"]
+				}
+			}
+		},
 		"vtsls": {
 			"settings": {
 				"typescript": {

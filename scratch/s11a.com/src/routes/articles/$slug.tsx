@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Suspense } from "react";
 
+import { Prose } from "#/components/Prose";
 import { TableOfContents } from "#/components/TableOfContents";
 import { Button } from "#/components/ui/button";
 import { getArticleMetadataBySlug } from "#/lib/article-metadata";
@@ -48,7 +49,9 @@ function RouteComponent() {
 					</p>
 					<div className="my-10 border-b-2 border-dotted border-border"></div>
 					<Suspense fallback={<div></div>}>
-						<Article />
+						<Prose>
+							<Article />
+						</Prose>
 					</Suspense>
 				</div>
 			</div>
