@@ -16,17 +16,14 @@ export function NotFoundComponent() {
 				<div className="flex items-center justify-center gap-4">
 					<Button asChild>
 						<Link
-							className="!text-primary-foreground hover:!text-primary-foreground"
+							className="text-primary-foreground! hover:text-primary-foreground!"
 							to="/articles"
 						>
 							Browse Articles
 						</Link>
 					</Button>
 					<Button variant="outline" asChild>
-						<Link
-							to="/"
-							className="font-mono !text-foreground hover:!text-foreground"
-						>
+						<Link to="/" className="font-mono">
 							Take me home
 						</Link>
 					</Button>

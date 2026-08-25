@@ -12,7 +12,13 @@
 			}
 		},
 		"TSX": {
-			"language_servers": ["vtsls", "oxfmt", "oxlint", "!eslint"],
+			"language_servers": [
+				"vtsls",
+				"tailwindcss-language-server",
+				"oxfmt",
+				"oxlint",
+				"!eslint"
+			],
 			"formatter": {
 				"language_server": {
 					"name": "oxfmt"
