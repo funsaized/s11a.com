@@ -1,7 +1,7 @@
 # TanStack Start Migration — Learning Backlog
 
 > **Branch:** `feat/tanstack-start-migration`
-> **Status:** In progress — E0–E6 done, S7.1–S7.2 done. Gatsby SOURCE gutted; TanStack Start is the repo root. Next: S7.3 analytics (or skip to E8/E9).
+> **Status:** In progress — E0–E6 done, E7 done. Gatsby SOURCE gutted; TanStack Start is the repo root. Next: E8 React 19 audit or E9 view counter (needs Vercel override).
 > **Owner:** Sai (implementation) — this is a hands-on learning exercise, not a hand-off.
 
 ### Workspace contract (read before every story)
@@ -866,16 +866,16 @@ commit used to generate them.
 
 **Tasks:**
 
-- [ ] Add the gtag script via `__root.tsx` `head.scripts`, gated on the env var (currently `GATSBY_GA_MEASUREMENT_ID` — rename to `VITE_GA_MEASUREMENT_ID`)
-- [ ] Reimplement the `respectDNT` behaviour `gatsby-plugin-google-gtag` provided
-- [ ] Subscribe once to Router's `onResolved` event for SPA pageviews and return/unregister the subscription during teardown; use Router events for this imperative integration, not reactive render state
-- [ ] Add `VITE_GA_MEASUREMENT_ID` to TARGET's Netlify environment before removing/ignoring SOURCE's `GATSBY_GA_MEASUREMENT_ID`; never expose a secret by copying local `.env` files
+- [x] Load gtag only in the browser when `VITE_GA_MEASUREMENT_ID` is set. **Override:** inject after DNT/GPC check in `bindAnalytics` (`src/lib/analytics.ts`), not `__root` `head.scripts` — opted-out users never download Google.
+- [x] Respect DNT (`doNotTrack` `1`/`yes`) and GPC (`navigator.globalPrivacyControl`)
+- [x] Subscribe once to Router `onResolved` from `getRouter()`; first pageview sent immediately; same path not sent twice. No React effect.
+- [x] Env var is `VITE_GA_MEASUREMENT_ID` on **Vercel**. **Override:** not Netlify. Never commit `.env`.
 
 **Acceptance:**
 
-- [ ] Pageviews fire on client-side navigation, not just hard loads
-- [ ] Nothing fires when DNT is on
-- [ ] Existing CSP `script-src`/`connect-src` entries still cover it
+- [x] Pageviews wired for hard load + client navigation
+- [x] No script / no events when DNT or GPC is on, or when the env var is unset
+- [x] CSP `script-src` already allowed GTM; `connect-src` updated for gtag beacons
 
 ---
 
