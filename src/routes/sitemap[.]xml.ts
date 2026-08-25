@@ -32,6 +32,7 @@ ${pages.join("\n")}
 }
 
 export const Route = createFileRoute("/sitemap.xml")({
+	// @ts-expect-error Start 1.168 types omit `server`; the compiler still wires GET handlers
 	server: {
 		handlers: {
 			GET: () =>
