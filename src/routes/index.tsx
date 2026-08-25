@@ -69,7 +69,9 @@ function Home() {
 								threads
 							</a>
 							{" · "}
-							<span title="RSS feed coming soon">rss</span>
+							<a href="/rss.xml" className="text-faint no-underline">
+								rss
+							</a>
 						</div>
 					</div>
 				</div>

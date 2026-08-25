@@ -23,7 +23,12 @@ export function Footer() {
 						>
 							linkedin
 						</a>
-						<span title="RSS feed coming soon">rss</span>
+						<a
+							href="/rss.xml"
+							className="text-faint no-underline hover:text-accent"
+						>
+							rss
+						</a>
 						<a
 							href="/404"
 							className="text-faint no-underline hover:text-accent"

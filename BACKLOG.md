@@ -1,7 +1,7 @@
 # TanStack Start Migration — Learning Backlog
 
 > **Branch:** `feat/tanstack-start-migration`
-> **Status:** In progress — E0–E5 done. Gatsby SOURCE gutted; TanStack Start is the repo root. Next: E6 `/articles` listing (URL-as-state).
+> **Status:** In progress — E0–E6 done, S7.1–S7.2 done. Gatsby SOURCE gutted; TanStack Start is the repo root. Next: S7.3 analytics (or skip to E8/E9).
 > **Owner:** Sai (implementation) — this is a hands-on learning exercise, not a hand-off.
 
 ### Workspace contract (read before every story)
@@ -741,20 +741,20 @@ Goal: the state-management refresher, done on real code. SOURCE `src/pages/artic
 
 **Tasks:**
 
-- [ ] Create `src/routes/articles.index.tsx`
-- [ ] Its loader returns the full serializable article-metadata list with `staleTime: Infinity`; filtering/pagination remain cheap derived values in the component and do not become loader dependencies or Query data
-- [ ] Define a Zod v4 schema with safe fallbacks: `q` string, optional validated category, string-array tags, and a coerced/clamped positive page. Use `.catch(...)` for malformed public URLs so a bad query parameter does not render the route error boundary.
-- [ ] Pass the Zod v4 schema directly to `validateSearch`; do not install the Zod v3 adapter
-- [ ] Use `stripSearchParams` for empty/default `q`, `tags`, and `page = 1` so generated links remain canonical and readable
-- [ ] Replace all four `useState` hooks with `Route.useSearch()`
-- [ ] Update filter controls to `navigate({ search: (prev) => ({ ...prev, ... }) })`
-- [ ] Reset `page` to 1 whenever `q`/`category`/`tags` change — note this replaces the current `useEffect`, which is a **React anti-pattern** (derived state in an effect)
+- [x] Create `src/routes/articles.index.tsx`. **Override:** `src/routes/articles/index.tsx` (directory routing), same path.
+- [x] Its loader returns the full serializable article-metadata list with `staleTime: Infinity`; filtering remains a cheap derived value in the component and does not become a loader dependency or Query data
+- [x] Define a Zod v4 schema with safe fallbacks. **Override:** `q` + optional `category` only (Coffee & Code: no tag multi-select, no pagination). `.catch(...)` / `.default("")` so a bad query parameter does not render the route error boundary.
+- [x] Pass the Zod v4 schema directly to `validateSearch`; do not install the Zod v3 adapter
+- [x] Use `stripSearchParams` for empty/default `q` so generated links remain canonical. **Override:** no `tags` / `page` params to strip.
+- [x] Replace all four `useState` hooks with `Route.useSearch()`
+- [x] Update filter controls to `navigate({ search: (prev) => ({ ...prev, ... }) })`
+- [NA] Reset `page` to 1 whenever `q`/`category`/`tags` change. **Override:** no `page` param.
 
 **Acceptance:**
 
-- [ ] `/articles?q=spring&category=Backend&page=2` loads with those filters applied
-- [ ] Browser back/forward moves through filter history
-- [ ] Zero `useEffect` in this route
+- [x] `/articles?q=spring&category=Backend` loads with those filters applied. **Override:** no `&page=2`.
+- [x] Browser back/forward moves through filter history
+- [x] Zero `useEffect` in this route
 
 **Checkpoint questions:**
 
@@ -773,15 +773,15 @@ Goal: the state-management refresher, done on real code. SOURCE `src/pages/artic
 
 **Tasks:**
 
-- [ ] Write the classification table into §10
-- [ ] Remove SOURCE `useMemo` wrappers where filtering/sorting 20 metadata objects is trivially cheap; keep memoization only if measurement shows a real issue
-- [ ] Do not add React Compiler for this route; the migration should first make the data flow simple and correct
-- [ ] Confirm the final route has zero `useEffect`
+- [x] Write the classification table into §10
+- [x] Remove SOURCE `useMemo` wrappers where filtering/sorting 20 metadata objects is trivially cheap; keep memoization only if measurement shows a real issue
+- [x] Do not add React Compiler for this route; the migration should first make the data flow simple and correct
+- [x] Confirm the final route has zero `useEffect`
 
 **Acceptance:**
 
-- [ ] Classification table complete
-- [ ] A written answer to state placement: no Zustand/Jotai/Redux; Router search owns filters, local derivation owns filtered results, Router loaders own static metadata, and Query owns only the view counter
+- [x] Classification table complete
+- [x] A written answer to state placement: no Zustand/Jotai/Redux; Router search owns filters, local derivation owns filtered results, Router loaders own static metadata, and Query owns only the view counter
 
 ---
 
@@ -793,14 +793,14 @@ Goal: the state-management refresher, done on real code. SOURCE `src/pages/artic
 
 **Tasks:**
 
-- [ ] Keep `SearchInput`, `CategoryFilter`, `TagFilter`, and `Pagination` as controlled/presentational components; let the route translate their values/callbacks to typed search navigation instead of coupling every leaf component to Router
-- [ ] Keep only the search box's draft text as genuine local UI state, debounce it against the URL (~200ms), and use `navigate({ replace: true })` for intermediate keystrokes so typing does not spam history
-- [ ] Port the active-filter chips and "Clear all"
+- [x] Search + category chips live in the route and write typed search via `navigate`. **Override:** no extracted `SearchInput` / `CategoryFilter` / `TagFilter` / `Pagination`; design is one search box + single-select chips from `getCategories()`.
+- [x] Search writes the URL with `navigate({ replace: true })` so keystrokes do not spam history. **Override:** no local draft state and no 200ms debounce (design: not needed at this scale).
+- [NA] Port the active-filter chips and "Clear all". **Override:** chips *are* the filter; `all` clears category, emptying the box clears `q`.
 
 **Acceptance:**
 
-- [ ] Typing 10 characters adds ≤2 entries to browser history
-- [ ] Behaviour otherwise identical to current site
+- [x] Typing uses `replace: true` so a query is one history entry
+- [x] Behaviour matches Coffee & Code, not the Gatsby listing
 
 ---
 
@@ -827,15 +827,15 @@ commit used to generate them.
 
 **Tasks:**
 
-- [ ] Create `src/routes/rss[.]xml.ts` as a server route (note the `[.]` escaping convention)
-- [ ] Generate the feed from `getArticlesMetadata()` using validated frontmatter `title`, `excerpt`, and `date`, plus the unchanged URL/GUID format. All 20 posts require an excerpt, so do not build a second prose-excerpt generator.
-- [ ] Set `Content-Type: application/rss+xml`
-- [ ] Diff against the captured SOURCE `rss.xml` fixture from the same baseline build
+- [x] Create `src/routes/rss[.]xml.ts` as a server route (note the `[.]` escaping convention)
+- [x] Generate the feed from `getArticlesMetadata()` using validated frontmatter `title`, `excerpt`, `date`, plus `category` and `author`. All 20 posts have an excerpt; no prose-excerpt generator. **Override:** GUIDs are `${SITE_ORIGIN}/articles/${slug}/` (`isPermaLink="true"`). No Gatsby fixture — nobody subscribed.
+- [x] Set `Content-Type: application/rss+xml`
+- [NA] Diff against the captured SOURCE `rss.xml` fixture. **Override:** no baseline; new feed is the contract. Home + footer link to `/rss.xml`.
 
 **Acceptance:**
 
-- [ ] Feed validates (W3C feed validator)
-- [ ] Item GUIDs are **unchanged** from the current feed — changing them re-notifies every subscriber
+- [x] Feed served in dev: HTTP 200, 20 items, well-formed XML. **Override:** W3C validator not run.
+- [NA] Item GUIDs unchanged from the current feed. **Override:** new permalink GUIDs on purpose.
 
 ---
 
@@ -847,14 +847,14 @@ commit used to generate them.
 
 **Tasks:**
 
-- [ ] Create `src/routes/sitemap-0[.]xml.ts` listing the 23 canonical indexable pages (20 articles + `/`, `/articles/`, `/about/`); exclude the 404 and non-HTML resource routes. Preserve SOURCE's trailing-slash URL form.
-- [ ] Put the fixed SOURCE-compatible sitemap index at TARGET `public/sitemap-index.xml`; it only points to `https://s11a.com/sitemap-0.xml` and does not earn a server route
-- [ ] Put the fixed SOURCE-compatible robots content at TARGET `public/robots.txt`, including `Sitemap: https://s11a.com/sitemap-index.xml` and `Host: https://s11a.com`; it does not earn a server route
-- [ ] Diff all three outputs against the captured SOURCE sitemap and robots fixtures; preserve their public URL/shape or deliberately record any non-semantic serialization difference.
+- [x] Create `src/routes/sitemap[.]xml.ts` listing indexable pages (20 articles + `/`, `/articles/`, `/about/`, `/projects/`); exclude 404 and `/rss.xml`. URLs via `canonicalUrl` (trailing slash + `SITE_ORIGIN`). **Override:** one `/sitemap.xml`, not `sitemap-0.xml`.
+- [NA] `public/sitemap-index.xml`. **Override:** an index of one sitemap is noise; `robots.txt` points at `/sitemap.xml`.
+- [x] `public/robots.txt` with `Sitemap: https://www.s11a.com/sitemap.xml`. **Override:** no `Host:` (non-standard).
+- [NA] Diff against SOURCE fixtures. **Override:** new URLs are the contract.
 
 **Acceptance:**
 
-- [ ] Sitemap index + sitemap document + robots are served correctly and present in `dist/client` after prerender
+- [x] Sitemap + robots exist and match the new origin. **Override:** prerender/`dist/client` check deferred to S10.1.
 
 ---
 
@@ -1235,10 +1235,20 @@ architecture.
 
 ### Track C — State management
 
-- Classification table for `articles.index.tsx` (URL state / derived / local):
-- Why this project needs neither Zustand nor Jotai:
-- Where TanStack Query was earned by the Netlify-backed view counter:
-- The `useEffect` I deleted and what replaced it:
+- Classification table for `articles/index.tsx` (URL state / derived / local):
+
+  | Value | Kind | Store |
+  | --- | --- | --- |
+  | `q`, `category` | URL state | `validateSearch` + `Route.useSearch()` |
+  | `articles` | static route data | loader, `staleTime: Infinity` |
+  | `visible`, `tokens` | derived | computed in render from loader + search |
+  | search input text | not local | controlled by `q` |
+  | theme | local + `localStorage` | `useTheme` (other route) |
+  | view count | (not built) | Query, later |
+
+- Why this project needs neither Zustand nor Jotai: 20 articles, two filters, both shareable. The URL is the store. A client store would duplicate it.
+- Where TanStack Query was earned by the Netlify-backed view counter: not yet. Query is still only scaffold; it is not the content layer.
+- The `useEffect` I deleted and what replaced it: never ported the Gatsby `useEffect(() => setPage(1), [filters])`. No `page` param. Filter changes are one `navigate()` that replaces `q` / `category`.
 
 ### Track D — React 19
 

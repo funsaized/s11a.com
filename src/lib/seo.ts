@@ -28,7 +28,7 @@ interface BuildHeadInput {
 	article?: ArticleSeo;
 }
 
-function canonicalUrl(path: string) {
+export function canonicalUrl(path: string) {
 	const withSlash = path.endsWith("/") ? path : `${path}/`;
 	return new URL(withSlash, SITE_ORIGIN).toString();
 }
