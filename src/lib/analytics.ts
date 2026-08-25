@@ -3,6 +3,11 @@ const measurementId = import.meta.env.VITE_GA_MEASUREMENT_ID;
 // HMR gate
 let bound = false;
 
+// Google's snippet uses `arguments`, not a rest array. gtag.js treats them differently.
+function pushGtagArgs() {
+	window.dataLayer!.push(arguments as unknown as never);
+}
+
 function prefersNoTrack() {
 	if (navigator.globalPrivacyControl) return true;
 
@@ -25,32 +30,23 @@ export function bindAnalytics(router: {
 
 	bound = true;
 
-	// Same as google snippet without <script> tag
 	window.dataLayer ??= [];
-	window.gtag ??= (...args: unknown[]) => {
-		window.dataLayer?.push(args);
-	};
+	window.gtag = pushGtagArgs;
 	window.gtag("js", new Date());
-	window.gtag("config", measurementId, { send_page_view: false });
+	window.gtag("config", measurementId);
 
 	const script = document.createElement("script");
 	script.async = true;
 	script.src = `https://www.googletagmanager.com/gtag/js?id=${encodeURIComponent(measurementId)}`;
 	document.head.appendChild(script);
 
-	let last = "";
-	const pageview = () => {
+	let last = router.state.location.href;
+	router.subscribe("onResolved", () => {
 		const path = router.state.location.href;
 		if (path === last) return;
 		last = path;
-		window.gtag?.("event", "page_view", {
-			page_location: window.location.href,
-			page_path: path,
-		});
-	};
-
-	pageview();
-	router.subscribe("onResolved", pageview);
+		window.gtag?.("config", measurementId, { page_path: path });
+	});
 }
 
 declare global {
