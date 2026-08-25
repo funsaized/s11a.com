@@ -1,0 +1,539 @@
+@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@400..700&family=Lora:ital,wght@0,400..700;1,400..700&family=Source+Serif+4:opsz,wght@8..60,400..700&family=Spline+Sans+Mono:wght@400..700&display=swap');
+@import 'tailwindcss';
+@plugin '@tailwindcss/typography';
+
+@import 'tw-animate-css';
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  --surface-strong: rgba(255, 255, 255, 0.9);
+  --line: #ddd8cf;
+  --dim: #5b554c;
+  --faint: #8a8378;
+  --accent: #95603c;
+  --accent2: #6f7d60;
+  --coffee-fill: #3a2413;
+  --glow: rgba(168, 156, 140, 0.16);
+  --stain-filter: opacity(0.85);
+
+  /* 'Spro theme typography */
+  --font-display: 'Lora', Georgia, serif;
+  --font-body: 'Source Serif 4', Georgia, serif;
+  --font-mono: 'Spline Sans Mono', ui-monospace, monospace;
+  --font-hand: 'Caveat', cursive;
+  --body-size: 19px;
+  --body-line-height: 1.65;
+
+  /* 'Spro theme radii */
+  --radius-pill: 999px;
+  --radius-input: 10px;
+  --radius-code: 12px;
+  --radius-media: 14px;
+
+  /* 'Spro theme signature dotted rule */
+  --rule-dotted: 2px dotted var(--line);
+
+  /* Spro theme motion */
+  --ease-theme: 0.4s ease;      /* theme cross-fade */
+  --ease-rise: 0.7s ease;       /* page-load reveal */
+  --ease-liquid: 0.6s ease;     /* toggle cup fill */
+
+  /* Spro theme selection */
+  --selection-bg: #d9c29b;
+  --selection-ink: #2b1a0c;
+
+  /* Page layout choices
+    Home, articles, index, projects: 820px
+    Article, about: 680px
+    Nav, footer: none
+  */
+  --width-page: 820px;
+  --width-prose: 680px;
+
+  --background: #f7f5f1;
+  --foreground: #2b2620;
+  --card: #fdfcfa;
+  --card-foreground: var(--foreground);
+  --popover: var(--card);
+  --popover-foreground: var(--foreground);
+  --primary: var(--accent);
+  --primary-foreground: var(--background);
+  --secondary: var(--accent2);
+  --secondary-foreground: var(--background);
+  --muted: color-mix(in oklab, var(--background) 78%, var(--line));
+  --muted-foreground: var(--dim);
+  --accent-foreground: var(--background);
+  --destructive: #b42318;
+  --destructive-foreground: #ffffff;
+  --border: var(--line);
+  --input: var(--line);
+  --ring: var(--accent);
+  --radius: 0.625rem;
+}
+
+.dark {
+  --surface-strong: rgba(15, 27, 31, 0.92);
+  --line: #3a2a1a;
+  --dim: #c5ad8f;
+  --faint: #8f7a5f;
+  --accent: #dfa25b;
+  --accent2: #a3b183;
+  --coffee-fill: #c9a87c;
+  --glow: rgba(224, 163, 92, 0.1);
+  --stain-filter: brightness(2.3) saturate(0.65) opacity(0.45);
+
+  --background: #171008;
+  --foreground: #f2e7d3;
+  --card: #221812;
+  --card-foreground: var(--foreground);
+  --popover: var(--card);
+  --popover-foreground: var(--foreground);
+  --primary: var(--accent);
+  --primary-foreground: var(--background);
+  --secondary: var(--accent2);
+  --secondary-foreground: var(--background);
+  --muted: color-mix(in oklab, var(--background) 78%, var(--line));
+  --muted-foreground: var(--dim);
+  --accent-foreground: var(--background);
+  --destructive: #ef6a62;
+  --destructive-foreground: var(--background);
+  --border: var(--line);
+  --input: var(--line);
+  --ring: var(--accent);
+}
+
+/* Layout model
+    w-full: fill the parent
+    max-w-page / max-w-prose: stop at the page token we want
+    mx-auto: center
+    px-[clamp(18px,4vw,24px)]: gutter
+*/
+
+/* Page layouts (pt)
+    list - 44 b/ 7vw / 72 -> articles, projects, about
+    reading - 40 / 6vw /  56 -> article slug
+    home intro - 40 / 7v2 / 64
+*/
+
+@theme inline {
+  --container-page: var(--width-page);
+  --container-prose: var(--width-prose);
+
+  /* 'Spro theme typography */
+  --font-display: var(--font-display);
+  --font-body: var(--font-body);
+  --font-mono: var(--font-mono);
+  --font-hand: var(--font-hand);
+
+  /* 'Spro theme radii */
+  --radius-pill: var(--radius-pill);
+  --radius-input: var(--radius-input);
+  --radius-code: var(--radius-code);
+  --radius-media: var(--radius-media);
+
+  /* Theme base utils */
+  --color-faint: var(--faint);
+  --color-accent-2: var(--accent2);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+html,
+body,
+#app {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  isolation: isolate;
+  color: var(--foreground);
+  font-family: var(--font-body);
+  font-size: var(--body-size);
+  line-height: var(--body-line-height);
+  background-color: var(--background);
+  transition: background var(--ease-theme), color var(--ease-theme);
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: -1;
+  background:
+    radial-gradient(circle at 18% 12%, var(--glow), transparent 34%),
+    radial-gradient(circle at 82% 28%, color-mix(in oklab, var(--glow) 70%, transparent), transparent 42%),
+    radial-gradient(circle at 42% 82%, color-mix(in oklab, var(--glow) 45%, transparent), transparent 36%);
+}
+
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: -1;
+  background-image:
+    linear-gradient(color-mix(in oklab, var(--glow) 35%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in oklab, var(--glow) 28%, transparent) 1px, transparent 1px);
+  background-size: 28px 28px;
+  mask-image: radial-gradient(circle at 50% 30%, black, transparent 78%);
+  opacity: 0.45;
+}
+
+.stain {
+  filter: var(--stain-filter);
+  mask: radial-gradient(closest-side,black 62%,rgba(0,0,0,.5) 82%,transparent 98%)
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--font-display);
+  font-weight: 550;
+}
+
+/* TOC scroll tuning */
+h1, h2, h3 {
+    @apply scroll-mt-20
+}
+
+a {
+  color: var(--accent);
+  text-decoration-color: var(--line);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+}
+
+a:hover {
+  color: var(--foreground);
+}
+
+.site-nav-link {
+    color: var(--dim);
+    text-decoration: none;
+    border-bottom: 2px dotted transparent;
+    padding: 0 0 2px;
+}
+
+.site-nav-link[aria-current="page"] {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+
+.site-nav-link:hover,
+.site-nav-link[aria-current="page"] {
+  color: var(--accent);
+}
+
+.row-link {
+  color: var(--foreground);
+  text-decoration: none;
+}
+.row-link:hover {
+  color: var(--accent);
+}
+
+.prose {
+  --tw-prose-body: var(--foreground);
+  --tw-prose-headings: var(--foreground);
+  --tw-prose-lead: var(--muted-foreground);
+  --tw-prose-links: var(--accent); /* match the rest of the site */
+  --tw-prose-bold: var(--foreground);
+  --tw-prose-counters: var(--muted-foreground);
+  --tw-prose-bullets: var(--muted-foreground);
+  --tw-prose-hr: var(--line);
+  --tw-prose-quotes: var(--foreground);
+  --tw-prose-quote-borders: var(--accent);
+  --tw-prose-captions: var(--muted-foreground);
+  --tw-prose-code: var(--foreground);
+  --tw-prose-pre-code: var(--foreground);
+  --tw-prose-pre-bg: var(--card);
+  --tw-prose-th-borders: var(--line);
+  --tw-prose-td-borders: var(--line);
+  max-width: none;
+  font-size: var(--body-size);
+  line-height: var(--body-line-height);
+
+}
+
+.prose :where(h1, h2, h3, h4) {
+  font-family: var(--font-display);
+  font-weight: 550;
+}
+
+.prose :where(code)::before,
+.prose :where(code)::after {
+  content: none;
+}
+
+.prose :not(pre) > code {
+  font-size: 0.9em;
+  border: 1px solid var(--line);
+  background: color-mix(in oklab, var(--surface-strong) 82%, white 18%);
+  border-radius: 7px;
+  padding: 2px 7px;
+}
+
+code {
+  font-size: 0.9em;
+  border: 1px solid var(--line);
+  background: color-mix(in oklab, var(--surface-strong) 82%, white 18%);
+  border-radius: 7px;
+  padding: 2px 7px;
+}
+
+pre code {
+  border: 0;
+  background: transparent;
+  padding: 0;
+  border-radius: 0;
+  font-size: inherit;
+  color: inherit;
+}
+
+.prose pre {
+  border: 1px solid var(--line);
+  border-radius: var(--radius-code);
+  background: var(--card);
+  color: var(--foreground);
+}
+
+/* Dual-theme Shiki (rehype-pretty-code). Toggle is .dark on <html>, not prefers-color-scheme.
+   keepBackground: false — pane stays --card; these rules only switch token colors. */
+code[data-theme*=" "],
+code[data-theme*=" "] span {
+  color: var(--shiki-light);
+}
+
+.dark code[data-theme*=" "],
+.dark code[data-theme*=" "] span {
+  color: var(--shiki-dark);
+}
+
+input::placeholder {
+  color: var(--faint);
+}
+
+button,
+a {
+  transition: background-color 180ms ease, color 180ms ease, border-color 180ms ease,
+    transform 180ms ease;
+}
+
+::selection {
+  background: var(--selection-bg);
+  color: var(--selection-ink);
+}
+
+/* Begin coffee logo */
+.coffee-mark {
+  position: relative;
+  display: inline-block;
+  width: 21px;
+  height: 19px;
+  color: var(--accent);
+}
+
+.coffee-steam,
+.coffee-cup,
+.coffee-handle,
+.coffee-saucer {
+  position: absolute;
+}
+
+.coffee-steam {
+  width: 2px;
+  border-radius: 2px;
+  background: currentColor;
+  animation: steam 2.6s ease-out infinite;
+}
+
+.coffee-steam-left {
+  left: 4px;
+  top: 1px;
+  height: 6px;
+  animation-delay: 0s;
+}
+
+.coffee-steam-middle {
+  left: 8.5px;
+  top: 0;
+  height: 7px;
+  animation-delay: 1.1s;
+}
+
+.coffee-steam-right {
+  left: 13px;
+  top: 2px;
+  height: 5px;
+  animation-delay: 0.5s;
+}
+
+
+.coffee-cup {
+  left: 2px;
+  bottom: 2px;
+  width: 14px;
+  height: 9px;
+  border: 1.7px solid currentColor;
+  border-radius: 2px 2px 7px 7px;
+}
+
+.coffee-handle {
+  right: 1px;
+  bottom: 4px;
+  width: 4px;
+  height: 4px;
+  border: 1.7px solid currentColor;
+  border-radius: 50%;
+  z-index: 1;
+}
+
+.coffee-saucer {
+  left: 0;
+  bottom: 0;
+  width: 19px;
+  height: 2px;
+  border-radius: 2px;
+  background: currentColor;
+}
+
+.coffee-mark-filled {
+  width: 17px;
+  height: 14px;
+  color: var(--dim);
+}
+
+.coffee-mark-filled .coffee-steam {
+  width: 1.5px;
+  background: var(--faint);
+  animation-duration: 2.2s;
+}
+
+.coffee-mark-filled .coffee-steam-left {
+  left: 5px;
+  top: -1px;
+  height: 5px;
+  animation-delay: 0s;
+}
+
+.coffee-mark-filled .coffee-steam-right {
+  left: 9px;
+  top: -2px;
+  height: 6px;
+  animation-delay: 0.9s;
+}
+
+.coffee-mark-filled .coffee-cup {
+  left: 1px;
+  bottom: 0;
+  width: 12px;
+  height: 8px;
+  border-width: 1.4px;
+  border-color: var(--dim);
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.coffee-fill {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 72%;
+  background: var(--coffee-fill);
+  transition: background var(--ease-liquid);
+}
+
+.coffee-mark-filled .coffee-handle {
+  right: 1px;
+  bottom: 2px;
+  width: 3.5px;
+  height: 3.5px;
+  border-width: 1.4px;
+  border-color: var(--dim);
+}
+
+.coffee-mark-filled .coffee-saucer {
+  display: none;
+}
+/* End coffee logo */
+
+/* Replaces SOURCE TextType's GSAP yoyo blink (0.5s fade, alternate). */
+@keyframes text-type-caret {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+.text-type-caret {
+  padding-left: 0.2em;
+  user-select: none;
+  pointer-events: none;
+  animation: text-type-caret 0.5s ease-in-out infinite alternate;
+}
+
+/* Drawn, not text — parent selection cannot copy the caret. \2060 keeps it on the last word. */
+.text-type-caret::after {
+  content: "\2060" attr(data-caret);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .text-type-caret {
+    animation: none;
+    opacity: 1;
+  }
+}
+
+@keyframes steam {
+  0% {
+    transform: translateY(2px);
+    opacity: 0;
+  }
+
+  35% {
+    opacity: 0.75;
+  }
+
+  100% {
+    transform: translateY(-9px) scaleX(1.7);
+    opacity: 0;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+  }
+}

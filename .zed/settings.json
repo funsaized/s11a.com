@@ -1,0 +1,49 @@
+{
+	"languages": {
+		"CSS": {
+			"language_servers": ["tailwindcss-intellisense-css"]
+		},
+		"TypeScript": {
+			"language_servers": ["vtsls", "oxfmt", "oxlint", "!eslint"],
+			"formatter": {
+				"language_server": {
+					"name": "oxfmt"
+				}
+			}
+		},
+		"TSX": {
+			"language_servers": [
+				"vtsls",
+				"tailwindcss-language-server",
+				"oxfmt",
+				"oxlint",
+				"!eslint"
+			],
+			"formatter": {
+				"language_server": {
+					"name": "oxfmt"
+				}
+			}
+		}
+	},
+	"lsp": {
+		"tailwindcss-language-server": {
+			"binary": {
+				"path": "./node_modules/.bin/tailwindcss-language-server",
+				"arguments": ["--stdio"]
+			},
+			"settings": {
+				"tailwindCSS": {
+					"classFunctions": ["cva", "cn"]
+				}
+			}
+		},
+		"vtsls": {
+			"settings": {
+				"typescript": {
+					"tsdk": "node_modules/typescript/lib"
+				}
+			}
+		}
+	}
+}

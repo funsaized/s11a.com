@@ -1,0 +1,14 @@
+{
+	"$schema": "./node_modules/oxfmt/configuration_schema.json",
+	"printWidth": 80,
+	"useTabs": true,
+	"singleQuote": false,
+	"sortImports": true,
+	"sortPackageJson": false,
+	"ignorePatterns": [
+		"src/routeTree.gen.ts",
+		"src/styles.css",
+		"design_handoff/**",
+		"src/content/**"
+	]
+}
