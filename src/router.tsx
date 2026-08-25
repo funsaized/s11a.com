@@ -4,6 +4,7 @@ import { setupRouterSsrQueryIntegration } from "@tanstack/react-router-ssr-query
 import { ErrorComponent } from "./components/ErrorComponent";
 import { NotFoundComponent } from "./components/NotFoundComponent";
 import { getContext } from "./integrations/tanstack-query/root-provider";
+import { bindAnalytics } from "./lib/analytics";
 import { routeTree } from "./routeTree.gen";
 
 export function getRouter() {
@@ -25,6 +26,7 @@ export function getRouter() {
 	});
 
 	setupRouterSsrQueryIntegration({ router, queryClient: context.queryClient });
+	bindAnalytics(router);
 
 	return router;
 }
