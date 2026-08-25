@@ -50,6 +50,24 @@ function Home() {
 								linkedin
 							</a>
 							{" · "}
+							<a
+								href="https://x.com/funsaized"
+								target="_blank"
+								rel="noreferrer"
+								className="text-faint no-underline"
+							>
+								twitter
+							</a>
+							{" · "}
+							<a
+								href="https://www.threads.net/@funsaized"
+								target="_blank"
+								rel="noreferrer"
+								className="text-faint no-underline"
+							>
+								threads
+							</a>
+							{" · "}
 							<span title="RSS feed coming soon">rss</span>
 						</div>
 					</div>

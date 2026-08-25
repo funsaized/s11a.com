@@ -1,7 +1,7 @@
 # TanStack Start Migration — Learning Backlog
 
 > **Branch:** `feat/tanstack-start-migration`
-> **Status:** In progress — E0 and the initial fresh-project scaffold are complete
+> **Status:** In progress — E0–E5 done. Next: E6 `/articles` listing (URL-as-state).
 > **Owner:** Sai (implementation) — this is a hands-on learning exercise, not a hand-off.
 
 ### Workspace contract (read before every story)
@@ -605,11 +605,11 @@ not allowed; SOURCE is a reference, not a shared package.
 **Tasks:**
 - [x] Port SOURCE `src/pages/about.tsx` → TARGET `src/routes/about.tsx`
 - [x] Update the single factual sentence that says the site uses Gatsby so TARGET names TanStack Start; otherwise preserve About-page content and layout
-- [ ] Confirm the 404 wired in S1.3 renders for unknown paths
-- [ ] Compare SOURCE's catch-all `netlify.toml` 404 redirect with Start/Netlify's generated routing. Do not blindly copy the Gatsby redirect into TARGET if it would intercept server functions; verify unknown paths return the TARGET not-found UI with status 404.
+- [x] Confirm the 404 wired in S1.3 renders for unknown paths. **Override:** 404 copy/layout is redesigned (`NotFoundComponent`), not a SOURCE clone. `defaultNotFoundComponent` is wired; article loader throws `notFound()`.
+- [x] Compare SOURCE's catch-all `netlify.toml` 404 redirect with Start/Netlify's generated routing. Do not blindly copy the Gatsby redirect into TARGET if it would intercept server functions; verify unknown paths return the TARGET not-found UI with status 404. **Override:** UI confirmed; HTTP 404 status deferred to S10.2.
 
 **Acceptance:**
-- [ ] Both render; 404 returns a real 404 status on the deployed preview
+- [x] Both render; 404 returns a real 404 status on the deployed preview. **Override:** UI done; status code deferred to S10.2.
 
 ---
 
@@ -626,16 +626,16 @@ The most important route on the site. 20 of 24 pages.
 **Depends on:** S3.2, S3.4
 
 **Tasks:**
-- [ ] Create `src/routes/articles.$slug.tsx`
-- [ ] The loader resolves **serializable metadata/TOC only** via `getArticleMetadataBySlug(params.slug)`, throws `notFound()` if missing, and uses `staleTime: Infinity`
-- [ ] The route component resolves the cached lazy component for `params.slug` and renders it inside one focused Suspense boundary with a stable article-body fallback; never return the component from the loader
-- [ ] Port the two-sidebar grid layout (TOC left, sharing right)
-- [ ] Port only the used behaviour from SOURCE `SharingComponent.tsx`. The hardcoded origin actually lives in SOURCE `src/templates/article.tsx`; build canonical/share URLs from one site-origin constant plus typed route params, not `window.location`
+- [x] Create `src/routes/articles.$slug.tsx`. **Override:** file-route is `src/routes/articles/$slug.tsx` (directory routing), same path.
+- [x] The loader resolves **serializable metadata/TOC only** via `getArticleMetadataBySlug(params.slug)`, throws `notFound()` if missing, and uses `staleTime: Infinity`
+- [x] The route component resolves the cached lazy component for `params.slug` and renders it inside one focused Suspense boundary with a stable article-body fallback; never return the component from the loader. **REVISIT:** fallback is an empty `<div></div>`, not a real body placeholder.
+- [x] Port the two-sidebar grid layout (TOC left, sharing right)
+- [x] Port only the used behaviour from SOURCE `SharingComponent.tsx`. The hardcoded origin actually lives in SOURCE `src/templates/article.tsx`; build canonical/share URLs from one site-origin constant plus typed route params, not `window.location`. **Override:** sharing is inlined in the article route; `SITE_ORIGIN` lives in `src/lib/site.ts`. No `SharingComponent.tsx`.
 
 **Acceptance:**
-- [ ] All 20 slugs render
-- [ ] URLs are **identical** to production today — no redirects required
-- [ ] Unknown slug renders the 404 component
+- [x] All 20 slugs render
+- [x] URLs are **identical** to production today — no redirects required
+- [x] Unknown slug renders the 404 component
 
 **Watch for:** the current template hardcodes the origin. Pull it from a single config constant so the preview deploy doesn't emit production URLs.
 
@@ -649,14 +649,14 @@ The most important route on the site. 20 of 24 pages.
 **Depends on:** S5.1
 
 **Tasks:**
-- [ ] Implement `head: ({ loaderData }) => ({ meta: [...], links: [...], scripts: [...] })`
-- [ ] Recreate the tags with actual consumers: title, description, canonical, OG title/description/image/url/type/site name, article published/modified time, Twitter card fields, author, and RSS alternate
-- [ ] Do not port SOURCE's non-standard `<meta name="image">` or redundant default `robots="index, follow"`; emit OG image dimensions only when the selected image's dimensions are known
-- [ ] Recreate `BlogPosting` JSON-LD including the `sameAs` social array; use the article's real category/tags instead of hardcoded `articleSection: "Technology"`
-- [ ] Extract the shared bits into `src/lib/seo.ts` so E7 can reuse it
+- [x] Implement `head: ({ loaderData }) => ({ meta: [...], links: [...], scripts: [...] })`
+- [x] Recreate the tags with actual consumers: title, description, canonical, OG title/description/image/url/type/site name, article published/modified time, Twitter card fields, author, and RSS alternate
+- [x] Do not port SOURCE's non-standard `<meta name="image">` or redundant default `robots="index, follow"`; emit OG image dimensions only when the selected image's dimensions are known
+- [x] Recreate `BlogPosting` JSON-LD including the `sameAs` social array; use the article's real category/tags instead of hardcoded `articleSection: "Technology"`
+- [x] Extract the shared bits into `src/lib/seo.ts` so E7 can reuse it
 
 **Acceptance:**
-- [ ] `curl` a prerendered article and diff its `<head>` against the current production page — only intended differences
+- [x] `curl` a prerendered article and diff its `<head>` against the current production page — only intended differences. **Override:** verified from `vite dev` view-source on `technical-docs-writing-guide`. Title/canonical/OG/Twitter/JSON-LD match. Devtools CSS is dev-only. Full prerender diff deferred to S10.1.
 
 ---
 
@@ -925,9 +925,11 @@ second content architecture.
 - [ ] Confirm the cache-control header rules still match the new asset paths and hashing scheme
 - [ ] Verify TARGET's `.nvmrc`, `package.json` engines, and Netlify image agree on TARGET's chosen Node 24.19.x / npm 11.17.x toolchain. SOURCE remains on Node 22.4.1 because it is an independent app.
 - [ ] Deploy preview from the branch
+- [ ] Deferred from S4.2: unknown paths return the TARGET not-found UI with HTTP 404; do not copy SOURCE's catch-all redirect if it would intercept server functions
 
 **Acceptance:**
 - [ ] Preview URL live, all 24 pages reachable
+- [ ] Unknown paths return HTTP 404 (deferred from S4.2)
 - [ ] View counts read and persist through the deployed Netlify server functions and Blob store
 - [ ] Zero CSP violations in console
 - [ ] Static assets served with `immutable` cache headers

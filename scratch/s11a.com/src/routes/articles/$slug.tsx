@@ -7,6 +7,7 @@ import { Button } from "#/components/ui/button";
 import { getArticleMetadataBySlug } from "#/lib/article-metadata";
 import { getArticleComponentBySlug } from "#/lib/article-modules";
 import { formatLongDate } from "#/lib/dates";
+import { articleHead } from "#/lib/seo";
 import { SITE_ORIGIN } from "#/lib/site";
 
 const TwitterIcon = () => (
@@ -82,13 +83,17 @@ export const Route = createFileRoute("/articles/$slug")({
 		return meta;
 	},
 	staleTime: Infinity,
+	head: ({ loaderData }) => {
+		if (!loaderData) return {};
+		return articleHead(loaderData);
+	},
 	component: RouteComponent,
 });
 
 function RouteComponent() {
 	const meta = Route.useLoaderData();
 	const {
-		frontmatter: { slug, title, category, date, readingTime, excerpt },
+		frontmatter: { slug, title, category, tags, date, readingTime, excerpt },
 		toc,
 	} = meta;
 	const [copied, setCopied] = useState(false);
@@ -141,7 +146,17 @@ function RouteComponent() {
 					<p className="italic text-muted-foreground text-xl font-medium">
 						{excerpt}
 					</p>
-					<div className="my-10 border-b-2 border-dotted border-border"></div>
+					<div className="flex gap-2 mt-4">
+						{tags.map((tag) => (
+							<span
+								key={tag}
+								className="rounded-full border border-accent px-3 py-1 font-mono text-muted-foreground text-xs"
+							>
+								{tag}
+							</span>
+						))}
+					</div>
+					<div className="my-8 border-b-2 border-dotted border-border"></div>
 					<Suspense fallback={<div></div>}>
 						<Prose>
 							<Article />

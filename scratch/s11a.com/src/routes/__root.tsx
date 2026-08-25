@@ -10,6 +10,7 @@ import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
 import { Footer } from "#/components/Footer";
 import { Header } from "#/components/Header";
 import { ThemeProvider } from "#/components/ThemeProvider";
+import { SITE_TITLE } from "#/lib/seo";
 
 import TanStackQueryDevtools from "../integrations/tanstack-query/devtools";
 
@@ -30,7 +31,7 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
 				content: "width=device-width, initial-scale=1",
 			},
 			{
-				title: "TanStack Start Starter",
+				title: SITE_TITLE,
 			},
 		],
 		links: [
