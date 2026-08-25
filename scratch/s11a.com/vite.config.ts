@@ -15,7 +15,7 @@ import { rehypeMdxToc } from "#/lib/rehype-mdx-toc";
 
 const config = defineConfig({
 	server: {
-		allowedHosts: ["blog-new.dev.s11a.com", "new.nzxt.dev.s11a.com"],
+		allowedHosts: ["new.nzxt.dev.s11a.com"],
 	},
 	resolve: { tsconfigPaths: true },
 	plugins: [
