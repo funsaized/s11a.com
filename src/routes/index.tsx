@@ -4,6 +4,7 @@ import { Articles } from "#/components/Articles";
 import { Projects } from "#/components/Projects";
 import { TextType } from "#/components/TextType";
 import { getArticlesMetadata } from "#/lib/article-metadata";
+
 export const Route = createFileRoute("/")({
 	loader: () => getArticlesMetadata().slice(0, 6),
 	staleTime: Infinity,
