@@ -50,7 +50,7 @@ ${items}
 }
 
 export const Route = createFileRoute("/rss.xml")({
-	// @ts-expect-error Start 1.168 types omit `server`; the compiler still wires GET handlers
+	// @ts-ignore Start 1.168 types omit `server` on some installs; handlers still run
 	server: {
 		handlers: {
 			GET: () =>
