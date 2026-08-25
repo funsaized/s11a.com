@@ -44,6 +44,7 @@
 		"remark-frontmatter": "^5.0.0",
 		"remark-gfm": "^4.0.1",
 		"remark-mdx-frontmatter": "^5.2.0",
+		"shiki": "^4.4.3",
 		"tailwind-merge": "^3.0.2",
 		"tailwindcss": "^4.1.18",
 		"tw-animate-css": "^1.3.6",
