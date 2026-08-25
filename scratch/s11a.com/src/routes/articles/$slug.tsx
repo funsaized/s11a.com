@@ -207,7 +207,7 @@ function RouteComponent() {
 							<Button
 								variant="outline"
 								size="sm"
-								className="w-full justify-start font-mono"
+								className="w-full justify-start font-mono text-accent hover:text-foreground"
 								onClick={copyLink}
 							>
 								{copied ? (

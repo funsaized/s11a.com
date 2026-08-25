@@ -49,7 +49,7 @@ export function TableOfContents({ toc }: { toc: TocItem[] }) {
 
 	return (
 		<nav>
-			<div className="flex items-center gap-2 font-semibold text-sm font-mono uppercase text-muted-foreground">
+			<div className="flex items-center gap-2 mb-2 font-semibold text-sm font-mono uppercase text-muted-foreground">
 				<ListIcon />
 				Table of contents
 			</div>
