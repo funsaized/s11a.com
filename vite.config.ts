@@ -1,9 +1,9 @@
 import mdx from "@mdx-js/rollup";
-import netlify from "@netlify/vite-plugin-tanstack-start";
 import tailwindcss from "@tailwindcss/vite";
 import { devtools } from "@tanstack/devtools-vite";
 import { tanstackStart } from "@tanstack/react-start/plugin/vite";
 import viteReact from "@vitejs/plugin-react";
+import { nitro } from "nitro/vite";
 import { rehypePrettyCode } from "rehype-pretty-code";
 import rehypeSlug from "rehype-slug";
 import remarkFrontmatter from "remark-frontmatter";
@@ -20,7 +20,6 @@ const config = defineConfig({
 	resolve: { tsconfigPaths: true },
 	plugins: [
 		devtools(),
-		netlify(),
 		tailwindcss(),
 		tanstackStart({
 			prerender: {
@@ -31,6 +30,7 @@ const config = defineConfig({
 				},
 			},
 		}),
+		nitro(),
 		mdx({
 			remarkPlugins: [
 				remarkFrontmatter,

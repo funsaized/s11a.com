@@ -1,6 +1,6 @@
 # s11a.com
 
-TanStack Start blog. React 19, Vite 8, Tailwind v4, Oxfmt/Oxlint. Hosted on Netlify.
+TanStack Start blog. React 19, Vite 8, Tailwind v4, Oxfmt/Oxlint. Hosted on Vercel via Nitro.
 
 ## Commands
 
@@ -10,7 +10,7 @@ Run from the repository root:
 npm ci
 npm run dev          # :3001
 npm run check        # generate-routes + format + lint + typecheck
-npm run build        # prerender → dist/client
+npm run build        # prerender → .output
 ```
 
 Do not use prettier or eslint. Format with `oxfmt`, lint with `oxlint`.
