@@ -9,6 +9,7 @@
 		"src/routeTree.gen.ts",
 		"src/styles.css",
 		"design_handoff/**",
-		"src/content/**"
+		"src/content/**",
+		"BACKLOG.md"
 	]
 }
