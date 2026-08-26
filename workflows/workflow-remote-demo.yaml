@@ -1,0 +1,18 @@
+id: 35b63d94-8db3-49df-bd79-d078658498f2
+name: remote-demo
+tags: {}
+jobs:
+  - name: build
+    steps:
+      - name: echo-on-worker
+        task:
+          type: model_method
+          modelIdOrName: remote-echo
+          methodName: execute
+        target: build-node
+        dependsOn: []
+        weight: 0
+        allowFailure: false
+    dependsOn: []
+    weight: 0
+version: 1
