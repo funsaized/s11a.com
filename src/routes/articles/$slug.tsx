@@ -1,5 +1,5 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { Suspense, useState } from "react";
+import { createElement, Suspense, useState } from "react";
 
 import { Prose } from "#/components/Prose";
 import { TableOfContents } from "#/components/TableOfContents";
@@ -158,9 +158,7 @@ function RouteComponent() {
 					</div>
 					<div className="my-8 border-b-2 border-dotted border-border"></div>
 					<Suspense fallback={<div></div>}>
-						<Prose>
-							<Article />
-						</Prose>
+						<Prose>{createElement(Article)}</Prose>
 					</Suspense>
 				</article>
 
