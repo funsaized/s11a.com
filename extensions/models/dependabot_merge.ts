@@ -143,7 +143,7 @@ export const extension = {
             ...merged,
             owner,
             repo: args.repo,
-          base: "master",
+            base: "master",
             head: pull.head.sha,
             mergedAt: new Date().toISOString(),
           },
