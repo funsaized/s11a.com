@@ -1,0 +1,20 @@
+type: '@funsaized/npm/project'
+typeVersion: 2026.08.26.1
+id: a3599699-6315-4027-b713-a9b8586a3d1c
+name: s11a-npm
+version: 1
+tags: {}
+globalArguments:
+  projectDir: .worktrees/dependabot-review
+  expectedNpmVersion: 11.17.0
+  expectedNodeVersion: '>=24'
+  strictToolchain: true
+  configPolicy: project
+  lifecycleScripts: deny
+  allowedScripts:
+    - check
+    - build
+  environment: {}
+  defaultTimeoutMs: 900000
+  requireCleanGit: true
+methods: {}

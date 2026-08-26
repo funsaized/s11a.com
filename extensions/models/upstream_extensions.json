@@ -70,5 +70,20 @@
     "checksum": "78174c10498cef22fd70f93f93b5914e7fcbd141faa006a45ed3946356b4d135",
     "filesChecksum": "1e59ff0450a15da68626ae20b8abd6518f0e854a9010f34082f149b7b6746a7c",
     "serverUrl": "https://swamp-club.com"
+  },
+  "@funsaized/npm": {
+    "version": "2026.08.26.1",
+    "pulledAt": "2026-08-26T20:28:23.374Z",
+    "files": [
+      ".swamp/bundles/4f9f5904/models/project.js",
+      ".swamp/pulled-extensions/@funsaized/npm/files/LICENSE",
+      ".swamp/pulled-extensions/@funsaized/npm/files/README.md",
+      ".swamp/pulled-extensions/@funsaized/npm/manifest.yaml",
+      ".swamp/pulled-extensions/@funsaized/npm/models/models/project.ts"
+    ],
+    "checksum": "4b7edb0ebf5e0a3646160c83374527ee98ad5706ae6f4ec37496e53c97df2b9f",
+    "filesChecksum": "4068b0edace7e807ca9fd15ffc20034e870041776a0d788f9856858af09230a8",
+    "serverUrl": "https://swamp-club.com",
+    "channel": "beta"
   }
 }

@@ -15,6 +15,7 @@ src/routeTree.gen.ts
 .netlify
 .sisyphus
 .playwright-mcp
+.worktrees/
 *.log
 .eslintcache
 

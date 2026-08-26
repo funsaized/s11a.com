@@ -14,8 +14,8 @@ inputs:
       description: Exact PR head SHA that passed CI and local browser review
     worktreePath:
       type: string
-      minLength: 1
-      description: Absolute path of the clean local review worktree to remove after merge
+      const: .worktrees/dependabot-review
+      description: Fixed clean local review worktree to remove after merge
   required:
     - pullRequest
     - reviewedHeadSha
@@ -41,13 +41,89 @@ jobs:
               pr.attributes.state == "open" &&
               !pr.attributes.draft &&
               !pr.attributes.merged &&
-              pr.attributes.base == "master")
+              pr.attributes.base == "master") &&
+            inputs.worktreePath == ".worktrees/dependabot-review"
           message: >-
             PR #${{ inputs.pullRequest }} must be an open, non-draft Dependabot
-            PR targeting master.
+            PR targeting master, using the fixed review worktree.
           severity: high
         dependsOn:
           - step: inspect-pr
+            condition:
+              type: succeeded
+      - name: npm-inspect
+        task:
+          type: model_method
+          modelIdOrName: s11a-npm
+          methodName: inspect
+          inputs:
+            expectedGitHead: ${{ inputs.reviewedHeadSha }}
+        dependsOn:
+          - step: require-safe-dependabot-pr
+            condition:
+              type: succeeded
+      - name: npm-ci
+        task:
+          type: model_method
+          modelIdOrName: s11a-npm
+          methodName: ci
+          inputs:
+            expectedGitHead: ${{ inputs.reviewedHeadSha }}
+        dependsOn:
+          - step: npm-inspect
+            condition:
+              type: succeeded
+      - name: npm-check
+        task:
+          type: model_method
+          modelIdOrName: s11a-npm
+          methodName: run
+          inputs:
+            script: check
+            expectedGitHead: ${{ inputs.reviewedHeadSha }}
+        dependsOn:
+          - step: npm-ci
+            condition:
+              type: succeeded
+      - name: npm-build
+        task:
+          type: model_method
+          modelIdOrName: s11a-npm
+          methodName: run
+          inputs:
+            script: build
+            expectedGitHead: ${{ inputs.reviewedHeadSha }}
+        dependsOn:
+          - step: npm-check
+            condition:
+              type: succeeded
+      - name: require-npm-evidence
+        task:
+          type: assert
+          expr: >-
+            data.findBySpec("s11a-npm", "invocation").size() == 4 &&
+            data.findBySpec("s11a-npm", "invocation").exists(i,
+              i.attributes.operation == "inspect") &&
+            data.findBySpec("s11a-npm", "invocation").exists(i,
+              i.attributes.operation == "ci") &&
+            data.findBySpec("s11a-npm", "invocation").filter(i,
+              i.attributes.operation == "run").size() == 2 &&
+            data.findBySpec("s11a-npm", "invocation").all(i,
+              i.attributes.executionStatus == "succeeded" &&
+              i.attributes.expectedGitHead == inputs.reviewedHeadSha &&
+              i.attributes.gitHeadBefore == inputs.reviewedHeadSha &&
+              i.attributes.gitHeadAfter == inputs.reviewedHeadSha &&
+              i.attributes.packageJsonSha256Before == i.attributes.packageJsonSha256After &&
+              i.attributes.lockfileSha256Before == i.attributes.lockfileSha256After &&
+              i.attributes.cleanWorktreeBefore == true &&
+              i.attributes.cleanWorktreeAfter == true &&
+              i.attributes.lifecyclePolicy == "deny")
+          message: >-
+            Current-run npm evidence must prove inspect, ci, check, and build
+            succeeded against the reviewed SHA without manifest or Git drift.
+          severity: high
+        dependsOn:
+          - step: npm-build
             condition:
               type: succeeded
       - name: merge-pr
@@ -60,7 +136,7 @@ jobs:
             pullNumber: ${{ inputs.pullRequest }}
             expectedHeadSha: ${{ inputs.reviewedHeadSha }}
         dependsOn:
-          - step: require-safe-dependabot-pr
+          - step: require-npm-evidence
             condition:
               type: succeeded
       - name: cleanup-worktree
