@@ -56,6 +56,7 @@ npm ci
 npm run dev          # :3001
 npm run check        # generate-routes + format + lint + typecheck
 npm run build        # prerender → .output
+npm run test:e2e     # desktop + mobile Chromium
 ```
 
 Do not use prettier or eslint. Format with `oxfmt`, lint with `oxlint`.
@@ -74,16 +75,13 @@ There is no Gatsby app in this tree. Historical SOURCE lives in git history.
 
 When asked to review or merge a Dependabot PR:
 
-1. Use `dependabot-prs` to discover candidates. The agent chooses one PR at a time.
-2. Verify GitHub Actions passed for the current PR head SHA. Never reuse evidence from an older SHA.
-3. Inspect the dependency diff and release notes. Reject unrelated or unsafe changes.
-4. Create the isolated worktree at `.worktrees/dependabot-review` on branch `review/pr-<number>`, merge `origin/master` into it, then run `npm ci`, `npm run check`, and `npm run build`. Commit and push any resulting merge before collecting final evidence.
-5. Start the app and use Playwright at desktop and mobile widths. Verify `/`, `/articles`, `/about`, and the newest article linked from `/articles`; fail on console errors, failed requests, broken navigation, overflow, or rendering defects.
-6. If CI, build, or browser review fails because of the dependency update, diagnose and make the smallest fix on the PR branch, push it, wait for CI on the new SHA, and repeat all checks. Stop and report after two failed fix attempts or when the fix would broaden scope beyond compatibility with the update.
-7. Only after all checks pass and the review worktree is clean, run `dependabot-review` with `pullRequest`, the exact `reviewedHeadSha`, and `worktreePath=.worktrees/dependabot-review`. The workflow uses `s11a-npm` to rerun inspect, lifecycle-denied ci, check, and build at that SHA before merge. Invoking it is the approval to merge and removes the matching worktree after success. Never call GitHub merge model methods directly.
-8. If the PR head changes at any point, discard the prior evidence and restart from step 2.
+1. Run `swamp workflow run dependabot-review --json`. Do not call its GitHub or Git model methods directly, and do not start another run while one is active or suspended.
+2. If no eligible PRs exist, the workflow succeeds without creating a worktree. Otherwise it aggregates every open `s11a.com` Dependabot PR in `.worktrees/dependabot-review`, then runs lifecycle-denied npm ci, check, build, and desktop/mobile Chromium E2E gates.
+3. At `approve-aggregate`, inspect every dependency diff and release note plus the generated aggregate diff. Reject unrelated or unsafe changes; approval authorizes exact-SHA squash merges.
+4. If validation fails, inspect the workflow and method reports before changing anything. Apply only the smallest compatibility fix to the affected PR branch, push it, wait for CI, and start a new workflow run. Stop after two failed fix attempts or if the fix broadens scope.
+5. Approve and resume only the same suspended run with `swamp workflow approve dependabot-review approve-aggregate --run <run-id>` followed by `swamp workflow resume dependabot-review --run <run-id> --json`.
 
-Browser review may ignore the known TanStack query-stream console error containing `Cannot read properties of undefined (reading 'mutations')` while this site does not use TanStack Query. All other console errors remain failures. Remove this exception when TanStack Query is used.
+The workflow rejects changed PR heads or base, unexpected squash trees, missing or failed GitHub checks, browser errors, dirty worktrees, discovery disagreement, and stale npm evidence. Successful merges remove the aggregate worktree.
 
 ## Content
 

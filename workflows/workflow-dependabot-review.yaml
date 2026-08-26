@@ -1,29 +1,34 @@
 id: 9f92f1cd-cff1-43b3-b079-4adf60534f21
 name: dependabot-review
-description: Validate and merge an agent-reviewed Dependabot PR at an exact SHA
+description: Discover, aggregate, validate, approve, and merge open Dependabot PRs
 tags: {}
+concurrency: 1
 inputs:
-  properties:
-    pullRequest:
-      type: integer
-      minimum: 1
-      description: Dependabot pull request selected by the agent
-    reviewedHeadSha:
-      type: string
-      pattern: ^[0-9a-f]{40}$
-      description: Exact PR head SHA that passed CI and local browser review
-    worktreePath:
-      type: string
-      const: .worktrees/dependabot-review
-      description: Fixed clean local review worktree to remove after merge
-  required:
-    - pullRequest
-    - reviewedHeadSha
-    - worktreePath
+  properties: {}
 jobs:
   - name: review
     steps:
-      - name: inspect-pr
+      - name: discover-dependabot-prs
+        task:
+          type: model_method
+          modelIdOrName: dependabot-prs
+          methodName: sweep
+      - name: require-complete-sweep
+        task:
+          type: assert
+          expr: >-
+            data.findBySpec("dependabot-prs", "sweep").filter(sweep,
+              sweep.workflowRunId == run.id).size() == 1 &&
+            data.findBySpec("dependabot-prs", "sweep").filter(sweep,
+              sweep.workflowRunId == run.id).all(sweep,
+                !sweep.attributes.truncated)
+          message: Dependabot discovery must be complete before review.
+          severity: high
+        dependsOn:
+          - step: discover-dependabot-prs
+            condition:
+              type: succeeded
+      - name: inspect-s11a-prs
         task:
           type: model_method
           modelIdOrName: github-prs
@@ -31,24 +36,79 @@ jobs:
           inputs:
             repo: s11a.com
             state: open
-      - name: require-safe-dependabot-pr
+        dependsOn:
+          - step: require-complete-sweep
+            condition:
+              type: succeeded
+      - name: resolve-exact-heads
+        task:
+          type: model_method
+          modelIdOrName: github-merge
+          methodName: inspectDependabotPrs
+          inputs:
+            repo: s11a.com
+            pullNumbers: >-
+              ${{ data.findBySpec("github-prs", "pull").filter(pr,
+                pr.workflowRunId == run.id &&
+                pr.attributes.user == "dependabot[bot]" &&
+                pr.attributes.state == "open" &&
+                !pr.attributes.draft &&
+                !pr.attributes.merged &&
+                pr.attributes.base == "master").map(pr, pr.attributes.number) }}
+        dependsOn:
+          - step: inspect-s11a-prs
+            condition:
+              type: succeeded
+      - name: reconcile-discovery
         task:
           type: assert
           expr: >-
-            data.findBySpec("github-prs", "pull").exists(pr,
-              pr.attributes.number == inputs.pullRequest &&
-              pr.attributes.user == "dependabot[bot]" &&
-              pr.attributes.state == "open" &&
-              !pr.attributes.draft &&
-              !pr.attributes.merged &&
-              pr.attributes.base == "master") &&
-            inputs.worktreePath == ".worktrees/dependabot-review"
-          message: >-
-            PR #${{ inputs.pullRequest }} must be an open, non-draft Dependabot
-            PR targeting master, using the fixed review worktree.
+            data.findBySpec("github-merge", "dependabotQueue").filter(queue,
+              queue.workflowRunId == run.id).size() == 1 &&
+            ((data.findBySpec("dependabot-prs", "repository").filter(repo,
+                repo.workflowRunId == run.id &&
+                repo.attributes.repo == "s11a.com").size() == 0 &&
+              data.findBySpec("github-merge", "dependabotQueue").filter(queue,
+                queue.workflowRunId == run.id).all(queue,
+                  queue.attributes.pullRequests.size() == 0)) ||
+              (data.findBySpec("dependabot-prs", "repository").filter(repo,
+                repo.workflowRunId == run.id &&
+                repo.attributes.repo == "s11a.com").size() == 1 &&
+                data.findBySpec("dependabot-prs", "repository").filter(repo,
+                  repo.workflowRunId == run.id &&
+                  repo.attributes.repo == "s11a.com").all(repo,
+                    data.findBySpec("github-merge", "dependabotQueue").filter(queue,
+                      queue.workflowRunId == run.id).all(queue,
+                        repo.attributes.prCount == queue.attributes.pullRequests.size() &&
+                        repo.attributes.prs.all(candidate,
+                          queue.attributes.pullRequests.exists(pr,
+                            pr.number == candidate.number))))))
+          message: Dependabot sweep and exact GitHub PR inspection must agree.
           severity: high
         dependsOn:
-          - step: inspect-pr
+          - step: resolve-exact-heads
+            condition:
+              type: succeeded
+      - name: prepare-aggregate-worktree
+        guard: >-
+          ${{ data.findBySpec("github-merge", "dependabotQueue").filter(queue,
+            queue.workflowRunId == run.id).all(queue,
+              queue.attributes.pullRequests.size() == 0) }}
+        task:
+          type: model_method
+          modelIdOrName: git-repo
+          methodName: prepareDependabotWorktree
+          inputs:
+            pullNumbers: >-
+              ${{ data.findBySpec("github-merge", "dependabotQueue").filter(queue,
+                queue.workflowRunId == run.id)[0].attributes.pullRequests.map(pr,
+                pr.number) }}
+            expectedHeadShas: >-
+              ${{ data.findBySpec("github-merge", "dependabotQueue").filter(queue,
+                queue.workflowRunId == run.id)[0].attributes.pullRequests.map(pr,
+                pr.head) }}
+        dependsOn:
+          - step: reconcile-discovery
             condition:
               type: succeeded
       - name: npm-inspect
@@ -57,9 +117,11 @@ jobs:
           modelIdOrName: s11a-npm
           methodName: inspect
           inputs:
-            expectedGitHead: ${{ inputs.reviewedHeadSha }}
+            expectedGitHead: >-
+              ${{ data.findBySpec("git-repo", "dependabotWorktree").filter(worktree,
+                worktree.workflowRunId == run.id)[0].attributes.headSha }}
         dependsOn:
-          - step: require-safe-dependabot-pr
+          - step: prepare-aggregate-worktree
             condition:
               type: succeeded
       - name: npm-ci
@@ -68,7 +130,9 @@ jobs:
           modelIdOrName: s11a-npm
           methodName: ci
           inputs:
-            expectedGitHead: ${{ inputs.reviewedHeadSha }}
+            expectedGitHead: >-
+              ${{ data.findBySpec("git-repo", "dependabotWorktree").filter(worktree,
+                worktree.workflowRunId == run.id)[0].attributes.headSha }}
         dependsOn:
           - step: npm-inspect
             condition:
@@ -80,7 +144,9 @@ jobs:
           methodName: run
           inputs:
             script: check
-            expectedGitHead: ${{ inputs.reviewedHeadSha }}
+            expectedGitHead: >-
+              ${{ data.findBySpec("git-repo", "dependabotWorktree").filter(worktree,
+                worktree.workflowRunId == run.id)[0].attributes.headSha }}
         dependsOn:
           - step: npm-ci
             condition:
@@ -92,51 +158,116 @@ jobs:
           methodName: run
           inputs:
             script: build
-            expectedGitHead: ${{ inputs.reviewedHeadSha }}
+            expectedGitHead: >-
+              ${{ data.findBySpec("git-repo", "dependabotWorktree").filter(worktree,
+                worktree.workflowRunId == run.id)[0].attributes.headSha }}
         dependsOn:
           - step: npm-check
+            condition:
+              type: succeeded
+      - name: npm-e2e
+        task:
+          type: model_method
+          modelIdOrName: s11a-npm
+          methodName: run
+          inputs:
+            script: test:e2e
+            expectedGitHead: >-
+              ${{ data.findBySpec("git-repo", "dependabotWorktree").filter(worktree,
+                worktree.workflowRunId == run.id)[0].attributes.headSha }}
+        dependsOn:
+          - step: npm-build
             condition:
               type: succeeded
       - name: require-npm-evidence
         task:
           type: assert
           expr: >-
-            data.findBySpec("s11a-npm", "invocation").size() == 4 &&
-            data.findBySpec("s11a-npm", "invocation").exists(i,
-              i.attributes.operation == "inspect") &&
-            data.findBySpec("s11a-npm", "invocation").exists(i,
-              i.attributes.operation == "ci") &&
             data.findBySpec("s11a-npm", "invocation").filter(i,
-              i.attributes.operation == "run").size() == 2 &&
-            data.findBySpec("s11a-npm", "invocation").all(i,
+              i.workflowRunId == run.id).size() == 5 &&
+            data.findBySpec("s11a-npm", "invocation").exists(i,
+              i.workflowRunId == run.id && i.attributes.operation == "inspect") &&
+            data.findBySpec("s11a-npm", "invocation").exists(i,
+              i.workflowRunId == run.id && i.attributes.operation == "ci") &&
+            data.findBySpec("s11a-npm", "invocation").filter(i,
+              i.workflowRunId == run.id && i.attributes.operation == "run").size() == 3 &&
+            data.findBySpec("s11a-npm", "invocation").exists(i,
+              i.workflowRunId == run.id && i.attributes.argv == ["npm", "run", "check"]) &&
+            data.findBySpec("s11a-npm", "invocation").exists(i,
+              i.workflowRunId == run.id && i.attributes.argv == ["npm", "run", "build"]) &&
+            data.findBySpec("s11a-npm", "invocation").exists(i,
+              i.workflowRunId == run.id && i.attributes.argv == ["npm", "run", "test:e2e"]) &&
+            data.findBySpec("s11a-npm", "invocation").filter(i,
+              i.workflowRunId == run.id).all(i,
               i.attributes.executionStatus == "succeeded" &&
-              i.attributes.expectedGitHead == inputs.reviewedHeadSha &&
-              i.attributes.gitHeadBefore == inputs.reviewedHeadSha &&
-              i.attributes.gitHeadAfter == inputs.reviewedHeadSha &&
+              i.attributes.expectedGitHead ==
+                data.findBySpec("git-repo", "dependabotWorktree").filter(worktree,
+                  worktree.workflowRunId == run.id)[0].attributes.headSha &&
+              i.attributes.gitHeadBefore ==
+                data.findBySpec("git-repo", "dependabotWorktree").filter(worktree,
+                  worktree.workflowRunId == run.id)[0].attributes.headSha &&
+              i.attributes.gitHeadAfter ==
+                data.findBySpec("git-repo", "dependabotWorktree").filter(worktree,
+                  worktree.workflowRunId == run.id)[0].attributes.headSha &&
               i.attributes.packageJsonSha256Before == i.attributes.packageJsonSha256After &&
               i.attributes.lockfileSha256Before == i.attributes.lockfileSha256After &&
               i.attributes.cleanWorktreeBefore == true &&
               i.attributes.cleanWorktreeAfter == true &&
               i.attributes.lifecyclePolicy == "deny")
           message: >-
-            Current-run npm evidence must prove inspect, ci, check, and build
-            succeeded against the reviewed SHA without manifest or Git drift.
+            Current-run npm evidence must prove inspect, ci, check, build, and
+            E2E succeeded against the aggregate SHA without manifest or Git drift.
           severity: high
         dependsOn:
-          - step: npm-build
+          - step: npm-e2e
             condition:
               type: succeeded
-      - name: merge-pr
+      - name: inspect-aggregate-diff
+        task:
+          type: model_method
+          modelType: "@swamp/git"
+          modelName: dependabot-aggregate-diff
+          methodName: diff
+          globalArgs:
+            repoPath: .worktrees/dependabot-review
+            remote: origin
+          inputs:
+            base: >-
+              ${{ data.findBySpec("git-repo", "dependabotWorktree").filter(worktree,
+                worktree.workflowRunId == run.id)[0].attributes.baseSha }}
+            head: >-
+              ${{ data.findBySpec("git-repo", "dependabotWorktree").filter(worktree,
+                worktree.workflowRunId == run.id)[0].attributes.headSha }}
+        dependsOn:
+          - step: require-npm-evidence
+            condition:
+              type: succeeded
+      - name: approve-aggregate
+        task:
+          type: manual_approval
+          prompt: >-
+            Review the discovered PR titles, release notes, and aggregate diff.
+            Approve only if every update is safe to merge together.
+          timeout: 86400
+        dependsOn:
+          - step: inspect-aggregate-diff
+            condition:
+              type: succeeded
+      - name: merge-prs
         task:
           type: model_method
           modelIdOrName: github-merge
-          methodName: mergeDependabotPr
+          methodName: mergeDependabotPrs
           inputs:
             repo: s11a.com
-            pullNumber: ${{ inputs.pullRequest }}
-            expectedHeadSha: ${{ inputs.reviewedHeadSha }}
+            baseSha: >-
+              ${{ data.findBySpec("git-repo", "dependabotWorktree").filter(worktree,
+                worktree.workflowRunId == run.id)[0].attributes.baseSha }}
+            pullRequests: >-
+              ${{ data.findBySpec("git-repo", "dependabotWorktree").filter(worktree,
+                worktree.workflowRunId == run.id)[0].attributes.pullRequests }}
         dependsOn:
-          - step: require-npm-evidence
+          - step: approve-aggregate
             condition:
               type: succeeded
       - name: cleanup-worktree
@@ -145,10 +276,10 @@ jobs:
           modelIdOrName: git-repo
           methodName: removeWorktree
           inputs:
-            worktreePath: ${{ inputs.worktreePath }}
-            expectedBranch: review/pr-${{ inputs.pullRequest }}
+            worktreePath: .worktrees/dependabot-review
+            expectedBranch: review/dependabot
         dependsOn:
-          - step: merge-pr
+          - step: merge-prs
             condition:
               type: succeeded
     dependsOn: []

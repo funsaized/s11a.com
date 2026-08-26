@@ -1,18 +1,13 @@
 import { createRouter as createTanStackRouter } from "@tanstack/react-router";
-import { setupRouterSsrQueryIntegration } from "@tanstack/react-router-ssr-query";
 
 import { ErrorComponent } from "./components/ErrorComponent";
 import { NotFoundComponent } from "./components/NotFoundComponent";
-import { getContext } from "./integrations/tanstack-query/root-provider";
 import { bindAnalytics } from "./lib/analytics";
 import { routeTree } from "./routeTree.gen";
 
 export function getRouter() {
-	const context = getContext();
-
 	const router = createTanStackRouter({
 		routeTree,
-		context,
 		scrollRestoration: true,
 		defaultPreload: "intent",
 		defaultPreloadStaleTime: 0,
@@ -25,7 +20,6 @@ export function getRouter() {
 		),
 	});
 
-	setupRouterSsrQueryIntegration({ router, queryClient: context.queryClient });
 	bindAnalytics(router);
 
 	return router;

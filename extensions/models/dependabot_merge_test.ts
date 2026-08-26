@@ -1,14 +1,30 @@
 /// <reference lib="deno.ns" />
 import { extension } from "./dependabot_merge.ts";
 
-const method = extension.methods[0].mergeDependabotPr;
+const method = extension.methods.find((entry) => entry.mergeDependabotPr)
+  ?.mergeDependabotPr;
+const inspectMethod = extension.methods.find((entry) =>
+  entry.inspectDependabotPrs
+)?.inspectDependabotPrs;
+const batchMethod = extension.methods.find((entry) => entry.mergeDependabotPrs)
+  ?.mergeDependabotPrs;
+if (!inspectMethod || !method || !batchMethod) {
+  throw new Error("Dependabot methods are missing");
+}
+const inspect = inspectMethod;
+const mergeMethod = method;
+const mergeBatchMethod = batchMethod;
 const sha = "a".repeat(40);
+const baseSha = "d".repeat(40);
 const pull = {
+  number: 1,
   state: "open",
   draft: false,
   user: { login: "dependabot[bot]" },
-  base: { ref: "master" },
+  base: { ref: "master", sha: baseSha },
   head: { sha },
+  mergeable: true,
+  mergeable_state: "clean",
 };
 
 async function executeWith(
@@ -22,7 +38,7 @@ async function executeWith(
   }) as typeof fetch;
 
   try {
-    return await method.execute(
+    return await mergeMethod.execute(
       { repo: "s11a.com", pullNumber: 1, expectedHeadSha: sha },
       {
         globalArgs: { token: "test", defaultOwner: "funsaized" },
@@ -34,6 +50,31 @@ async function executeWith(
   }
 }
 
+Deno.test("inspects exact Dependabot heads into one queue", async () => {
+  const originalFetch = globalThis.fetch;
+  let queue: Record<string, unknown> | undefined;
+  globalThis.fetch =
+    (() => Promise.resolve(new Response(JSON.stringify(pull)))) as typeof fetch;
+
+  try {
+    await inspect.execute(
+      { repo: "s11a.com", pullNumbers: [1] },
+      {
+        globalArgs: { token: "test", defaultOwner: "funsaized" },
+        writeResource: (_spec, _name, data) => {
+          queue = data;
+          return Promise.resolve({ name: "dependabot-queue" });
+        },
+      },
+    );
+    if (!JSON.stringify(queue).includes(`"head":"${sha}"`)) {
+      throw new Error("Queue is missing the exact inspected head");
+    }
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
 Deno.test("refuses a changed PR head before checking or merging", async () => {
   let message = "";
   try {
@@ -41,7 +82,7 @@ Deno.test("refuses a changed PR head before checking or merging", async () => {
   } catch (error) {
     message = error instanceof Error ? error.message : String(error);
   }
-  if (!message.includes("PR head changed")) {
+  if (!message.includes("PR #1 head changed")) {
     throw new Error(`Unexpected result: ${message}`);
   }
 });
@@ -94,5 +135,166 @@ Deno.test("merges only after successful checks and status", async () => {
   }
   if (mergeRequest.body !== JSON.stringify({ sha, merge_method: "squash" })) {
     throw new Error("Merge request was not SHA-guarded squash");
+  }
+});
+
+Deno.test("validates every PR before starting a batch merge", async () => {
+  const originalFetch = globalThis.fetch;
+  const responses = [
+    { object: { sha: baseSha } },
+    pull,
+    {
+      total_count: 1,
+      check_runs: [{
+        name: "validate",
+        status: "completed",
+        conclusion: "success",
+      }],
+    },
+    { state: "success", statuses: [] },
+    { ...pull, number: 2, head: { sha: "c".repeat(40) } },
+  ];
+  let mergeRequested = false;
+  globalThis.fetch = ((url: string | URL | Request) => {
+    if (String(url).endsWith("/merge")) mergeRequested = true;
+    return Promise.resolve(new Response(JSON.stringify(responses.shift())));
+  }) as typeof fetch;
+
+  try {
+    let message = "";
+    try {
+      await mergeBatchMethod.execute(
+        {
+          repo: "s11a.com",
+          baseSha,
+          pullRequests: [
+            { number: 1, head: sha, tree: "1".repeat(40) },
+            { number: 2, head: "b".repeat(40), tree: "2".repeat(40) },
+          ],
+        },
+        {
+          globalArgs: { token: "test", defaultOwner: "funsaized" },
+          writeResource: () => Promise.resolve({ name: "merge" }),
+        },
+      );
+    } catch (error) {
+      message = error instanceof Error ? error.message : String(error);
+    }
+    if (!message.includes("PR #2 head changed") || mergeRequested) {
+      throw new Error(`Unexpected result: ${message}`);
+    }
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+Deno.test("batch merges only onto the tested base and tree sequence", async () => {
+  const originalFetch = globalThis.fetch;
+  const secondHead = "b".repeat(40);
+  const firstMerge = "e".repeat(40);
+  const secondMerge = "f".repeat(40);
+  const firstTree = "1".repeat(40);
+  const secondTree = "2".repeat(40);
+  const successfulChecks = {
+    total_count: 1,
+    check_runs: [{
+      name: "validate",
+      status: "completed",
+      conclusion: "success",
+    }],
+  };
+  const responses = [
+    { object: { sha: baseSha } },
+    pull,
+    successfulChecks,
+    { state: "success", statuses: [] },
+    { ...pull, number: 2, head: { sha: secondHead } },
+    successfulChecks,
+    { state: "success", statuses: [] },
+    { object: { sha: baseSha } },
+    { sha: firstMerge, merged: true, message: "merged" },
+    { tree: { sha: firstTree } },
+    { object: { sha: firstMerge } },
+    { sha: secondMerge, merged: true, message: "merged" },
+    { tree: { sha: secondTree } },
+  ];
+  const writes: string[] = [];
+  globalThis.fetch = (() =>
+    Promise.resolve(
+      new Response(JSON.stringify(responses.shift())),
+    )) as typeof fetch;
+
+  try {
+    await mergeBatchMethod.execute(
+      {
+        repo: "s11a.com",
+        baseSha,
+        pullRequests: [
+          { number: 1, head: sha, tree: firstTree },
+          { number: 2, head: secondHead, tree: secondTree },
+        ],
+      },
+      {
+        globalArgs: { token: "test", defaultOwner: "funsaized" },
+        writeResource: (_spec, name) => {
+          writes.push(name);
+          return Promise.resolve({ name });
+        },
+      },
+    );
+    if (responses.length !== 0 || writes.join(",") !== "1,2") {
+      throw new Error("Batch did not verify and record both squash trees");
+    }
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+Deno.test("stops when GitHub produces an unexpected squash tree", async () => {
+  const originalFetch = globalThis.fetch;
+  const expectedTree = "1".repeat(40);
+  const responses = [
+    { object: { sha: baseSha } },
+    pull,
+    {
+      total_count: 1,
+      check_runs: [{
+        name: "validate",
+        status: "completed",
+        conclusion: "success",
+      }],
+    },
+    { state: "success", statuses: [] },
+    { object: { sha: baseSha } },
+    { sha: "e".repeat(40), merged: true, message: "merged" },
+    { tree: { sha: "2".repeat(40) } },
+  ];
+  globalThis.fetch = (() =>
+    Promise.resolve(
+      new Response(JSON.stringify(responses.shift())),
+    )) as typeof fetch;
+
+  try {
+    let message = "";
+    try {
+      await mergeBatchMethod.execute(
+        {
+          repo: "s11a.com",
+          baseSha,
+          pullRequests: [{ number: 1, head: sha, tree: expectedTree }],
+        },
+        {
+          globalArgs: { token: "test", defaultOwner: "funsaized" },
+          writeResource: () => Promise.resolve({ name: "merge" }),
+        },
+      );
+    } catch (error) {
+      message = error instanceof Error ? error.message : String(error);
+    }
+    if (!message.includes(`expected ${expectedTree}`)) {
+      throw new Error(`Unexpected result: ${message}`);
+    }
+  } finally {
+    globalThis.fetch = originalFetch;
   }
 });

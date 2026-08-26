@@ -9,10 +9,10 @@ used by `s11a.com`.
 
 Swamp currently serves three purposes in this repository:
 
-1. Discover, review, safely merge, and clean up local worktrees for Dependabot
-   pull requests.
-2. Re-run authoritative npm inspect, lifecycle-denied ci, check, and build
-   against the exact agent-reviewed commit before a Dependabot merge.
+1. Discover all open `s11a.com` Dependabot pull requests and aggregate their
+   exact heads in one local worktree.
+2. Run authoritative npm inspect, lifecycle-denied ci, check, build, and
+   Playwright gates before manually approved exact-SHA squash merges.
 3. Demonstrate dispatching a model method to a remote worker named
    `build-node`.
 
@@ -23,52 +23,38 @@ TanStack Start site built with npm and deployed through Vercel/Nitro.
 
 The Dependabot process deliberately separates judgment from enforcement:
 
-- The agent inspects release notes and diffs, creates an isolated worktree,
-  fixes compatibility problems, runs application checks, performs browser
-  review, pushes changes, and verifies CI for an exact commit.
-- Swamp refreshes the PR state, re-runs npm validation in the fixed review
-  worktree, enforces machine-checkable evidence, merges only the reviewed
-  commit, removes the matching clean worktree, and stores structured outputs.
+- Swamp discovers and reconciles eligible PRs, creates the aggregate worktree,
+  runs npm and browser validation, and suspends at a manual approval step.
+- The approver inspects dependency release notes and the generated aggregate
+  diff. Approval authorizes only the exact heads already validated.
+- Swamp revalidates every live head and GitHub check, squash-merges the batch,
+  removes the clean worktree, and stores structured outputs.
 
 The workflow is an execution gate, not an autonomous reviewer. It does not
 decide whether a dependency update is semantically safe.
 
 ```mermaid
 flowchart TD
-    A["Dependabot opens a PR"] --> B["dependabot-prs discovers candidates"]
-    B --> C["Agent selects and reviews one PR"]
-    C --> D["review/pr-N worktree"]
-    D --> E["npm check, build, and browser review"]
-    E --> F["Push fixes and wait for CI on exact SHA"]
-    F --> G["Manual dependabot-review workflow invocation"]
+    A["Run dependabot-review"] --> B["Discover open Dependabot PRs"]
+    B --> C{"Any eligible PRs?"}
+    C -->|no| Z["Succeed without mutation"]
+    C -->|yes| D["Build review/dependabot aggregate worktree"]
 
     subgraph SWAMP["Swamp"]
-        G --> H["github-prs.list"]
-        H --> I[("Pull request data")]
-        I --> J{"CEL safety assertion"}
-        J -->|pass| U["s11a-npm inspect → ci → check → build"]
-        J -->|fail| X["Stop without merge"]
-        U --> Y{"Current-run npm evidence"}
-        Y -->|pass| K["github-merge.mergeDependabotPr"]
-        Y -->|fail| X
-        K --> L{"Live SHA and CI checks"}
-        L -->|pass| M["SHA-guarded squash merge"]
-        L -->|fail| X
-        M --> N[("Merge data")]
-        N --> O["git-repo.removeWorktree"]
-        O --> P{"Registered, clean, expected branch?"}
-        P -->|yes| Q["Remove worktree"]
-        P -->|already absent| R["Record no-op"]
-        P -->|unsafe| S["Preserve worktree and fail cleanup"]
-        Q --> T[("Cleanup data")]
-        R --> T
+        D --> E["npm inspect → ci → check → build → E2E"]
+        E --> F{"Current-run evidence valid?"}
+        F -->|no| X["Stop without merge"]
+        F -->|yes| G["Generate aggregate diff"]
+        G --> H{"Manual approval"}
+        H -->|reject| X
+        H -->|approve| I["Revalidate all exact heads and GitHub checks"]
+        I -->|pass| J["Squash-merge every PR"]
+        I -->|fail| X
+        J --> K["Remove clean review/dependabot worktree"]
     end
 
-    V[("my-secrets vault")] -->|github-token| H
-    V -->|github-token| K
-    I --> W[("Automatic reports")]
-    N --> W
-    T --> W
+    V[("my-secrets vault")] -->|github-token| B
+    V -->|github-token| I
 ```
 
 ## Repository Layout
@@ -154,22 +140,27 @@ swamp doctor extensions --json
 The project extends existing domain types instead of creating parallel GitHub
 or Git integrations.
 
-#### `mergeDependabotPr`
+#### Dependabot inspection and merge
 
 `extensions/models/dependabot_merge.ts` extends `@hivemq/github/merge` with a
-single method:
+small fan-out API:
 
 ```text
+inspectDependabotPrs(repo, pullNumbers)
 mergeDependabotPr(repo, pullNumber, expectedHeadSha)
+mergeDependabotPrs(repo, baseSha, pullRequests)
 ```
 
-Before mutation, the method requires:
+`inspectDependabotPrs` resolves eligible PR numbers to exact head SHAs and
+writes the `dependabot-queue` resource. The batch merge method validates every
+PR before starting any merge. Each PR must satisfy:
 
 - The PR is open.
 - The PR is not a draft.
 - The author is exactly `dependabot[bot]`.
 - The base branch is exactly `master`.
 - The live PR head SHA equals `expectedHeadSha`.
+- GitHub reports the PR as mergeable.
 - At least one GitHub check run exists.
 - GitHub's `total_count` equals the number of returned check runs, preventing a
   partial page from being treated as complete.
@@ -177,21 +168,29 @@ Before mutation, the method requires:
 - A check named `validate` exists.
 - The combined commit status is successful when statuses are present.
 
-The final GitHub merge request is a squash merge guarded by the same head SHA.
-The method writes a `merge` resource containing the merge commit SHA, reviewed
-head SHA, owner, repository, base branch, result message, and timestamp.
+The batch method also requires the live `master` SHA to equal the tested base
+before mutation and before each merge. Each final request is a squash merge
+guarded by the same head SHA, and its resulting Git tree must equal the matching
+locally recorded squash tree. The methods write one `merge` resource per PR.
 
 Tests are in `extensions/models/dependabot_merge_test.ts`.
 
-#### `removeWorktree`
+#### Aggregate worktree preparation and cleanup
 
 `extensions/models/git_worktree.ts` extends `@swamp/git` with:
 
 ```text
+prepareDependabotWorktree(pullNumbers, expectedHeadShas)
 removeWorktree(worktreePath, expectedBranch)
 ```
 
-The method is fail-closed:
+`prepareDependabotWorktree` fetches every exact `refs/pull/<number>/head`,
+verifies each SHA, recreates `.worktrees/dependabot-review` at current
+`origin/master`, squash-merges and commits each head into `review/dependabot`,
+records every intermediate tree, requires clean Git state, and writes the
+`dependabot-aggregate` resource.
+
+Cleanup is fail-closed:
 
 - It refuses the primary repository worktree.
 - An existing path must be registered by `git worktree list --porcelain`.
@@ -201,9 +200,10 @@ The method is fail-closed:
 - Removal never uses `--force`.
 - An already-absent, unregistered path is an idempotent no-op.
 
-The method writes an infinite-lifetime `worktreeRemoval` resource containing the
+It writes an infinite-lifetime `worktreeRemoval` resource containing the
 path, branch, removal result, and timestamp. Tests cover clean removal,
-idempotent replay, primary-worktree refusal, and dirty-worktree refusal in
+idempotent replay, primary-worktree refusal, dirty-worktree refusal, and
+aggregate preparation in
 `extensions/models/git_worktree_test.ts`.
 
 The missing upstream capability is tracked at
@@ -262,8 +262,8 @@ swamp vault edit my-secrets
 
 ## Dependabot Discovery
 
-Discovery is separate from the merge workflow so the agent can choose one PR at
-a time.
+The review workflow starts with a fresh discovery sweep. The model can also be
+run independently for diagnostics:
 
 Run the sweep:
 
@@ -273,9 +273,8 @@ swamp model method run dependabot-prs sweep
 
 The model searches repositories owned by the `funsaized` user. Its allowlist
 marks `s11a.com` as live regardless of activity heuristics; it does not restrict
-the sweep to that repository. The sweep can therefore return Dependabot PRs for
-other repositories owned by `funsaized`, which the agent must ignore when
-working in this repository.
+the sweep to that repository. The workflow reconciles only the `s11a.com`
+result with a fresh GitHub PR listing.
 
 The method writes an infinite-lifetime `sweep` resource named `current` with a
 version garbage-collection count of 30. It also writes one infinite-lifetime
@@ -299,133 +298,117 @@ The current workflow is `dependabot-review`, defined in
 ### Trigger
 
 The workflow has no schedule, webhook, or automatic trigger. It is manually
-invoked only after the agent completes the review procedure in `AGENTS.md`.
-
-Required inputs:
-
-| Input             | Constraint                                  | Meaning                                      |
-| ----------------- | ------------------------------------------- | -------------------------------------------- |
-| `pullRequest`     | Positive integer                            | Selected Dependabot PR number                |
-| `reviewedHeadSha` | Exactly 40 lowercase hexadecimal characters | Commit that passed final CI and local review |
-| `worktreePath`    | Exactly `.worktrees/dependabot-review`      | Fixed clean `review/pr-<number>` worktree    |
-
-Invocation:
+invoked with no inputs:
 
 ```bash
 swamp workflow validate dependabot-review --json
-
-swamp workflow run dependabot-review \
-  --input pullRequest=<number> \
-  --input reviewedHeadSha=<40-character-sha> \
-  --input worktreePath=.worktrees/dependabot-review
+swamp workflow run dependabot-review --json
 ```
 
-Calling the workflow is the approval to merge. Do not call GitHub merge model
-methods directly.
+Do not call its GitHub or Git mutation methods directly. No eligible PRs is a
+successful no-op: discovery and reconciliation run, while worktree, npm,
+approval, merge, and cleanup steps skip.
 
-### Pre-Workflow Review
-
-Before invocation, the agent must:
-
-1. Confirm CI for the current PR head SHA.
-2. Inspect the dependency diff and release notes; reject unrelated or unsafe
-   changes.
-3. Create `.worktrees/dependabot-review` on `review/pr-<number>`.
-4. Merge `origin/master` into the review branch.
-5. Run `npm ci`, `npm run check`, and `npm run build`.
-6. Commit and push any resulting merge before collecting final evidence.
-7. Test `/`, `/articles`, `/about`, and the newest article linked from
-   `/articles` with Playwright at desktop and mobile widths.
-8. Reject console errors, failed requests, broken navigation, horizontal
-   overflow, and rendering defects.
-9. Push any compatibility fix and wait for CI on the new SHA.
-10. Stop after two failed fix attempts or when a fix would broaden scope beyond
-    compatibility with the dependency update.
-11. Ensure the worktree is clean.
-
-The browser review may ignore only the known TanStack query-stream error
-containing `Cannot read properties of undefined (reading 'mutations')` while
-this site does not use TanStack Query.
+Job concurrency is `1`. Every queue, worktree, and npm CEL reference is bound to
+the current run rather than an older `data.latest` artifact. Do not overlap
+workflow runs because they intentionally share one fixed aggregate worktree.
 
 ### Workflow DAG
 
 ```mermaid
 flowchart LR
-    A["inspect-pr"] -->|succeeded| B["require-safe-dependabot-pr"]
-    B --> C["npm-inspect"] --> D["npm-ci"] --> E["npm-check"]
-    E --> F["npm-build"] --> G["require-npm-evidence"]
-    G --> H["merge-pr"] --> I["cleanup-worktree"]
+    A["discover"] --> B["resolve exact heads"] --> C["reconcile"]
+    C --> D["prepare aggregate worktree"]
+    D --> E["inspect → ci → check → build → E2E"]
+    E --> F["verify current-run evidence"] --> G["aggregate diff"]
+    G --> H["manual approval"] --> I["revalidate and merge batch"]
+    I --> J["cleanup worktree"]
 ```
 
-#### 1. `inspect-pr`
+#### 1. Discovery and reconciliation
 
-Calls `github-prs.list` with repository `s11a.com` and state `open`. This
-refreshes GitHub state and writes one typed `pull` resource per returned PR.
+`dependabot-prs.sweep` discovers candidates and must report a complete,
+non-truncated sweep. `github-prs.list` independently lists open `s11a.com` PRs.
+`github-merge.inspectDependabotPrs` revalidates Dependabot identity, open state,
+draft state, and `master` base while resolving exact 40-character head SHAs.
 
-#### 2. `require-safe-dependabot-pr`
+The reconciliation assertion requires both discovery sources to contain the
+same eligible PR numbers. A disagreement fails before local or remote mutation.
 
-Uses CEL over the data produced by `inspect-pr`:
+#### 2. Aggregate worktree
 
-```cel
-data.findBySpec("github-prs", "pull").exists(pr,
-  pr.attributes.number == inputs.pullRequest &&
-  pr.attributes.user == "dependabot[bot]" &&
-  pr.attributes.state == "open" &&
-  !pr.attributes.draft &&
-  !pr.attributes.merged &&
-  pr.attributes.base == "master")
-```
-
-Failure stops the workflow before mutation.
+`git-repo.prepareDependabotWorktree` recreates
+`.worktrees/dependabot-review` on `review/dependabot` from current
+`origin/master`, fetches each PR ref, verifies every expected SHA, applies
+sequential squash merges in PR-number order, requires clean Git state, and
+records the base SHA, aggregate SHA, source PR SHAs, and intermediate trees.
 
 #### 3. npm validation and evidence
 
-`npm-inspect`, `npm-ci`, `npm-check`, and `npm-build` call `s11a-npm` in
-sequence, each with `expectedGitHead=reviewedHeadSha`. The model executes in
-`.worktrees/dependabot-review`, denies install lifecycle scripts, allows only
-`check` and `build`, and requires clean tracked Git state.
+`npm-inspect`, `npm-ci`, `npm-check`, `npm-build`, and `npm-e2e` call `s11a-npm`
+in sequence with the aggregate SHA. The model executes in the fixed worktree,
+denies install lifecycle scripts, allows only `check`, `build`, and `test:e2e`,
+sets `CI=true` so Playwright starts the tested worktree's own server, and
+requires clean tracked Git state.
 
 `require-npm-evidence` inspects only resources produced by the current workflow
-run. It requires four successful invocations, matching before/after Git heads,
-unchanged package and lockfile hashes, clean tracked state, and lifecycle policy
-`deny`.
+run. It requires all five successful invocations, matching before/after Git
+heads, unchanged package and lockfile hashes, clean tracked state, and lifecycle
+policy `deny`.
 
-#### 4. `merge-pr`
+#### 4. Diff and approval
 
-Calls `github-merge.mergeDependabotPr` with the selected PR and exact reviewed
-SHA. The method performs the live SHA, identity, base-branch, check-run, and
-commit-status validation described above before issuing the squash merge.
+The workflow generates a structured diff from the recorded base SHA to the
+aggregate SHA, then suspends at `approve-aggregate` for up to 24 hours. Inspect
+every dependency diff and release note before approving.
 
-#### 5. `cleanup-worktree`
+```bash
+swamp workflow approvals --json
+swamp workflow approve dependabot-review approve-aggregate --run <run-id>
+swamp workflow resume dependabot-review --run <run-id> --json
+```
 
-Runs only after `merge-pr` succeeds. It calls `git-repo.removeWorktree` with:
+Reject unsafe or unrelated changes instead:
+
+```bash
+swamp workflow reject dependabot-review approve-aggregate \
+  --run <run-id> \
+  --reason "unsafe dependency change"
+```
+
+#### 5. Merge and cleanup
+
+After approval, `github-merge.mergeDependabotPrs` revalidates every live exact
+head, Dependabot identity, base branch, required `validate` check, all returned
+check runs, combined status, and mergeability before starting the batch. It
+requires `master` to remain on the tested sequence, performs SHA-guarded squash
+merges, and verifies each resulting Git tree before continuing.
+
+`git-repo.removeWorktree` runs only after all merges succeed, with:
 
 ```text
-worktreePath = workflow input
-expectedBranch = review/pr-<pullRequest>
+worktreePath = .worktrees/dependabot-review
+expectedBranch = review/dependabot
 ```
 
 The local branch is retained. Only the worktree registration and directory are
 removed.
 
-### Partial Success
+### Failure and Partial Success
 
-Merge and cleanup are sequential external mutations, not a transaction. If the
-merge succeeds but cleanup refuses a dirty or mismatched worktree:
+The workflow is not a transaction. If a later batch merge fails after an earlier
+one succeeds, the successful merge remains. A cleanup refusal also preserves
+the worktree. Inspect reports and merge resources before retrying.
 
-- The PR remains merged.
-- The worktree remains intact for recovery.
-- The workflow reports failure at `cleanup-worktree`.
-- Inspect the merge data before taking further action.
-- Clean or preserve the local changes, then resume from cleanup rather than
-  rerunning the merge.
+Validation failures leave the aggregate worktree for diagnosis. Apply the
+smallest compatibility fix to the affected PR branch, push it, wait for GitHub
+checks on the new SHA, and start a new workflow run; preparation safely replaces
+a clean prior aggregate worktree.
 
 ```bash
 swamp report get @swamp/workflow-summary \
   --workflow dependabot-review \
   --json
-
-swamp workflow resume dependabot-review --from cleanup-worktree
 ```
 
 ## Data Model
@@ -435,22 +418,26 @@ files directly; use `swamp data` commands.
 
 ### Resource Names
 
-| Producer                         | Spec              | Data name                      |
-| -------------------------------- | ----------------- | ------------------------------ |
-| `dependabot-prs.sweep`           | `sweep`           | `current`                      |
-| `dependabot-prs.sweep`           | `repository`      | `<bare repository name>`       |
-| `github-prs.list`                | `pull`            | `s11a.com-<PR number>`         |
-| `github-merge.mergeDependabotPr` | `merge`           | `<PR number>`                  |
-| `git-repo.removeWorktree`        | `worktreeRemoval` | `worktree-<worktree basename>` |
-| `s11a-npm.*`                     | `invocation`      | `invocation-<operation>-<run>` |
-| `s11a-npm.inspect`               | `project`         | `project-current`              |
+| Producer                             | Spec                 | Data name                      |
+| ------------------------------------ | -------------------- | ------------------------------ |
+| `dependabot-prs.sweep`               | `sweep`              | `current`                      |
+| `dependabot-prs.sweep`               | `repository`         | `<bare repository name>`       |
+| `github-prs.list`                    | `pull`               | `s11a.com-<PR number>`         |
+| `github-merge.inspectDependabotPrs`  | `dependabotQueue`    | `dependabot-queue`             |
+| `github-merge.mergeDependabotPrs`    | `merge`              | `<PR number>`                  |
+| `git-repo.prepareDependabotWorktree` | `dependabotWorktree` | `dependabot-aggregate`         |
+| `git-repo.removeWorktree`            | `worktreeRemoval`    | `worktree-<worktree basename>` |
+| `s11a-npm.*`                         | `invocation`         | `invocation-<operation>-<run>` |
+| `s11a-npm.inspect`                   | `project`            | `project-current`              |
 
 Typical retrieval:
 
 ```bash
 swamp data get github-prs s11a.com-290 --json
+swamp data get github-merge dependabot-queue --json
+swamp data get git-repo dependabot-aggregate --json
 swamp data get github-merge 290 --json
-swamp data get git-repo worktree-pr-290 --json
+swamp data get git-repo worktree-dependabot-review --json
 ```
 
 List or query workflow outputs:
@@ -485,11 +472,11 @@ data.latest("github-merge", "290").attributes.sha
 
 ### Data Lifetime
 
-The PR, merge, and worktree-removal resources have infinite lifetime with
-bounded version garbage-collection counts defined by their types. Runtime data
-is local because `.swamp/` is ignored. A team-wide audit history requires a
-shared Swamp datastore or Swamp server; Git alone shares definitions, not run
-data.
+The queue, aggregate, PR, merge, and worktree-removal resources have infinite
+lifetime with bounded version garbage-collection counts defined by their types.
+Runtime data is local because `.swamp/` is ignored. A team-wide audit history
+requires a shared Swamp datastore or Swamp server; Git alone shares definitions,
+not run data.
 
 ## Reports and Run History
 
@@ -525,17 +512,12 @@ swamp report get @swamp/method-summary \
   --json
 ```
 
-The successful PR `#290` run predates the cleanup step and therefore contains
-three steps and no `worktreePath` input. Current and future runs use the
-four-step workflow documented here.
-
 ## Failure Recovery
 
 ### PR Head Changed
 
-If `mergeDependabotPr` reports that the PR head changed, discard all previous CI
-and browser evidence. Restart review for the new SHA. Do not retry with the old
-SHA.
+If inspection, worktree preparation, or merge reports that a PR head changed,
+discard the suspended or failed run. Start a new workflow run for the new SHA.
 
 ### Checks Missing, Pending, or Failed
 
@@ -547,14 +529,14 @@ swamp report get @swamp/method-summary --model github-merge --json
 swamp report get @swamp/workflow-summary --workflow dependabot-review --json
 ```
 
-Wait for GitHub checks or fix the PR branch, rerun all review gates, and invoke a
-new workflow run with the new exact SHA.
+Wait for GitHub checks or fix the PR branch, then start a new workflow run. The
+workflow recreates and revalidates the aggregate at the new exact SHA.
 
 ### Cleanup Refused
 
 Do not force-remove the worktree. Inspect and preserve local changes. Once the
-worktree is clean and still on `review/pr-<number>`, resume from
-`cleanup-worktree`.
+worktree is clean and still on `review/dependabot`, verify `git-repo` before
+using its `removeWorktree` method or resuming cleanup.
 
 ### Method or Workflow Lock Appears Stale
 
@@ -632,6 +614,7 @@ swamp model validate dependabot-prs --json
 swamp model validate github-prs --json
 swamp model validate github-merge --json
 swamp model validate git-repo --json
+swamp model validate s11a-npm --json
 swamp model validate remote-echo --json
 swamp workflow validate dependabot-review --json
 swamp workflow validate remote-demo --json
@@ -649,6 +632,7 @@ Application validation:
 ```bash
 npm run check
 npm run build
+npm run test:e2e
 ```
 
 Local extension validation:
@@ -683,26 +667,30 @@ swamp workflow validate dependabot-review --json
 ## Security Properties and Limits
 
 - Secrets are referenced through the vault and are not committed.
-- The final merge is guarded by the exact reviewed SHA, preventing a changed PR
-  from reusing old evidence.
+- Aggregate preparation and final merges are guarded by every exact discovered
+  PR SHA, preventing changed heads from reusing old evidence.
+- The tested base SHA and each sequential squash tree are revalidated during
+  the remote merge batch.
 - PR identity, draft state, base branch, checks, and combined status are
   revalidated immediately before merge.
 - Worktree removal is branch-bound, clean-only, secondary-only, and never
   forced.
-- npm merge evidence is tied to the reviewed SHA, produced in the current
-  workflow run, lifecycle-denied for installation, and checked for manifest and
-  tracked-worktree drift.
+- npm and Playwright evidence is tied to the aggregate SHA, produced in the
+  current workflow run, lifecycle-denied for installation, and checked for
+  manifest and tracked-worktree drift.
+- CEL inputs select only current-run data. Overlapping runs are unsupported
+  because the aggregate worktree path is fixed; exact base and tree checks keep
+  remote merges fail-closed if operators violate this constraint.
 - `github-merge` still exposes upstream generic merge methods because the local
   method extends an existing type. Repository policy forbids calling GitHub
   merge model methods directly; use `dependabot-review`.
-- Playwright evidence remains agent-managed rather than a Swamp model resource.
 - A generic verification attestation may not populate its commit and branch
-  subject from workflow inputs. The exact reviewed head remains available in
-  workflow inputs and the merge resource.
+  subject. Exact PR heads and the aggregate SHA remain available in queue,
+  worktree, npm invocation, and merge resources.
 - Runtime data and encrypted local-vault values are machine-local unless a
   shared datastore and vault backend are configured.
-- There is no automatic Dependabot trigger. Human or agent invocation remains
-  the explicit approval boundary.
+- There is no automatic Dependabot trigger. The suspended `approve-aggregate`
+  step is the explicit approval boundary.
 
 ## Operating Rules
 

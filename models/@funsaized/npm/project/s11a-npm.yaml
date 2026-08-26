@@ -14,7 +14,9 @@ globalArguments:
   allowedScripts:
     - check
     - build
-  environment: {}
+    - test:e2e
+  environment:
+    CI: "true"
   defaultTimeoutMs: 900000
   requireCleanGit: true
 methods: {}
