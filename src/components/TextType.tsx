@@ -1,9 +1,15 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 
 interface TextTypeProps {
 	text: string;
 	typingSpeed?: number;
 	cursorCharacter?: string;
+}
+
+function subscribeToReducedMotion(callback: () => void) {
+	const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+	mediaQuery.addEventListener("change", callback);
+	return () => mediaQuery.removeEventListener("change", callback);
 }
 
 function prefersReducedMotion() {
@@ -17,12 +23,14 @@ export function TextType({
 }: TextTypeProps) {
 	const [displayedText, setDisplayedText] = useState("");
 	const [index, setIndex] = useState(0);
+	const reducedMotion = useSyncExternalStore(
+		subscribeToReducedMotion,
+		prefersReducedMotion,
+		() => false,
+	);
 
 	useEffect(() => {
-		if (prefersReducedMotion()) {
-			setDisplayedText(text);
-			return undefined;
-		}
+		if (reducedMotion) return undefined;
 
 		if (index >= text.length) return undefined;
 
@@ -32,7 +40,7 @@ export function TextType({
 		}, typingSpeed);
 
 		return () => clearTimeout(timeout);
-	}, [index, text, typingSpeed]);
+	}, [index, reducedMotion, text, typingSpeed]);
 
 	return (
 		<span
@@ -40,7 +48,7 @@ export function TextType({
 			aria-label={text}
 		>
 			<span className="inline">
-				{displayedText}
+				{reducedMotion ? text : displayedText}
 				<span
 					aria-hidden="true"
 					className="text-type-caret"

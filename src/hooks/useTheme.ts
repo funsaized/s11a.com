@@ -1,21 +1,26 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 
 type Theme = "light" | "dark" | "system";
+const subscribeToHydration = () => () => {};
+
+function getStoredTheme(): Theme {
+	if (typeof window === "undefined") return "system";
+	try {
+		const stored = localStorage.getItem("theme");
+		if (stored === "light" || stored === "dark" || stored === "system") {
+			return stored;
+		}
+	} catch {}
+	return "system";
+}
 
 export function useTheme() {
-	const [theme, setTheme] = useState<Theme>("system");
-	const [mounted, setMounted] = useState(false);
-
-	// get initial when mount complete
-	useEffect(() => {
-		setMounted(true);
-		try {
-			const stored = localStorage.getItem("theme") as Theme | null;
-			if (stored && ["light", "dark", "system"].includes(stored)) {
-				setTheme(stored);
-			}
-		} catch {}
-	}, []);
+	const [theme, setTheme] = useState<Theme>(getStoredTheme);
+	const mounted = useSyncExternalStore(
+		subscribeToHydration,
+		() => true,
+		() => false,
+	);
 
 	useEffect(() => {
 		if (!mounted) return;

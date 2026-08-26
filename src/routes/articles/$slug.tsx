@@ -1,5 +1,5 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { Suspense, useState } from "react";
+import { createElement, Suspense, useState } from "react";
 
 import { Prose } from "#/components/Prose";
 import { TableOfContents } from "#/components/TableOfContents";
@@ -146,7 +146,7 @@ function RouteComponent() {
 					<p className="italic text-muted-foreground text-xl font-medium">
 						{excerpt}
 					</p>
-					<div className="flex gap-2 mt-4">
+					<div className="flex flex-wrap gap-2 mt-4">
 						{tags.map((tag) => (
 							<span
 								key={tag}
@@ -158,9 +158,7 @@ function RouteComponent() {
 					</div>
 					<div className="my-8 border-b-2 border-dotted border-border"></div>
 					<Suspense fallback={<div></div>}>
-						<Prose>
-							<Article />
-						</Prose>
+						<Prose>{createElement(Article)}</Prose>
 					</Suspense>
 				</article>
 
