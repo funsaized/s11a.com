@@ -6,6 +6,12 @@
 	"sortImports": true,
 	"sortPackageJson": false,
 	"ignorePatterns": [
+		".opencode/**",
+		"AGENTS.md",
+		"extensions/**",
+		"models/**",
+		"vaults/**",
+		"workflows/**",
 		"src/routeTree.gen.ts",
 		"src/styles.css",
 		"design_handoff/**",
