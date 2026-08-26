@@ -1,0 +1,10 @@
+type: '@swamp/git'
+typeVersion: 2026.08.25.1
+id: 9af103ab-ac62-4272-ab91-3d4cf8d0be82
+name: git-repo
+version: 1
+tags: {}
+globalArguments:
+  repoPath: .
+  remote: origin
+methods: {}

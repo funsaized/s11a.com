@@ -70,6 +70,21 @@ Do not use prettier or eslint. Format with `oxfmt`, lint with `oxlint`.
 
 There is no Gatsby app in this tree. Historical SOURCE lives in git history.
 
+## Dependabot Review
+
+When asked to review or merge a Dependabot PR:
+
+1. Use `dependabot-prs` to discover candidates. The agent chooses one PR at a time.
+2. Verify GitHub Actions passed for the current PR head SHA. Never reuse evidence from an older SHA.
+3. Inspect the dependency diff and release notes. Reject unrelated or unsafe changes.
+4. Create an isolated local worktree on branch `review/pr-<number>`, merge `origin/master` into it, then run `npm ci`, `npm run check`, and `npm run build`. Commit and push any resulting merge before collecting final evidence.
+5. Start the app and use Playwright at desktop and mobile widths. Verify `/`, `/articles`, `/about`, and the newest article linked from `/articles`; fail on console errors, failed requests, broken navigation, overflow, or rendering defects.
+6. If CI, build, or browser review fails because of the dependency update, diagnose and make the smallest fix on the PR branch, push it, wait for CI on the new SHA, and repeat all checks. Stop and report after two failed fix attempts or when the fix would broaden scope beyond compatibility with the update.
+7. Only after all checks pass and the review worktree is clean, run `dependabot-review` with `pullRequest`, the exact `reviewedHeadSha`, and the absolute `worktreePath`; invoking the workflow is the approval to merge and removes the matching `review/pr-<number>` worktree after a successful merge. Never call GitHub merge model methods directly.
+8. If the PR head changes at any point, discard the prior evidence and restart from step 2.
+
+Browser review may ignore the known TanStack query-stream console error containing `Cannot read properties of undefined (reading 'mutations')` while this site does not use TanStack Query. All other console errors remain failures. Remove this exception when TanStack Query is used.
+
 ## Content
 
 Add an article by dropping an `.mdx` file in `src/content/articles/` with the frontmatter schema in `article-metadata.ts`. Prerender discovers linked routes via `crawlLinks`.

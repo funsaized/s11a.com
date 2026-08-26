@@ -1,0 +1,13 @@
+type: '@sntxrr/dependabot-sweep'
+typeVersion: 2026.08.13.1
+id: f2ab72cd-5448-4eec-86ae-d447ae23b558
+name: dependabot-prs
+version: 1
+tags: {}
+globalArguments:
+  owner: funsaized
+  ownerType: user
+  token: '${{ vault.get("my-secrets", "github-token") }}'
+  allowlist:
+    - s11a.com
+methods: {}

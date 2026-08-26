@@ -1,0 +1,10 @@
+type: '@bixu/github/pull'
+typeVersion: 2026.03.09.1
+id: 8457fad6-6556-4078-9acd-1babe4e1b65d
+name: github-prs
+version: 1
+tags: {}
+globalArguments:
+  owner: funsaized
+  token: '${{ vault.get("my-secrets", "github-token") }}'
+methods: {}

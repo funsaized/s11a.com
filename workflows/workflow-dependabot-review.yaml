@@ -1,0 +1,79 @@
+id: 9f92f1cd-cff1-43b3-b079-4adf60534f21
+name: dependabot-review
+description: Validate and merge an agent-reviewed Dependabot PR at an exact SHA
+tags: {}
+inputs:
+  properties:
+    pullRequest:
+      type: integer
+      minimum: 1
+      description: Dependabot pull request selected by the agent
+    reviewedHeadSha:
+      type: string
+      pattern: ^[0-9a-f]{40}$
+      description: Exact PR head SHA that passed CI and local browser review
+    worktreePath:
+      type: string
+      minLength: 1
+      description: Absolute path of the clean local review worktree to remove after merge
+  required:
+    - pullRequest
+    - reviewedHeadSha
+    - worktreePath
+jobs:
+  - name: review
+    steps:
+      - name: inspect-pr
+        task:
+          type: model_method
+          modelIdOrName: github-prs
+          methodName: list
+          inputs:
+            repo: s11a.com
+            state: open
+      - name: require-safe-dependabot-pr
+        task:
+          type: assert
+          expr: >-
+            data.findBySpec("github-prs", "pull").exists(pr,
+              pr.attributes.number == inputs.pullRequest &&
+              pr.attributes.user == "dependabot[bot]" &&
+              pr.attributes.state == "open" &&
+              !pr.attributes.draft &&
+              !pr.attributes.merged &&
+              pr.attributes.base == "master")
+          message: >-
+            PR #${{ inputs.pullRequest }} must be an open, non-draft Dependabot
+            PR targeting master.
+          severity: high
+        dependsOn:
+          - step: inspect-pr
+            condition:
+              type: succeeded
+      - name: merge-pr
+        task:
+          type: model_method
+          modelIdOrName: github-merge
+          methodName: mergeDependabotPr
+          inputs:
+            repo: s11a.com
+            pullNumber: ${{ inputs.pullRequest }}
+            expectedHeadSha: ${{ inputs.reviewedHeadSha }}
+        dependsOn:
+          - step: require-safe-dependabot-pr
+            condition:
+              type: succeeded
+      - name: cleanup-worktree
+        task:
+          type: model_method
+          modelIdOrName: git-repo
+          methodName: removeWorktree
+          inputs:
+            worktreePath: ${{ inputs.worktreePath }}
+            expectedBranch: review/pr-${{ inputs.pullRequest }}
+        dependsOn:
+          - step: merge-pr
+            condition:
+              type: succeeded
+    dependsOn: []
+version: 1
