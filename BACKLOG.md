@@ -1024,7 +1024,7 @@ second content architecture.
 - [ ] Confirm the integration emits the runtime server functions needed by the article view counter
 - [ ] Re-verify the CSP — the current policy is strict and hand-written; check `script-src`/`connect-src` still cover Start's hydration bootstrap and any server-function calls
 - [ ] Confirm the cache-control header rules still match the new asset paths and hashing scheme
-- [ ] Verify TARGET's `.nvmrc`, `package.json` engines, and Netlify image agree on TARGET's chosen Node 24.19.x / npm 11.17.x toolchain. SOURCE remains on Node 22.4.1 because it is an independent app.
+- [ ] Verify TARGET's `package.json` engines and Netlify image agree on TARGET's chosen Node 24 / npm 11 toolchain. SOURCE remains on Node 22.4.1 because it is an independent app.
 - [ ] Deploy preview from the branch
 - [ ] Deferred from S4.2: unknown paths return the TARGET not-found UI with HTTP 404; do not copy SOURCE's catch-all redirect if it would intercept server functions
 

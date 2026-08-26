@@ -9,4 +9,4 @@ npm run check
 npm run build    # .output
 ```
 
-Node 24 / npm 11. See `AGENTS.md` for repo conventions.
+Node 24 / npm 11. See `AGENTS.md` for repo conventions (i.e [the swamp](./SWAMP.md)).
