@@ -83,7 +83,6 @@
     ],
     "checksum": "4b7edb0ebf5e0a3646160c83374527ee98ad5706ae6f4ec37496e53c97df2b9f",
     "filesChecksum": "4068b0edace7e807ca9fd15ffc20034e870041776a0d788f9856858af09230a8",
-    "serverUrl": "https://swamp-club.com",
-    "channel": "beta"
+    "serverUrl": "https://swamp-club.com"
   }
 }
