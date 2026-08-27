@@ -1,9 +1,15 @@
-import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import {
+	ClientOnly,
+	createFileRoute,
+	Link,
+	notFound,
+} from "@tanstack/react-router";
 import { createElement, Suspense, useState } from "react";
 
 import { Prose } from "#/components/Prose";
 import { TableOfContents } from "#/components/TableOfContents";
 import { Button } from "#/components/ui/button";
+import { ViewCount } from "#/components/ViewCount";
 import { getArticleMetadataBySlug } from "#/lib/article-metadata";
 import { getArticleComponentBySlug } from "#/lib/article-modules";
 import { formatLongDate } from "#/lib/dates";
@@ -139,6 +145,10 @@ function RouteComponent() {
 						{category} {" · "}
 						{formatLongDate(date)} {" · "}
 						{readingTime}
+						{" · "}
+						<ClientOnly fallback={null}>
+							<ViewCount slug={slug} />
+						</ClientOnly>
 					</div>
 					<h1 className="text-[clamp(34px,5vw,48px)] leading-[1.15] my-4">
 						{title}
