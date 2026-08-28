@@ -61,7 +61,7 @@
 		"@tailwindcss/typography": "^0.5.16",
 		"@tanstack/devtools-vite": "latest",
 		"@tanstack/router-cli": "^1.132.0",
-		"@types/node": "^24.13.3",
+		"@types/node": "^25.9.5",
 		"@types/react": "^19.2.0",
 		"@types/react-dom": "^19.2.0",
 		"@vitejs/plugin-react": "^6.0.1",
