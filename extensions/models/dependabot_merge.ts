@@ -14,13 +14,25 @@ const PullSchema = z.object({
   mergeable: z.boolean().nullable(),
   mergeable_state: z.string(),
 });
+const ClosablePullSchema = PullSchema.extend({
+  state: z.enum(["open", "closed"]),
+});
 
 const ChecksSchema = z.object({
   total_count: z.number().int(),
   check_runs: z.array(z.object({
     name: z.string(),
     status: z.literal("completed"),
-    conclusion: z.literal("success"),
+    conclusion: z.enum([
+      "success",
+      "failure",
+      "neutral",
+      "cancelled",
+      "skipped",
+      "timed_out",
+      "action_required",
+      "stale",
+    ]),
   })),
 });
 
@@ -94,6 +106,27 @@ async function github<T>(
   return schema.parse(body);
 }
 
+async function githubEmpty(path: string, token: string, init: RequestInit) {
+  const response = await fetch(`https://api.github.com${path}`, {
+    ...init,
+    headers: {
+      Accept: "application/vnd.github+json",
+      Authorization: `Bearer ${token}`,
+      "X-GitHub-Api-Version": "2022-11-28",
+      ...init.headers,
+    },
+  });
+  if (!response.ok) {
+    const body: unknown = await response.json().catch(() => ({}));
+    const message = z.object({ message: z.string() }).safeParse(body);
+    throw new Error(
+      message.success
+        ? message.data.message
+        : `GitHub returned ${response.status}`,
+    );
+  }
+}
+
 async function mergeDependabotPrs(
   repo: string,
   pullRequests: Array<
@@ -101,11 +134,13 @@ async function mergeDependabotPrs(
   >,
   context: Context,
   expectedBaseSha?: string,
+  validateOnly = false,
 ) {
   const { token, defaultOwner: owner } = context.globalArgs;
   if (!token || !owner) {
     throw new Error("GitHub token and defaultOwner are required");
   }
+
   if (
     new Set(pullRequests.map(({ number }) => number)).size !==
       pullRequests.length
@@ -165,9 +200,21 @@ async function mergeDependabotPrs(
         `Not all GitHub check runs for PR #${pullRequest.number} were inspected`,
       );
     }
-    if (!checks.check_runs.some((check) => check.name === "validate")) {
+    if (
+      !checks.check_runs.some((check) =>
+        check.name === "validate" && check.conclusion === "success"
+      )
+    ) {
       throw new Error(
-        `Required GitHub check 'validate' is missing for PR #${pullRequest.number}`,
+        `Required GitHub check 'validate' is missing or unsuccessful for PR #${pullRequest.number}`,
+      );
+    }
+    const failedCheck = checks.check_runs.find((check) =>
+      !["success", "neutral", "skipped"].includes(check.conclusion)
+    );
+    if (failedCheck) {
+      throw new Error(
+        `GitHub check '${failedCheck.name}' concluded ${failedCheck.conclusion} for PR #${pullRequest.number}`,
       );
     }
 
@@ -182,6 +229,8 @@ async function mergeDependabotPrs(
       );
     }
   }
+
+  if (validateOnly) return { dataHandles: [] };
 
   const dataHandles = [];
   for (const pullRequest of pullRequests) {
@@ -302,6 +351,102 @@ export const extension = {
           },
         );
         return { dataHandles: [handle] };
+      },
+    },
+  }, {
+    rerunFailedWorkflowJobs: {
+      description: "Rerun only failed jobs in one GitHub Actions workflow run",
+      arguments: z.object({
+        repo: z.string().min(1),
+        runId: z.number().int().positive(),
+      }),
+      execute: async (
+        args: { repo: string; runId: number },
+        context: Context,
+      ) => {
+        const { token, defaultOwner: owner } = context.globalArgs;
+        if (!token || !owner) {
+          throw new Error("GitHub token and defaultOwner are required");
+        }
+        await githubEmpty(
+          `/repos/${encodeURIComponent(owner)}/${
+            encodeURIComponent(args.repo)
+          }/actions/runs/${args.runId}/rerun-failed-jobs`,
+          token,
+          { method: "POST" },
+        );
+        return { dataHandles: [] };
+      },
+    },
+  }, {
+    validateDependabotPrs: {
+      description:
+        "Validate every exact Dependabot head, base, and required GitHub check without mutation",
+      arguments: z.object({
+        repo: z.string().min(1),
+        baseSha: z.string().regex(/^[0-9a-f]{40}$/),
+        pullRequests: z.array(PullRequestInputSchema).min(1),
+      }),
+      execute: async (
+        args: {
+          repo: string;
+          baseSha: string;
+          pullRequests: z.infer<typeof PullRequestInputSchema>[];
+        },
+        context: Context,
+      ) =>
+        mergeDependabotPrs(
+          args.repo,
+          args.pullRequests,
+          context,
+          args.baseSha,
+          true,
+        ),
+    },
+  }, {
+    closeDependabotPrs: {
+      description: "Close Dependabot PRs superseded by the published aggregate",
+      arguments: z.object({
+        repo: z.string().min(1),
+        pullRequests: z.array(PullRequestInputSchema).min(1),
+      }),
+      execute: async (
+        args: {
+          repo: string;
+          pullRequests: z.infer<typeof PullRequestInputSchema>[];
+        },
+        context: Context,
+      ) => {
+        const { token, defaultOwner: owner } = context.globalArgs;
+        if (!token || !owner) {
+          throw new Error("GitHub token and defaultOwner are required");
+        }
+        const root = `/repos/${encodeURIComponent(owner)}/${
+          encodeURIComponent(args.repo)
+        }`;
+        const openPullRequests = [];
+        for (const candidate of args.pullRequests) {
+          const pull = await github(
+            `${root}/pulls/${candidate.number}`,
+            token,
+            ClosablePullSchema,
+          );
+          if (pull.head.sha !== candidate.head) {
+            throw new Error(
+              `PR #${candidate.number} head changed before close`,
+            );
+          }
+          if (pull.state === "open") openPullRequests.push(candidate);
+        }
+        for (const candidate of openPullRequests) {
+          await github(
+            `${root}/pulls/${candidate.number}`,
+            token,
+            z.object({ state: z.literal("closed") }),
+            { method: "PATCH", body: JSON.stringify({ state: "closed" }) },
+          );
+        }
+        return { dataHandles: [] };
       },
     },
   }, {

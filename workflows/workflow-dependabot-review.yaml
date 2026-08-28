@@ -169,9 +169,8 @@ jobs:
         task:
           type: model_method
           modelIdOrName: s11a-npm
-          methodName: run
+          methodName: runPlaywrightE2e
           inputs:
-            script: test:e2e
             expectedGitHead: >-
               ${{ data.findBySpec("git-repo", "dependabotWorktree").filter(worktree,
                 worktree.workflowRunId == run.id)[0].attributes.headSha }}
@@ -179,24 +178,36 @@ jobs:
           - step: npm-build
             condition:
               type: succeeded
-      - name: require-npm-evidence
+      - name: require-npm-invocations
         task:
           type: assert
           expr: >-
             data.findBySpec("s11a-npm", "invocation").filter(i,
-              i.workflowRunId == run.id).size() == 5 &&
+              i.workflowRunId == run.id).size() == 4 &&
             data.findBySpec("s11a-npm", "invocation").exists(i,
               i.workflowRunId == run.id && i.attributes.operation == "inspect") &&
             data.findBySpec("s11a-npm", "invocation").exists(i,
               i.workflowRunId == run.id && i.attributes.operation == "ci") &&
             data.findBySpec("s11a-npm", "invocation").filter(i,
-              i.workflowRunId == run.id && i.attributes.operation == "run").size() == 3 &&
+              i.workflowRunId == run.id && i.attributes.operation == "run").size() == 2 &&
             data.findBySpec("s11a-npm", "invocation").exists(i,
               i.workflowRunId == run.id && i.attributes.argv == ["npm", "run", "check"]) &&
             data.findBySpec("s11a-npm", "invocation").exists(i,
               i.workflowRunId == run.id && i.attributes.argv == ["npm", "run", "build"]) &&
-            data.findBySpec("s11a-npm", "invocation").exists(i,
-              i.workflowRunId == run.id && i.attributes.argv == ["npm", "run", "test:e2e"]) &&
+            data.findBySpec("s11a-npm", "invocation").filter(i,
+              i.workflowRunId == run.id &&
+              has(i.attributes.lifecyclePolicy) &&
+              i.attributes.lifecyclePolicy == "deny").size() == 4
+          message: Current-run npm invocation set or lifecycle policy is incomplete.
+          severity: high
+        dependsOn:
+          - step: npm-e2e
+            condition:
+              type: succeeded
+      - name: require-npm-integrity
+        task:
+          type: assert
+          expr: >-
             data.findBySpec("s11a-npm", "invocation").filter(i,
               i.workflowRunId == run.id).all(i,
               i.attributes.executionStatus == "succeeded" &&
@@ -212,14 +223,30 @@ jobs:
               i.attributes.packageJsonSha256Before == i.attributes.packageJsonSha256After &&
               i.attributes.lockfileSha256Before == i.attributes.lockfileSha256After &&
               i.attributes.cleanWorktreeBefore == true &&
-              i.attributes.cleanWorktreeAfter == true &&
-              i.attributes.lifecyclePolicy == "deny")
-          message: >-
-            Current-run npm evidence must prove inspect, ci, check, build, and
-            E2E succeeded against the aggregate SHA without manifest or Git drift.
+              i.attributes.cleanWorktreeAfter == true)
+          message: Current-run npm evidence does not match the clean aggregate SHA.
           severity: high
         dependsOn:
-          - step: npm-e2e
+          - step: require-npm-invocations
+            condition:
+              type: succeeded
+      - name: require-e2e-evidence
+        task:
+          type: assert
+          expr: >-
+            data.findBySpec("s11a-npm", "playwrightLog").filter(log,
+              log.workflowRunId == run.id &&
+              log.attributes.executionStatus == "succeeded" &&
+              log.attributes.expectedGitHead ==
+                data.findBySpec("git-repo", "dependabotWorktree").filter(worktree,
+                  worktree.workflowRunId == run.id)[0].attributes.headSha &&
+              log.attributes.gitHeadBefore == log.attributes.expectedGitHead &&
+              log.attributes.gitHeadAfter == log.attributes.expectedGitHead &&
+              log.attributes.cleanWorktreeAfter == true).size() == 1
+          message: Current-run E2E evidence does not match the clean aggregate SHA.
+          severity: high
+        dependsOn:
+          - step: require-npm-integrity
             condition:
               type: succeeded
       - name: inspect-aggregate-diff
@@ -239,7 +266,7 @@ jobs:
               ${{ data.findBySpec("git-repo", "dependabotWorktree").filter(worktree,
                 worktree.workflowRunId == run.id)[0].attributes.headSha }}
         dependsOn:
-          - step: require-npm-evidence
+          - step: require-e2e-evidence
             condition:
               type: succeeded
       - name: approve-aggregate
@@ -253,11 +280,11 @@ jobs:
           - step: inspect-aggregate-diff
             condition:
               type: succeeded
-      - name: merge-prs
+      - name: validate-pr-heads
         task:
           type: model_method
           modelIdOrName: github-merge
-          methodName: mergeDependabotPrs
+          methodName: validateDependabotPrs
           inputs:
             repo: s11a.com
             baseSha: >-
@@ -265,9 +292,41 @@ jobs:
                 worktree.workflowRunId == run.id)[0].attributes.baseSha }}
             pullRequests: >-
               ${{ data.findBySpec("git-repo", "dependabotWorktree").filter(worktree,
-                worktree.workflowRunId == run.id)[0].attributes.pullRequests }}
+                worktree.workflowRunId == run.id)[0].attributes.pullRequests.map(pr,
+                {"number": pr.number, "head": pr.head}) }}
         dependsOn:
           - step: approve-aggregate
+            condition:
+              type: succeeded
+      - name: publish-aggregate
+        task:
+          type: model_method
+          modelIdOrName: git-repo
+          methodName: publishDependabotAggregate
+          inputs:
+            expectedBaseSha: >-
+              ${{ data.findBySpec("git-repo", "dependabotWorktree").filter(worktree,
+                worktree.workflowRunId == run.id)[0].attributes.baseSha }}
+            expectedHeadSha: >-
+              ${{ data.findBySpec("git-repo", "dependabotWorktree").filter(worktree,
+                worktree.workflowRunId == run.id)[0].attributes.headSha }}
+        dependsOn:
+          - step: validate-pr-heads
+            condition:
+              type: succeeded
+      - name: close-prs
+        task:
+          type: model_method
+          modelIdOrName: github-merge
+          methodName: closeDependabotPrs
+          inputs:
+            repo: s11a.com
+            pullRequests: >-
+              ${{ data.findBySpec("git-repo", "dependabotWorktree").filter(worktree,
+                worktree.workflowRunId == run.id)[0].attributes.pullRequests.map(pr,
+                {"number": pr.number, "head": pr.head}) }}
+        dependsOn:
+          - step: publish-aggregate
             condition:
               type: succeeded
       - name: cleanup-worktree
@@ -279,8 +338,8 @@ jobs:
             worktreePath: .worktrees/dependabot-review
             expectedBranch: review/dependabot
         dependsOn:
-          - step: merge-prs
+          - step: close-prs
             condition:
-              type: succeeded
+              type: completed
     dependsOn: []
 version: 1

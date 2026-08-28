@@ -6,8 +6,14 @@ const prepareMethod = extension.methods.find((entry) =>
 )?.prepareDependabotWorktree;
 const method = extension.methods.find((entry) => entry.removeWorktree)
   ?.removeWorktree;
-if (!prepareMethod || !method) throw new Error("Worktree methods are missing");
+const publishMethod = extension.methods.find((entry) =>
+  entry.publishDependabotAggregate
+)?.publishDependabotAggregate;
+if (!prepareMethod || !publishMethod || !method) {
+  throw new Error("Worktree methods are missing");
+}
 const prepare = prepareMethod;
+const publish = publishMethod;
 const remove = method;
 
 async function git(cwd: string, ...args: string[]) {
@@ -164,6 +170,109 @@ Deno.test("prepares an aggregate worktree from an exact PR head", async () => {
     const tree = await git(worktree, "rev-parse", "HEAD^{tree}");
     if (!JSON.stringify(aggregate).includes(`"tree":"${tree}"`)) {
       throw new Error("Aggregate resource is missing the tested squash tree");
+    }
+    if (
+      (await git(worktree, "rev-list", "--count", "origin/master..HEAD")) !==
+        "1"
+    ) {
+      throw new Error("Aggregate was not reduced to one commit");
+    }
+
+    await publish.execute(
+      {
+        expectedBaseSha: await git(repo, "rev-parse", "origin/master"),
+        expectedHeadSha: await git(worktree, "rev-parse", "HEAD"),
+      },
+      {
+        signal: new AbortController().signal,
+        globalArgs: { repoPath: repo },
+        writeResource: () => Promise.resolve({ name: "publish" }),
+      },
+    );
+    if (
+      (await git(root, "--git-dir", remote, "rev-parse", "master")) !==
+        await git(worktree, "rev-parse", "HEAD")
+    ) {
+      throw new Error("Published master does not match the tested aggregate");
+    }
+  } finally {
+    await Deno.remove(root, { recursive: true });
+  }
+});
+
+Deno.test("aggregates conflicting npm dependency updates", async () => {
+  const { root, repo } = await fixture();
+  const remote = `${root}/remote.git`;
+  let aggregate: Record<string, unknown> | undefined;
+  try {
+    await Deno.writeTextFile(
+      `${repo}/package.json`,
+      '{"name":"fixture","version":"1.0.0","devDependencies":{"ansi-regex":"5.0.1","picocolors":"1.0.0"}}\n',
+    );
+    const initialInstall = await new Deno.Command("npm", {
+      args: ["install", "--package-lock-only", "--ignore-scripts"],
+      cwd: repo,
+    }).output();
+    if (!initialInstall.success) throw new Error("Initial npm install failed");
+    await git(repo, "add", "package.json", "package-lock.json");
+    await git(repo, "commit", "-m", "add npm project");
+    await git(root, "init", "--bare", remote);
+    await git(repo, "remote", "add", "origin", remote);
+    await git(repo, "push", "origin", "master");
+
+    const heads: string[] = [];
+    for (
+      const [number, dependency, version] of [
+        ["1", "ansi-regex", "6.2.2"],
+        ["2", "picocolors", "1.1.1"],
+      ]
+    ) {
+      await git(repo, "checkout", "-B", `pr-${number}`, "master");
+      const manifest = JSON.parse(
+        await Deno.readTextFile(`${repo}/package.json`),
+      );
+      manifest.devDependencies[dependency] = version;
+      await Deno.writeTextFile(
+        `${repo}/package.json`,
+        `${JSON.stringify(manifest, null, 2)}\n`,
+      );
+      const install = await new Deno.Command("npm", {
+        args: ["install", "--package-lock-only", "--ignore-scripts"],
+        cwd: repo,
+      }).output();
+      if (!install.success) {
+        throw new Error(`npm install failed for ${dependency}`);
+      }
+      await git(repo, "add", "package.json", "package-lock.json");
+      await git(repo, "commit", "-m", `update ${dependency}`);
+      heads.push(await git(repo, "rev-parse", "HEAD"));
+      await git(repo, "push", "origin", `HEAD:refs/pull/${number}/head`);
+    }
+    await git(repo, "checkout", "master");
+
+    await prepare.execute(
+      { pullNumbers: [1, 2], expectedHeadShas: heads },
+      {
+        signal: new AbortController().signal,
+        globalArgs: { repoPath: repo },
+        writeResource: (_spec, _name, data) => {
+          aggregate = data;
+          return Promise.resolve({ name: "aggregate" });
+        },
+      },
+    );
+
+    const manifest = JSON.parse(
+      await Deno.readTextFile(
+        `${repo}/.worktrees/dependabot-review/package.json`,
+      ),
+    );
+    if (
+      manifest.devDependencies["ansi-regex"] !== "6.2.2" ||
+      manifest.devDependencies.picocolors !== "1.1.1" ||
+      !aggregate
+    ) {
+      throw new Error("Aggregate did not retain both dependency updates");
     }
   } finally {
     await Deno.remove(root, { recursive: true });

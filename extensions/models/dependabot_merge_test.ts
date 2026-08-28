@@ -8,12 +8,27 @@ const inspectMethod = extension.methods.find((entry) =>
 )?.inspectDependabotPrs;
 const batchMethod = extension.methods.find((entry) => entry.mergeDependabotPrs)
   ?.mergeDependabotPrs;
-if (!inspectMethod || !method || !batchMethod) {
+const validateMethod = extension.methods.find((entry) =>
+  entry.validateDependabotPrs
+)?.validateDependabotPrs;
+const rerunMethod = extension.methods.find((entry) =>
+  entry.rerunFailedWorkflowJobs
+)?.rerunFailedWorkflowJobs;
+const closeMethod = extension.methods.find((entry) => entry.closeDependabotPrs)
+  ?.closeDependabotPrs;
+if (
+  !inspectMethod || !method || !batchMethod || !validateMethod ||
+  !rerunMethod ||
+  !closeMethod
+) {
   throw new Error("Dependabot methods are missing");
 }
 const inspect = inspectMethod;
 const mergeMethod = method;
 const mergeBatchMethod = batchMethod;
+const validate = validateMethod;
+const rerun = rerunMethod;
+const close = closeMethod;
 const sha = "a".repeat(40);
 const baseSha = "d".repeat(40);
 const pull = {
@@ -75,6 +90,67 @@ Deno.test("inspects exact Dependabot heads into one queue", async () => {
   }
 });
 
+Deno.test("reruns only failed workflow jobs", async () => {
+  const originalFetch = globalThis.fetch;
+  let request: { url: string; method?: string } | undefined;
+  globalThis.fetch = ((url: string | URL | Request, init?: RequestInit) => {
+    request = { url: String(url), method: init?.method };
+    return Promise.resolve(new Response(null, { status: 201 }));
+  }) as typeof fetch;
+  try {
+    await rerun.execute(
+      { repo: "s11a.com", runId: 123 },
+      {
+        globalArgs: { token: "test", defaultOwner: "funsaized" },
+        writeResource: () => Promise.resolve({ name: "unused" }),
+      },
+    );
+    if (
+      request?.method !== "POST" ||
+      !request.url.endsWith("/actions/runs/123/rerun-failed-jobs")
+    ) {
+      throw new Error(
+        "Failed jobs were not rerun through the guarded endpoint",
+      );
+    }
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+Deno.test("closing Dependabot PRs is idempotent", async () => {
+  const originalFetch = globalThis.fetch;
+  const secondHead = "b".repeat(40);
+  const responses = [
+    { ...pull, state: "closed" },
+    { ...pull, number: 2, head: { sha: secondHead } },
+    { state: "closed" },
+  ];
+  let patches = 0;
+  globalThis.fetch = ((_url: string | URL | Request, init?: RequestInit) => {
+    if (init?.method === "PATCH") patches++;
+    return Promise.resolve(new Response(JSON.stringify(responses.shift())));
+  }) as typeof fetch;
+  try {
+    await close.execute(
+      {
+        repo: "s11a.com",
+        pullRequests: [
+          { number: 1, head: sha },
+          { number: 2, head: secondHead },
+        ],
+      },
+      {
+        globalArgs: { token: "test", defaultOwner: "funsaized" },
+        writeResource: () => Promise.resolve({ name: "unused" }),
+      },
+    );
+    if (patches !== 1) throw new Error(`Expected one close, got ${patches}`);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
 Deno.test("refuses a changed PR head before checking or merging", async () => {
   let message = "";
   try {
@@ -104,7 +180,45 @@ Deno.test("requires the validate check", async () => {
   } catch (error) {
     message = error instanceof Error ? error.message : String(error);
   }
-  if (!message.includes("Required GitHub check 'validate' is missing")) {
+  if (
+    !message.includes(
+      "Required GitHub check 'validate' is missing or unsuccessful",
+    )
+  ) {
+    throw new Error(`Unexpected result: ${message}`);
+  }
+});
+
+Deno.test("allows neutral auxiliary checks but rejects failures", async () => {
+  await executeWith([
+    pull,
+    {
+      total_count: 2,
+      check_runs: [
+        { name: "validate", status: "completed", conclusion: "success" },
+        { name: "preview", status: "completed", conclusion: "neutral" },
+      ],
+    },
+    { state: "success", statuses: [] },
+    { sha, merged: true, message: "merged" },
+  ]);
+
+  let message = "";
+  try {
+    await executeWith([
+      pull,
+      {
+        total_count: 2,
+        check_runs: [
+          { name: "validate", status: "completed", conclusion: "success" },
+          { name: "preview", status: "completed", conclusion: "failure" },
+        ],
+      },
+    ]);
+  } catch (error) {
+    message = error instanceof Error ? error.message : String(error);
+  }
+  if (!message.includes("GitHub check 'preview' concluded failure")) {
     throw new Error(`Unexpected result: ${message}`);
   }
 });
@@ -182,6 +296,42 @@ Deno.test("validates every PR before starting a batch merge", async () => {
     }
     if (!message.includes("PR #2 head changed") || mergeRequested) {
       throw new Error(`Unexpected result: ${message}`);
+    }
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+Deno.test("validates an aggregate queue without mutating GitHub", async () => {
+  const originalFetch = globalThis.fetch;
+  const methods: string[] = [];
+  const responses = [
+    { object: { sha: baseSha } },
+    pull,
+    {
+      total_count: 1,
+      check_runs: [{
+        name: "validate",
+        status: "completed",
+        conclusion: "success",
+      }],
+    },
+    { state: "success", statuses: [] },
+  ];
+  globalThis.fetch = ((_url: string | URL | Request, init?: RequestInit) => {
+    methods.push(init?.method ?? "GET");
+    return Promise.resolve(new Response(JSON.stringify(responses.shift())));
+  }) as typeof fetch;
+  try {
+    await validate.execute(
+      { repo: "s11a.com", baseSha, pullRequests: [{ number: 1, head: sha }] },
+      {
+        globalArgs: { token: "test", defaultOwner: "funsaized" },
+        writeResource: () => Promise.resolve({ name: "unused" }),
+      },
+    );
+    if (methods.some((method) => method !== "GET")) {
+      throw new Error("Validation mutated GitHub");
     }
   } finally {
     globalThis.fetch = originalFetch;
