@@ -21,12 +21,6 @@ test-results/
 *.log
 .eslintcache
 
-# BEGIN swamp managed section - DO NOT EDIT
-
-# Runtime data (not needed in version control)
 .swamp/
-
-# Local extension sources (developer-specific, not shared)
 .swamp-sources.yaml
-# END swamp managed section
 .vercel

@@ -1,7 +1,0 @@
-id: 267765b7-9058-42a2-a301-bbfb788b6d80
-name: my-secrets
-type: local_encryption
-config:
-  auto_generate: true
-  base_dir: /home/saiguy/Projects/s11a.com
-createdAt: '2026-08-26T09:33:43.080Z'

@@ -10,4 +10,4 @@ npm run build    # .output
 npm run test:e2e # desktop + mobile Chromium
 ```
 
-Node 24 / npm 11. See `AGENTS.md` for repo conventions (i.e [the swamp](./SWAMP.md)).
+Node 24 / npm 11. See `AGENTS.md` for repository conventions.
