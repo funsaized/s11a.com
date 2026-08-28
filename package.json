@@ -76,13 +76,5 @@
 			"lightningcss",
 			"sharp"
 		]
-	},
-	"overrides": {
-		"vite": {
-			"rolldown": "1.1.0"
-		},
-		"nitro": {
-			"rolldown": "1.1.0"
-		}
 	}
 }
