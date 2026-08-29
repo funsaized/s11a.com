@@ -1,0 +1,32 @@
+---
+title: "Private by Routing: How I Built a Personal Development Cloud"
+slug: private-development-cloud-tailscale
+excerpt: >-
+  I wanted always-on agents, real HTTPS, and remote development that felt
+  like the internet without exposing any of it on the internet. Here's where I landed.
+date: "2026-08-28"
+category: Cloud
+tags:
+  - Tailscale
+  - Homelab
+  - Caddy
+  - DevOps
+  - Privacy
+readingTime: 10 min read
+featured: true
+author: Sai Nimmagadda
+---
+
+In the age of personalized software, I wanted a personal cloud. The idea came down to three things:
+
+- I wanted agents, dev servers, and long-running jobs to keep working after I closed my laptop.
+- I had perfectly good compute sitting around (m1 mac mini, 2016 TB MBP, NZXT prebuild 3080TI) and wanted to use each machine for what it does best.
+- I wanted moving between them to feel like a seamless development experience rather than a collection of boxes I had to babysit.
+
+So I networked my machines together, gave their apps real names and trusted HTTPS, and made the whole setup easy for both me and my agents to reach.
+
+And of utmost importance, was doing all of that without any of it being exposed to the public internet.
+
+<div style={{ display: "flex", justifyContent: "center" }}>
+  ![A tinfoil hat man with a thumbs up](/images/articles/tin-foil-hat.gif)
+</div>
