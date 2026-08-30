@@ -19,7 +19,7 @@ author: Sai Nimmagadda
 
 In the age of personalized software, I wanted a personal cloud. The idea came down to three things:
 
-- I wanted agents, dev servers, and long-running jobs to keep working after I closed my laptop.
+- I wanted agents, dev servers, and long-running jobs to keep working after I closed my laptop. My workspaces should 'feel' like they're on the internet.
 - I had perfectly good compute sitting around (m1 mac mini, 2016 TB MBP, NZXT prebuild 3080TI) and wanted to use each machine for what it does best.
 - I wanted moving between them to feel like a seamless development experience rather than a collection of boxes I had to babysit.
 
@@ -30,3 +30,27 @@ And of utmost importance, was doing all of that without any of it being exposed 
 <div style={{ display: "flex", justifyContent: "center" }}>
   ![A tinfoil hat man with a thumbs up](/images/articles/tin-foil-hat.gif)
 </div>
+
+## My requirements for the design.
+
+My acceptance criteria can basically be boiled down to a statement: I want a **secure**, always-on hub for AI agents. It should foster long running terminals, tests, CI, and local web apps. It's important to consider that I'll primarily be working from a laptop (my m4 mac mini) that sleeps and changes networks.
+
+Additionally, I want native Linux for when macOS is the wrong kernel for the use case and to avoid the bloat that comes with turning my mini into a hypervisor.
+
+As open and local models advance, I want local GPU inference that doesn't live on a public API.
+
+For my web-facing projects, browser-trusted HTTPS and readable hostnames was priority. Insecure origin browsers are too much of a tax in 2026.
+
+Lastly, and probably most importantly **ZERO PUBLIC INGRESS**. This includes port-forwarding and funnels.
+
+## Translating requirements to technical constraints
+
+## The three-layer mental model
+
+The method to materializing ... is to split three jobs that people usually smash together:
+
+| Job                                  | Layer                                           |
+| ------------------------------------ | ----------------------------------------------- |
+| Who is this device, and may it talk? | Tailscale (identity, WireGuard, policy)         |
+| What is this app called?             | Public DNS pointing at a Tailscale address      |
+| How does a browser reach it?         | Caddy on the Tailscale IP, proxying to loopback |
