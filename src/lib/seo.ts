@@ -5,7 +5,7 @@ export const SITE_NAME = "Sai Nimmagadda";
 export const SITE_TITLE = "Sai Nimmagadda - Full-Stack Engineer";
 export const SITE_DESCRIPTION = "Full-stack engineer. full-time nerd";
 
-const DEFAULT_IMAGE_PATH = "/images/face.png";
+const DEFAULT_IMAGE_PATH = "/images/articles/face.png";
 const TWITTER_USERNAME = "@FunSaized";
 const SAME_AS = [
 	"https://github.com/funsaized",
