@@ -19,9 +19,11 @@ author: Sai Nimmagadda
 
 In the age of personalized software, I wanted a personal cloud. The idea came down to three things:
 
-- I wanted agents, dev servers, and long-running jobs to keep working after I closed my laptop. My workspaces should 'feel' like they're on the internet.
+- Agents and dev servers die when the laptop closes. My workspaces should feel like they're on the internet. `app.dev.example.com` in a real browser, from any machine should be reachable by only me.
 - I had perfectly good compute sitting around (m1 mac mini, 2016 TB MBP, NZXT prebuild 3080TI) and wanted to use each machine for what it does best.
 - I wanted moving between them to feel like a seamless development experience rather than a collection of boxes I had to babysit.
+
+Of course, why not "just SSH and port-forward". You're right, it works. But fails the moment a browser, cookie, or teammate-shaped future shows up.
 
 So I networked my machines together, gave their apps real names and trusted HTTPS, and made the whole setup easy for both me and my agents to reach.
 
@@ -31,26 +33,61 @@ And of utmost importance, was doing all of that without any of it being exposed 
   ![A tinfoil hat man with a thumbs up](/images/articles/tin-foil-hat.gif)
 </div>
 
-## My requirements for the design.
+## Requirements that drove the design
 
-My acceptance criteria can basically be boiled down to a statement: I want a **secure**, always-on hub for AI agents. It should foster long running terminals, tests, CI, and local web apps. It's important to consider that I'll primarily be working from a laptop (my m4 mac mini) that sleeps and changes networks.
+My acceptance criteria can be boiled down to this: I want an always-on hub for AI agents that doesn't sacrifice **security**.
 
-Additionally, I want native Linux for when macOS is the wrong kernel for the use case and to avoid the bloat that comes with turning my mini into a hypervisor.
+It should foster long running terminals, tests, CI, and local web apps. It's important to consider that I'll primarily be working from a laptop that sleeps and changes networks.
 
-As open and local models advance, I want local GPU inference that doesn't live on a public API.
+I should have native Linux for when macOS is the wrong kernel for the use case. I dont want to deal with the bloat that comes with turning my mini into a hypervisor.
+
+Lower priority, if my meager machine can drive it, I want local GPU inference that doesn't live on a public API.
 
 For my web-facing projects, browser-trusted HTTPS and readable hostnames was priority. Insecure origin browsers are too much of a tax in 2026.
 
-Lastly, and probably most importantly **ZERO PUBLIC INGRESS**. This includes port-forwarding and funnels.
+**ZERO PUBLIC INGRESS**. This includes port-forwarding and funnels.
 
-## Translating requirements to technical constraints
+## Translating requirements to decisions
 
-## The three-layer mental model
+### The three-layer mental model
 
-The method to materializing ... is to split three jobs that people usually smash together:
+The approach hinges on understanding the roles of the three layers that work together:
 
 | Job                                  | Layer                                           |
 | ------------------------------------ | ----------------------------------------------- |
 | Who is this device, and may it talk? | Tailscale (identity, WireGuard, policy)         |
 | What is this app called?             | Public DNS pointing at a Tailscale address      |
 | How does a browser reach it?         | Caddy on the Tailscale IP, proxying to loopback |
+
+#### Tailscale is identity not just "the VPN"
+
+A traditional VPN is a tunnel into a network: connect to a gateway, gain access to the machines behind it. Tailscale adds a control plane on top: it builds a [WireGuard-based mesh](https://tailscale.com/docs/concepts/wireguard) in which each enrolled device:
+
+- has its own cryptographic identity and keypair
+- has a stable Taklscale IP from `100.64.0.0/10`
+- has a [MagicDNS](https://tailscale.com/docs/features/magicdns) name
+- integrates with your identity provider
+- is governed by central access ruels
+
+MagicDNS is the syntactic sugar making connections trival. `ssh user@<SOME.OPAQUE.IP>` becomes `ssh user@machine1`.
+
+#### Public DNS for private addresses
+
+I wanted names under a domain I control rather than
+MagicDNS names. So `*.dev.example.com` resolves in public DNS to the mini's
+Tailscale IPv4 address.
+
+That sounds like exposing the service, but DNS only tells a client which address belongs to a hostname; it does not
+proxy traffic or make that address reachable. A device outside my tailnet can
+look up `app.dev.example.com` and receive an address in `100.64.0.0/10`, but it
+has no route to that Tailscale peer and no identity authorized to connect to
+it. A device inside the tailnet follows the same DNS answer and can reach the
+mini directly over WireGuard.
+
+There is a hidden tradeoff here: names are public metadata. Anyone can query the DNS
+record, and publicly trusted certificates can expose hostnames through
+Certificate Transparency logs. I'm not running any stealth projects.. I am comfortable revealing a name exists;
+the boundary I care about is whether the service behind it is reachable.
+
+This split gives browsers ordinary, memorable hostnames while Tailscale still
+decides who can send traffic to them. Public name, private route.
