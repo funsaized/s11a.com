@@ -4,7 +4,7 @@ slug: private-development-cloud-tailscale
 excerpt: >-
   I wanted always-on agents, real HTTPS, and remote development that felt
   like the internet without exposing any of it on the internet. Here's where I landed.
-date: "2026-08-28"
+date: "2026-08-31"
 category: Cloud
 tags:
   - Tailscale
@@ -20,10 +20,10 @@ author: Sai Nimmagadda
 In the age of personalized software, I wanted a personal cloud. The idea came down to three things:
 
 - Agents and dev servers die when the laptop closes. My workspaces should feel like they're on the internet. `app.dev.example.com` in a real browser, from any machine should be reachable by only me.
-- I had perfectly good compute sitting around (m1 mac mini, 2016 TB MBP, NZXT prebuild 3080TI) and wanted to use each machine for what it does best.
+- I had perfectly good compute sitting around (M1 Mac mini, 2016 TB MBP, NZXT prebuild 3080 Ti) and wanted to use each machine for what it does best.
 - I wanted moving between them to feel like a seamless development experience rather than a collection of boxes I had to babysit.
 
-Of course, why not "just SSH and port-forward". You're right, it works. But fails the moment a browser, cookie, or teammate-shaped future shows up.
+Of course, why not "just SSH and port-forward"? You're right, it works. But it fails the moment a browser, cookie, or teammate-shaped future shows up.
 
 So I networked my machines together, gave their apps real names and trusted HTTPS, and made the whole setup easy for both me and my agents to reach.
 
@@ -39,15 +39,25 @@ My acceptance criteria can be boiled down to this: I want an always-on hub for A
 
 It should foster long running terminals, tests, CI, and local web apps. It's important to consider that I'll primarily be working from a laptop that sleeps and changes networks.
 
-I should have native Linux for when macOS is the wrong kernel for the use case. I dont want to deal with the bloat that comes with turning my mini into a hypervisor.
+I should have native Linux for when macOS is the wrong kernel for the use case. I don't want to deal with the bloat that comes with turning my mini into a hypervisor.
 
-Lower priority, if my meager machine can drive it, I want local GPU inference that doesn't live on a public API.
+If my meager machine can drive it, I want local GPU inference that doesn't live on a public API.
 
-For my web-facing projects, browser-trusted HTTPS and readable hostnames was priority. Insecure origin browsers are too much of a tax in 2026.
+For my web-facing projects, browser-trusted HTTPS and readable hostnames were a priority. Insecure origin browsers are too much of a tax in 2026.
 
 **ZERO PUBLIC INGRESS**. This includes port-forwarding and funnels.
 
 ## Translating requirements to decisions
+
+I always start projects by identifying requirements. Only after do I look for solutions. That keeps me from asking one product to solve every part of the problem. The requirements exercise ended up with this:
+
+| Constraint                        | Consequence                                                      |
+| --------------------------------- | ---------------------------------------------------------------- |
+| No public listeners               | Apps bind to loopback; the proxy binds to the Tailscale IP       |
+| Always-on work                    | Select machines stay awake while the others take specific roles  |
+| Real names and certificates       | Public DNS and ACME DNS-01, since there is no public port 80     |
+| Multiple machines, one namespace  | A wildcard for the hub and nested wildcards for additional hosts |
+| Laptops sleep and change networks | Mosh keeps the connection alive; Herdr keeps the workspace alive |
 
 ### The three-layer mental model
 
@@ -61,15 +71,17 @@ The approach hinges on understanding the roles of the three layers that work tog
 
 #### Tailscale is identity not just "the VPN"
 
-A traditional VPN is a tunnel into a network: connect to a gateway, gain access to the machines behind it. Tailscale adds a control plane on top: it builds a [WireGuard-based mesh](https://tailscale.com/docs/concepts/wireguard) in which each enrolled device:
+A traditional VPN is a tunnel into a network: you connect to a gateway and gain access to the machines behind it. Tailscale adds a control plane on top: it builds a [WireGuard-based mesh](https://tailscale.com/docs/concepts/wireguard) in which each enrolled device:
 
 - has its own cryptographic identity and keypair
-- has a stable Taklscale IP from `100.64.0.0/10`
+- has a stable Tailscale IP from `100.64.0.0/10`
 - has a [MagicDNS](https://tailscale.com/docs/features/magicdns) name
 - integrates with your identity provider
-- is governed by central access ruels
+- is governed by central access rules
 
-MagicDNS is the syntactic sugar making connections trival. `ssh user@<SOME.OPAQUE.IP>` becomes `ssh user@machine1`.
+MagicDNS is the syntactic sugar making connections trivial. `ssh user@<SOME.OPAQUE.IP>` becomes `ssh user@machine1`.
+
+My laptop talks directly to the mini, GPU workstation, or Linux laptop. The control plane handles identity, key exchange, discovery, and policy; WireGuard carries application traffic between peers. When a direct connection cannot get through NAT, a DERP server relays encrypted traffic without gaining access to it.
 
 #### Public DNS for private addresses
 
@@ -84,10 +96,129 @@ has no route to that Tailscale peer and no identity authorized to connect to
 it. A device inside the tailnet follows the same DNS answer and can reach the
 mini directly over WireGuard.
 
-There is a hidden tradeoff here: names are public metadata. Anyone can query the DNS
+There is a tradeoff here: names are public metadata. Anyone can query the DNS
 record, and publicly trusted certificates can expose hostnames through
-Certificate Transparency logs. I'm not running any stealth projects.. I am comfortable revealing a name exists;
+Certificate Transparency logs. I'm not running any stealth projects. I am comfortable revealing a name exists;
 the boundary I care about is whether the service behind it is reachable.
 
 This split gives browsers ordinary, memorable hostnames while Tailscale still
 decides who can send traffic to them. Public name, private route.
+
+![Request flow from a readable hostname through public DNS, a private WireGuard route, Caddy on the Tailscale address, and finally a loopback application](/images/articles/private-cloud-request-flow.svg)
+
+#### Caddy is the only intended ingress
+
+The applications themselves listen on `127.0.0.1`. Caddy listens on the mini's Tailscale address and reverse-proxies each hostname to the right loopback port.
+
+```caddy
+app.dev.example.com {
+    bind <TAILSCALE_IPV4>
+    reverse_proxy 127.0.0.1:8000
+
+    tls {
+        dns <DNS_PROVIDER> {env.DNS_API_TOKEN}
+    }
+}
+```
+
+Those two binds are the boundary. If the app listens on `0.0.0.0`, it may be reachable from networks I did not intend. If Caddy listens on the LAN address, the proxy has escaped the tailnet. Neither is necessary.
+
+HTTPS is not redundant here. Tailscale answers whether two devices may communicate. TLS proves to the browser that the process at the other end is allowed to call itself `app.dev.example.com`. Cookies, service workers, WebAuthn, and the rest of the secure-context web platform care about that proof.
+
+Since I refused public ingress, HTTP-01 certificate validation was out. DNS-01 lets Caddy request a certificate, publish the CA's TXT challenge through my DNS provider's API, and complete validation without opening port 80. The Caddy binary needs the module for that DNS provider, which may mean building it rather than installing the stock binary.
+
+The exact Caddy build, service definitions, and DNS records live in the [reference architecture gist](https://gist.github.com/funsaized/43d6f7bf40d52113616880ed85663560). They are implementation details. The durable rule is simpler: public name, private address, narrow bind, loopback app.
+
+## Machines have roles
+
+I ended up with four roles spread across the hardware I already owned:
+
+```text
+Client laptop    | editor, browser, Mosh; sleeps and changes networks
+Mac mini         | always-on hub; agents, sessions, and *.dev.example.com
+GPU workstation  | local models and observability; its own DNS subtree
+Linux laptop     | native Linux for work that needs the Linux kernel
+```
+
+The Mac mini is the operational center because it is quiet, low-power, and always on. Repositories, agents, dev servers, and long-running tests live there. It coordinates the work, but it is not a subnet router and does not need to become a hypervisor.
+
+The GPU workstation is a bounded compute tier. It can run quantized local models and keep the dashboards and metrics for those workloads close by. It also has different constraints. Model weights, container volumes, and metrics all compete for disk, and the GPU is happiest loading one model at a time. None of that makes it a second hub.
+
+The Linux laptop exists because sometimes the kernel is the feature. Making it a native Tailscale peer was less work than virtualizing Linux on the mini. It gets its own keypair, address, firewall, and application boundary like every other machine.
+
+Adding a machine did not create a new kind of network. It added a role to the mesh.
+
+## Persistent work, not persistent SSH
+
+Closing my laptop used to kill the agent running on it. The answer was not to stop closing the laptop. The agent should never have lived there.
+
+I treat remote work as four separate layers:
+
+| Layer         | Job                                                                          |
+| ------------- | ---------------------------------------------------------------------------- |
+| SSH           | Proves who I am to the shell and chooses the right key                       |
+| Mosh          | Keeps the connection usable through sleep, roaming, and network changes      |
+| Herdr         | Keeps agents, servers, tests, and logs running after the connection vanishes |
+| Remote editor | Keeps files and builds on the mini while the interface stays on my laptop    |
+
+[Mosh](https://mosh.org/) handles the unreliable pipe. It uses UDP, so the host firewall must allow its port range on the Tailscale interface. [Herdr](https://github.com/herdrdev/herdr) handles the durable workspace. When the laptop wakes up on another network, I reconnect to the same work instead of reconstructing it from shell history.
+
+Tailscale membership does not automatically grant shell access. Overlay identity and SSH identity remain separate. I still distribute keys deliberately, use key-only SSH, and set `IdentitiesOnly yes` so a crowded SSH agent does not try every key until the server responds with "Too many authentication failures."
+
+That separation is useful. SSH knows who opened the workspace. Mosh keeps a path to it. Herdr keeps it alive. The editor makes it comfortable. No one layer pretends to do all four jobs.
+
+## Growing the cloud
+
+A new app on the mini takes three steps:
+
+1. Bind it to `127.0.0.1`.
+2. Add a Caddy site bound to the Tailscale IP.
+3. Reload Caddy.
+
+The wildcard already points to the mini, so I do not add a DNS record for every dev server. The app receives a readable URL and a trusted certificate without becoming a new network listener.
+
+A host with its own ingress gets a nested wildcard instead of competing for the hub's flat namespace:
+
+```text
+*.dev.example.com         -> mini
+*.host1.dev.example.com   -> GPU workstation
+*.host2.dev.example.com   -> Linux laptop
+```
+
+DNS uses the closest matching wildcard, so `chat.host1.dev.example.com` resolves to the GPU workstation while `notes.dev.example.com` still resolves to the mini. Each host runs its own Caddy process, binds to its own Tailscale address, and enforces its own firewall. The same three layers repeat under a new subtree.
+
+Loopback comes first on the GPU host too. Ollama, Open WebUI, Grafana, Prometheus, and Dozzle do not become safe merely because they sit on a tailnet. A raw model API stays on loopback. A dashboard gets application authentication before it gets a vanity URL.
+
+As the number of apps grew, I split Caddy sites into `conf.d/*.caddy` and passed the Tailscale IP into each imported file. That is organization, not another architectural layer. The narrow bind remains the part that matters.
+
+## Private by routing is not private by policy
+
+This architecture is private by routing, not private by host policy. A device outside the tailnet has no path to the service. A device inside it can still reach whatever Tailscale ACLs, the host firewall, SSH, Caddy, and the application permit.
+
+I treat the boring controls as part of the setup rather than a hardening project for later:
+
+1. Every host uses key-only SSH. I verify access from a second machine before disabling passwords, and I keep a LAN recovery path before considering a Tailscale-only SSH bind.
+2. Host firewalls stay on. A successful `tailscale ping` proves that WireGuard can reach the peer, not that an application port is open or correctly restricted.
+3. Tailscale ACLs become explicit before another person or a less-trusted device joins. Default allow-all is convenient for one person, not a policy to grow into.
+4. Anything leaving loopback gets its own authentication. Open WebUI gets an admin account, Grafana loses anonymous admin, and raw Ollama remains private to the host.
+5. Recovery has a procedure. A stolen laptop means disabling its Tailscale node and rotating its SSH keys. A leaked DNS token gets revoked and replaced. An accidental `0.0.0.0` bind gets corrected, then tested from the LAN address.
+
+Public metadata and secrets also need different treatment. DNS names, certificate logs, and the existence of this architecture are public. DNS API tokens, tailnet names, usernames, real addresses, and unresolved security gaps are not.
+
+## What I refused
+
+The architecture became easier to reason about once I stopped making exceptions:
+
+- No Funnel or tunnel whose purpose is public reachability.
+- No router port forwarding.
+- No app bound to `0.0.0.0` "just for now."
+- No unauthenticated dashboard on a tailnet IP.
+- No second flat wildcard when another host joins.
+- No VM host on the mini just to get a Linux kernel.
+- No pretending MagicDNS device names are application URLs.
+
+Each refusal maps to an original constraint. If I intentionally publish something later, I can make a different decision for that service. It should be an exception I can point to, not an accidental property of the whole cloud.
+
+The result is a small cloud I control: agents that survive a closed lid, HTTPS that browsers trust, a GPU that is not an API vendor, and a Linux machine that is just another peer.
+
+If you want the sanitized cookbook, including the Caddyfiles, nested DNS records, SSH fragments, firewall notes, and ACL skeleton, it is in the [reference architecture gist](https://gist.github.com/funsaized/43d6f7bf40d52113616880ed85663560). This post is the method that made that cookbook inevitable.
