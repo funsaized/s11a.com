@@ -283,6 +283,8 @@ a:hover {
 .prose :where(h1, h2, h3, h4) {
   font-family: var(--font-display);
   font-weight: 550;
+  margin-top: 1.25em;
+  margin-bottom: 0.6em;
 }
 
 .prose :where(code)::before,
@@ -320,6 +322,7 @@ pre code {
   border-radius: var(--radius-code);
   background: var(--card);
   color: var(--foreground);
+  font-size: 0.75em;
 }
 
 /* Dual-theme Shiki (rehype-pretty-code). Toggle is .dark on <html>, not prefers-color-scheme.
