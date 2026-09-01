@@ -22,7 +22,11 @@ function Home() {
 						{"// morning pour — thoughts on software & life"}
 					</div>
 					<h1 className="mt-4 max-w-prose text-[clamp(28px,4vw,40px)] leading-[1.28]">
-						<TextType text="Hi, I'm Sai — a full‑stack engineer writing about healthcare tech, AI, and whatever else is brewing." />
+						<TextType text="Hi, I'm Sai." />{" "}
+						<div>
+							A full‑stack engineer writing about healthcare tech, AI, and
+							whatever else is brewing.{" "}
+						</div>
 					</h1>
 					<div className="mt-6 flex flex-wrap items-baseline gap-8 font-mono text-[13px]">
 						<Link
