@@ -132,7 +132,7 @@ function RouteComponent() {
 				type="search"
 				value={q}
 				onChange={(event) => setQuery(event.target.value)}
-				placeholder="search the shelf — title, tag, or topic…"
+				placeholder="search the shelf — title, tag, topic, or anything rly…"
 				aria-label="search the shelf"
 				className="mt-8 w-full rounded-input border border-border bg-card px-4 py-3.25 font-mono text-sm text-foreground focus:outline-none"
 			/>
