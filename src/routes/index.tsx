@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 
 import { Articles } from "#/components/Articles";
 import { Projects } from "#/components/Projects";
@@ -29,13 +29,13 @@ function Home() {
 						</div>
 					</h1>
 					<div className="mt-6 flex flex-wrap items-baseline gap-8 font-mono text-[13px]">
-						<Link
+						{/*<Link
 							to="/projects"
 							activeProps={{ className: "text-accent" }}
 							className="text-muted-foreground! [border-bottom:var(--rule-dotted)]"
 						>
 							view projects ↗
-						</Link>
+						</Link>*/}
 						<div className="text-faint">
 							<a
 								href="https://github.com/funsaized"
