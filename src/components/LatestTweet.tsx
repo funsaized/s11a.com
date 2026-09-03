@@ -51,12 +51,23 @@ function LatestTweetLoaded() {
 	return (
 		<NapkinFrame>
 			<div className="text-base text-faint">latest tweet ~</div>
-			<div>{tweet?.text ?? FALLBACK.text}</div>
-			<div className="text-lg font-semibold text-accent">
-				{tweet
-					? `-@FunSaized, ${timeAgo(tweet.createdAt)}`
-					: FALLBACK.attribution}
-			</div>
+			<a
+				href={
+					tweet
+						? `https://x.com/funsaized/status/${tweet.id}`
+						: "https://x.com/funsaized"
+				}
+				target="_blank"
+				rel="noreferrer"
+				className="row-link"
+			>
+				{tweet?.text ?? FALLBACK.text}
+				<div className="text-lg font-semibold">
+					{tweet
+						? `-@FunSaized, ${timeAgo(tweet.createdAt)}`
+						: FALLBACK.attribution}
+				</div>
+			</a>
 		</NapkinFrame>
 	);
 }
