@@ -2,10 +2,11 @@ import { ScriptOnce } from "@tanstack/react-router";
 
 const themeScript = `(function() {
   try {
-    const theme = localStorage.getItem('theme') || 'auto';
-    const resolved = theme === 'auto'
-      ? (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
-      : theme;
+    const stored = localStorage.getItem('theme');
+    const resolved = stored === 'light' || stored === 'dark'
+      ? stored
+      : (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    document.documentElement.classList.remove('light', 'dark', 'system', 'auto');
     document.documentElement.classList.add(resolved);
   } catch (e) {}
 })();`;

@@ -66,7 +66,7 @@ export function Header() {
 				<div className="flex flex-1 gap-4 justify-start">
 					<Link to="/" className="flex items-center space-x-2">
 						<CoffeeCup />
-						<span className="text-xxl text-foreground hover:text-accent font-semibold font-mono">
+						<span className="text-xl text-foreground hover:text-accent font-semibold font-mono">
 							s11a
 						</span>
 					</Link>

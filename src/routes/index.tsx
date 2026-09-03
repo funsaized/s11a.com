@@ -5,10 +5,17 @@ import { LatestTweet } from "#/components/LatestTweet";
 import { Projects } from "#/components/Projects";
 import { TextType } from "#/components/TextType";
 import { getArticlesMetadata } from "#/lib/article-metadata";
+import { buildHead } from "#/lib/seo";
 
 export const Route = createFileRoute("/")({
 	loader: () => getArticlesMetadata().slice(0, 6),
 	staleTime: Infinity,
+	head: () =>
+		buildHead({
+			path: "/",
+			description:
+				"A full-stack engineer writing about healthcare tech, AI, and whatever else is brewing.",
+		}),
 	component: Home,
 });
 
@@ -24,10 +31,10 @@ function Home() {
 					</div>
 					<h1 className="mt-4 max-w-prose text-[clamp(28px,4vw,40px)] leading-[1.28]">
 						<TextType text="Hi, I'm Sai." />{" "}
-						<div>
+						<span className="block">
 							A full‑stack engineer writing about healthcare tech, AI, and
 							whatever else is brewing.{" "}
-						</div>
+						</span>
 					</h1>
 					<div className="mt-6 flex flex-wrap items-baseline gap-8 font-mono text-[13px]">
 						{/*<Link
@@ -42,7 +49,7 @@ function Home() {
 								href="https://github.com/funsaized"
 								target="_blank"
 								rel="noreferrer"
-								className="text-faint no-underline"
+								className="text-faint no-underline hover:text-accent"
 							>
 								github
 							</a>
@@ -51,7 +58,7 @@ function Home() {
 								href="https://www.linkedin.com/in/sainimmagadda/"
 								target="_blank"
 								rel="noreferrer"
-								className="text-faint no-underline"
+								className="text-faint no-underline hover:text-accent"
 							>
 								linkedin
 							</a>
@@ -60,7 +67,7 @@ function Home() {
 								href="https://x.com/funsaized"
 								target="_blank"
 								rel="noreferrer"
-								className="text-faint no-underline"
+								className="text-faint no-underline hover:text-accent"
 							>
 								twitter
 							</a>
@@ -69,12 +76,15 @@ function Home() {
 								href="https://www.threads.net/@funsaized"
 								target="_blank"
 								rel="noreferrer"
-								className="text-faint no-underline"
+								className="text-faint no-underline hover:text-accent"
 							>
 								threads
 							</a>
 							{" · "}
-							<a href="/rss.xml" className="text-faint no-underline">
+							<a
+								href="/rss.xml"
+								className="text-faint no-underline hover:text-accent"
+							>
 								rss
 							</a>
 						</div>

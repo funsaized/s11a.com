@@ -25,7 +25,6 @@ const articleFrontmatterSchema = z.object({
 	category: z.enum(category),
 	tags: z.array(z.string()),
 	readingTime: z.string(),
-	featured: z.boolean(),
 	author: z.string(),
 });
 
