@@ -1,0 +1,45 @@
+---
+title: "Even LLMs have to Deal With Kernighan's Law"
+slug: llms-have-to-deal-with-kernighans
+excerpt: >-
+  I wanted always-on agents, real HTTPS, and remote development that felt
+  like the internet without exposing any of it on the internet. Here's where I landed.
+date: "2026-09-03"
+category: Cloud
+tags:
+  - LLM
+  - AI
+  - Agents
+readingTime: 3 min read
+author: Sai Nimmagadda
+---
+
+> Everyone knows that debugging is twice as hard as writing a program in the first place. So if you’re as clever as you can be when you write it, how will you ever debug it?
+
+_Brian Kernighan, 1974_
+
+This quote popped up in my feed recently, and it made me think about my latest hot take on frontier models:
+
+**No matter how smart a model is, it will eventually build systems it can no longer understand or maintain if you let it.**
+
+I've been exploring autonomous delivery systems in a few side projects. This past month, Fable 5 finally outbuilt itself and flailed for a week. Fable 5.1 seems like it will fix the immediate problem, but who knows how long it will be able to maintain the system it inherits.
+
+This is a low-risk project where I haven't looked at a lick of code. That makes it a good place to experiment, but the failure still made the problem obvious: autonomous tooling needs strong guardrails.
+
+## Exponential delivery and compounding complexity
+
+When LLMs hit the software scene, many people correctly understood that they could operate much more effectively than humans in complex, or even bad, codebases.
+
+What I think they missed emphasizing is that LLMs can also create bad code and complexity much faster than humans can.
+
+Those two capabilities are improving at different rates. Models get better with each generation at working in bad codebases, but they get much better at running unsupervised for long stretches and producing exceptionally complicated problems.
+
+The rate of complexity creation is outpacing the rate at which models improve at understanding that complexity.
+
+## This bugs me
+
+As someone who _needs_ to understand the nitty-gritty around an implementation, this has bugged me since agentic software delivery began. My knee-jerk reaction was to read and debug every line of AI-generated code so I could understand and own it. Full autonomy removes that safeguard by design.
+
+The problem gets worse on large teams, where the debt compounds superlinearly. More autonomous output does not merely mean more code to maintain. It means the system can become harder to understand faster than either the humans or the models responsible for it can keep up.
+
+A smarter model may recover from the previous model's mess. Fable 5.1 may even prove that in my side project. But recovery is not the same as maintainability, and another model generation does not repeal Kernighan's law. Without guardrails, every model eventually writes at the edge of its ability and leaves the debugging to a system that is not twice as capable.
