@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 
 import { Articles } from "#/components/Articles";
+import { LatestTweet } from "#/components/LatestTweet";
 import { Projects } from "#/components/Projects";
 import { TextType } from "#/components/TextType";
 import { getArticlesMetadata } from "#/lib/article-metadata";
@@ -80,21 +81,7 @@ function Home() {
 					</div>
 				</div>
 				<div className="relative h-70.75 w-67.5 shrink-0 select-none">
-					<img
-						src="/images/stain-ring.png"
-						alt=""
-						className="stain pointer-events-none absolute inset-0 size-full -rotate-12 object-cover"
-					/>
-					<div className="absolute inset-[84px_32px_80px_58px] -rotate-2 font-hand text-2xl text-center flex flex-col items-center justify-center">
-						<div className="text-base text-faint">latest tweet ~</div>
-						<div>
-							shipping a little forest that grows every time claude does my
-							chores 🌳
-						</div>
-						<div className="text-lg font-semibold text-accent">
-							-@funaized, 2h ago
-						</div>
-					</div>
+					<LatestTweet />
 				</div>
 			</section>
 			<section className="w-full pt-[clamp(36px,6vw,52px)] pb-10">
