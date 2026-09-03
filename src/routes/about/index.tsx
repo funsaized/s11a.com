@@ -1,6 +1,15 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 
+import { buildHead } from "#/lib/seo";
+
 export const Route = createFileRoute("/about/")({
+	head: () =>
+		buildHead({
+			title: "About",
+			path: "/about/",
+			description:
+				"Full-stack, platform, and AI-minded engineer building systems that scale from product UX to infrastructure.",
+		}),
 	component: RouteComponent,
 });
 
@@ -36,7 +45,7 @@ const desk: Definition[] = [
 	{ key: "laptop", value: 'MacBook Air 13" M4, 24GB RAM' },
 	{ key: "home server", value: "Mac Mini M1 (2020), 16GB RAM" },
 	{ key: "keyboard", value: "Keychron K2 HE Wireless" },
-	{ key: "this site", value: "TanStack Start + Tailwind, hosted on Netlify" },
+	{ key: "this site", value: "TanStack Start + Tailwind, hosted on Vercel" },
 ];
 
 function DefinitionList({ items }: { items: Definition[] }) {

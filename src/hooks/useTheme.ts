@@ -31,7 +31,7 @@ export function useTheme() {
 		const applyTheme = () => {
 			const resolvedTheme =
 				theme === "system" ? (mediaQuery.matches ? "dark" : "light") : theme;
-			root.classList.remove("light", "dark");
+			root.classList.remove("light", "dark", "system", "auto");
 			root.classList.add(resolvedTheme);
 		};
 

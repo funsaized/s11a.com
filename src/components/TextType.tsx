@@ -43,17 +43,11 @@ export function TextType({
 	}, [index, reducedMotion, text, typingSpeed]);
 
 	return (
-		<span
-			className="inline-block whitespace-pre-wrap tracking-tight"
-			aria-label={text}
-		>
-			<span className="inline">
+		<span className="inline-block whitespace-pre-wrap tracking-tight">
+			<span className="sr-only">{text}</span>
+			<span aria-hidden="true">
 				{reducedMotion ? text : displayedText}
-				<span
-					aria-hidden="true"
-					className="text-type-caret"
-					data-caret={cursorCharacter}
-				/>
+				<span className="text-type-caret" data-caret={cursorCharacter} />
 			</span>
 		</span>
 	);
