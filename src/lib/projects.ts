@@ -93,6 +93,17 @@ export const projects: Project[] = [
 		badge: "new",
 	},
 	{
+		icon: "🌊",
+		title: "Kanagawa Zed Theme",
+		path: "https://github.com/funsaized/kanagawa-zed-theme",
+		source: "https://github.com/funsaized/kanagawa-zed-theme",
+		description:
+			"Kanagawa Wave dark theme with blur/transparency effects for Zed.",
+		status: "active",
+		year: 2026,
+		category: "Zed extension",
+	},
+	{
 		icon: "🌅",
 		title: "Eventide",
 		path: "https://eventide.s11a.com",
