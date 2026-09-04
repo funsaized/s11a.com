@@ -154,7 +154,7 @@ export function WorkTree() {
 				</Link>
 			</div>
 			<p className="mt-2 font-mono text-[13px] text-faint">
-				open source, on the counter
+				sometimes I build things...
 			</p>
 			<div className="mt-6">
 				<p className="mb-1 font-mono text-[13px] text-faint">Work</p>
