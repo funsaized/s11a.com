@@ -2,8 +2,8 @@ import { createFileRoute } from "@tanstack/react-router";
 
 import { Articles } from "#/components/Articles";
 import { LatestTweet } from "#/components/LatestTweet";
-import { Projects } from "#/components/Projects";
 import { TextType } from "#/components/TextType";
+import { WorkTree } from "#/components/WorkTree";
 import { getArticlesMetadata } from "#/lib/article-metadata";
 import { buildHead } from "#/lib/seo";
 
@@ -98,7 +98,7 @@ function Home() {
 				<Articles articles={articles} />
 			</section>
 			<section className="w-full pb-10">
-				<Projects />
+				<WorkTree />
 			</section>
 		</div>
 	);
