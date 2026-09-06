@@ -28,18 +28,6 @@ export const projects: Project[] = [
 		badge: "building",
 	},
 	{
-		icon: "🌳",
-		title: "arbord",
-		path: "https://arbord.dev",
-		source: "https://github.com/funsaized/arbord",
-		description:
-			"Track every claude & codex session. Watch usage. Grow a forest. Shipping Fall '26",
-		status: "active",
-		year: 2026,
-		category: "Developer tools",
-		badge: "building",
-	},
-	{
 		icon: "🧑‍🍳",
 		title: "herdr-mise",
 		path: "https://github.com/funsaized/herdr-mise",
