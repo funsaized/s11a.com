@@ -18,19 +18,23 @@ featured: true
 author: Sai Nimmagadda
 ---
 
-Yes it's 2026 and my site was still on Gatsby. I admittedly am a holdout. When it hit the scene and gained traction ~2015 I was **hooked**. Blazingly fast static sites that unified markdown, headless CMS, and APIs into an extendable platform. It made development feel powerful and fun. But since, its ownership and maintenance has been tumultuous, and the web has moved towards SSR and partial hydration.
+Yes it's 2026 and my site was still on Gatsby. Admittedly I am a holdout. When the framework hit the scene ~2015 I was **hooked**. Blazingly fast static sites that unified markdown, headless CMS, and APIs into an extendable platform. It made development feel powerful and fun. But since, its ownership and maintenance has been tumultuous, and the web has moved towards SSR and partial hydration.
 
 This site wasn't broken. Gatsby was serving its purpose. But the last major update was November 2022. I'd been pigeonholed into React 18, MDX v2, and a clunky GraphQL data layer around local MDX files. On top of that, continual CVE overrides meant keeping the site working had become an unbounded maintenance task.
 
 ## Motivations behind the plan
 
-I lock decisions before starting things... or at least have a rough backlog of options to iterate on at each inflection point in whatever is being built.
+Before starting things I strive to lock decisions... or at least have a backlog of options to iterate on at each inflection point in whatever I'm building.
 
-I knew I wanted to get going with TanStack. I regularly work with the NextJS stack in my day-to-day. For my personal things, I figured it would be a good time to build my comfort working in a framework with better DX and a faster moving featureset.
+I knew I wanted to get going with TanStack. I regularly work with the NextJS stack in my day-to-day. For my personal things, I figured it would be a good time to build my comfort working in a framework with better DX and a faster moving featureset. I didn't quite have a handle on how I would get markdown -> React components in a factory pattern. But bundlers have come a long way and a quick chat with some agents & reading github's showed me the way.
 
-Nowadays Vite does most of the heavy lifting that Gatsby extensions did. Some basic digging revealed to me that the plugin `mdx-js/rollup` can completely replace the GraphQL layer around my blog posts. With some extensions of its own, it can parse MDX into components, handle frontmatter and heading ID generation for a table of contents, and generate code highlighting and HTML transforms. Developing an understanding of `mdx-js/rollup` in tandem with `remark-mdx-frontmatter/remark-frontmatter`, `rehype-slug` allowed me to drop the GraphQL complexity from my stack.
+### Vite lifts. I configure
+
+It became clear to me Vite can do most of the heavy lifting that Gatsby and the extension ecosystem did. `mdx-js/rollup` can completely replace the GraphQL layer I was using to statically render and lazily-load my blog posts. With some extensions `mdx-js/rollup` can parse MDX into components, handle frontmatter and heading ID generation, and generate code highlighting and HTML transforms. I ended up writing a quick extension to parse the headings into a table of contents. Developing an understanding of `mdx-js/rollup` in tandem with `remark-mdx-frontmatter/remark-frontmatter`, `rehype-slug` allowed me to drop the GraphQL complexity from my stack.
 
 ### Mapping Gatsby patterns to TanStack
+
+Mentally I found these parallels when thinking about old blog vs new blog:
 
 | Gatsby                                  | TanStack Start                                           |
 | --------------------------------------- | -------------------------------------------------------- |
@@ -39,12 +43,13 @@ Nowadays Vite does most of the heavy lifting that Gatsby extensions did. Some ba
 | page / static queries                   | route `loader` + `staleTime: Infinity`                   |
 | `gatsby-plugin-mdx` v2                  | `@mdx-js/rollup` + MDX v3                                |
 | Prism + hand-maintained theme CSS       | `rehype-pretty-code` / Shiki (lotus / dragon)            |
-| `scripts/validate-content.ts`           | Zod at glob parse time                                   |
 | `HeadFC` / SEO component                | route `head` + `seo.ts`                                  |
 | `gatsby-ssr` theme anti-flash           | `ScriptOnce` in `ThemeProvider`                          |
 | `gatsby-plugin-feed` / sitemap / robots | `rss[.]xml.ts`, `sitemap[.]xml.ts`                       |
 | webpack aliases in `gatsby-node`        | `tsconfig` paths + Vite `tsconfigPaths`                  |
 | 4× `useState` on `/articles`            | `validateSearch` (`q`, `category`)                       |
 | `Layout.tsx` wrap                       | `__root.tsx` `shellComponent`                            |
-| `gatsby-plugin-google-gtag`             | `analytics.ts`                                           |
+| `gatsby-plugin-google-gtag`             | `analytics.ts` (simple gtag script)                      |
 | (none — static only)                    | `createServerFn` + Query for views and tweets            |
+
+Look at that, a plugin wold where I had to bounce between docs and APIs becomes Typescript + Vite :).
