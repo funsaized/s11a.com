@@ -17,6 +17,10 @@ function timeAgo(iso: string) {
 	return `${Math.round(hours / 24)}d ago`;
 }
 
+function napkinCopy(text: string) {
+	return text.replace(/\s*https?:\/\/\S+/g, "").trim();
+}
+
 function NapkinFrame({ children }: { children: ReactNode }) {
 	return (
 		<>
@@ -25,7 +29,7 @@ function NapkinFrame({ children }: { children: ReactNode }) {
 				alt=""
 				className="stain pointer-events-none absolute inset-0 size-full -rotate-12 object-cover"
 			/>
-			<div className="absolute inset-[84px_32px_80px_58px] -rotate-2 font-hand text-2xl text-center flex flex-col items-center justify-center gap-2">
+			<div className="absolute inset-[64px_44px_68px_48px] flex flex-col items-center justify-center gap-1 overflow-hidden -rotate-2 text-center font-hand">
 				{children}
 			</div>
 		</>
@@ -48,9 +52,12 @@ function LatestTweetLoaded() {
 
 	if (isPending) return <TweetSkeleton />;
 
+	const text = napkinCopy(tweet?.text ?? FALLBACK.text);
+	const long = text.length > 120;
+
 	return (
 		<NapkinFrame>
-			<div className="text-base text-faint">latest tweet ~</div>
+			<div className="shrink-0 text-base text-faint">latest tweet ~</div>
 			<a
 				href={
 					tweet
@@ -59,10 +66,18 @@ function LatestTweetLoaded() {
 				}
 				target="_blank"
 				rel="noreferrer"
-				className="row-link"
+				className="row-link min-h-0 w-full"
 			>
-				{tweet?.text ?? FALLBACK.text}
-				<div className="text-lg font-semibold">
+				<span
+					className={
+						long
+							? "line-clamp-4 wrap-break-words text-lg leading-tight"
+							: "line-clamp-3 text-2xl leading-snug"
+					}
+				>
+					{text}
+				</span>
+				<div className="mt-0.5 shrink-0 text-lg font-semibold">
 					{tweet
 						? `-@FunSaized, ${timeAgo(tweet.createdAt)}`
 						: FALLBACK.attribution}
