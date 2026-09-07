@@ -1,0 +1,50 @@
+---
+title: "Why I Left Gatsby: Migrating a Blog to TanStack Start"
+slug: migrating-gatsby-to-tanstack-start
+excerpt: >-
+  Gatsby 5 is a frozen framework wrapping GraphQL
+  around twenty local files. Here's why I left it and what
+  actually mapped onto TanStack Start.
+date: "2026-09-07"
+category: Frontend
+tags:
+  - TanStack
+  - Gatsby
+  - Vite
+  - MDX
+  - Migration
+readingTime: 10 min read
+featured: true
+author: Sai Nimmagadda
+---
+
+Yes it's 2026 and my site was still on Gatsby. I admittedly am a holdout. When it hit the scene and gained traction ~2015 I was **hooked**. Blazingly fast static sites that unified markdown, headless CMS, and APIs into an extendable platform. It made development feel powerful and fun. But since, its ownership and maintenance has been tumultuous, and the web has moved towards SSR and partial hydration.
+
+This site wasn't broken. Gatsby was serving its purpose. But the last major update was November 2022. I'd been pigeonholed into React 18, MDX v2, and a clunky GraphQL data layer around local MDX files. On top of that, continual CVE overrides meant keeping the site working had become an unbounded maintenance task.
+
+## Motivations behind the plan
+
+I lock decisions before starting things... or at least have a rough backlog of options to iterate on at each inflection point in whatever is being built.
+
+I knew I wanted to get going with TanStack. I regularly work with the NextJS stack in my day-to-day. For my personal things, I figured it would be a good time to build my comfort working in a framework with better DX and a faster moving featureset.
+
+Nowadays Vite does most of the heavy lifting that Gatsby extensions did. Some basic digging revealed to me that the plugin `mdx-js/rollup` can completely replace the GraphQL layer around my blog posts. With some extensions of its own, it can parse MDX into components, handle frontmatter and heading ID generation for a table of contents, and generate code highlighting and HTML transforms. Developing an understanding of `mdx-js/rollup` in tandem with `remark-mdx-frontmatter/remark-frontmatter`, `rehype-slug` allowed me to drop the GraphQL complexity from my stack.
+
+### Mapping Gatsby patterns to TanStack
+
+| Gatsby                                  | TanStack Start                                           |
+| --------------------------------------- | -------------------------------------------------------- |
+| `gatsby-source-filesystem` + `allMdx`   | `import.meta.glob` + Zod in `article-metadata.ts`        |
+| `gatsby-node` `createPages`             | `src/routes/articles/$slug.tsx` + `prerender.crawlLinks` |
+| page / static queries                   | route `loader` + `staleTime: Infinity`                   |
+| `gatsby-plugin-mdx` v2                  | `@mdx-js/rollup` + MDX v3                                |
+| Prism + hand-maintained theme CSS       | `rehype-pretty-code` / Shiki (lotus / dragon)            |
+| `scripts/validate-content.ts`           | Zod at glob parse time                                   |
+| `HeadFC` / SEO component                | route `head` + `seo.ts`                                  |
+| `gatsby-ssr` theme anti-flash           | `ScriptOnce` in `ThemeProvider`                          |
+| `gatsby-plugin-feed` / sitemap / robots | `rss[.]xml.ts`, `sitemap[.]xml.ts`                       |
+| webpack aliases in `gatsby-node`        | `tsconfig` paths + Vite `tsconfigPaths`                  |
+| 4× `useState` on `/articles`            | `validateSearch` (`q`, `category`)                       |
+| `Layout.tsx` wrap                       | `__root.tsx` `shellComponent`                            |
+| `gatsby-plugin-google-gtag`             | `analytics.ts`                                           |
+| (none — static only)                    | `createServerFn` + Query for views and tweets            |
