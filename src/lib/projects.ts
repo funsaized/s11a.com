@@ -18,7 +18,7 @@ export const projects: Project[] = [
 	{
 		icon: "✏️",
 		title: "stet",
-		path: "https://github.com/funsaized/stet",
+		path: "https://stetkit.com",
 		source: "https://github.com/funsaized/stet",
 		description:
 			"Hand-sketched margin marks on live UI. Add circles, highlights, arrows, notes, and proofreader marks without replacing your controls or layout",
