@@ -292,11 +292,12 @@ a:hover {
 }
 
 .prose :not(pre) > code {
-  font-size: 0.9em;
+  font-size: 0.82em;
+  font-weight: 400;
   border: 1px solid var(--line);
   background: color-mix(in oklab, var(--surface-strong) 82%, white 18%);
   border-radius: 7px;
-  padding: 2px 7px;
+  padding: 1px 5px;
 }
 
 code {
