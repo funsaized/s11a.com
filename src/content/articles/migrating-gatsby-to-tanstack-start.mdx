@@ -1,0 +1,121 @@
+---
+title: "Why I Left Gatsby: Migrating a Blog to TanStack Start"
+slug: migrating-gatsby-to-tanstack-start
+excerpt: >-
+  I was wrapping GraphQL
+  around twenty local files and using a frozen framework. Here's why I left it and what
+  mapped onto TanStack Start.
+date: "2026-09-08"
+category: Frontend
+tags:
+  - TanStack
+  - Gatsby
+  - Vite
+  - MDX
+  - Migration
+readingTime: 10 min read
+featured: true
+author: Sai Nimmagadda
+---
+
+Yes it's 2026 and my site was still on Gatsby. Admittedly I am a holdout. When the framework hit the scene cerca 2015 I was **hooked**. Blazingly fast static sites that unified markdown, headless CMS, and APIs into an extendable platform. It made development feel powerful and fun.
+
+There's just something about 'wheels included' frameworks that also let you take apart the system that draws me in. But since, its ownership and maintenance has been tumultuous, and the web has moved towards SSR and partial hydration.
+
+## Motivations behind the plan
+
+This site wasn't broken. Gatsby was serving its purpose. But the last major update was November 2022. I'd been pigeonholed into React 18, MDX v2, and a clunky GraphQL data layer around local MDX files. On top of that, continual CVE overrides meant keeping the site working had become an unbounded maintenance task.
+
+Before starting things I strive to lock decisions... or at least have a backlog of options to iterate on at each inflection point in whatever I'm building.
+
+I knew I wanted to get going with TanStack. I regularly work with the NextJS stack in my day-to-day. For my personal things, I figured it would be a good time to build my comfort working in a framework with better DX and a faster moving featureset.
+
+## Starting a conversation
+
+I didn't quite have a handle on how I would get markdown -> React components in a factory pattern. But bundlers have come a long way and a quick chat with some agents & reading github's showed me the way.
+
+I started a converstation with an agen to hash out the details. I asked it some questions around SSR vs SSG and replacing SEO and Gatsby extensions. I didn't want to overcomplicate the scope, so I presented the Gatsby -> TanStack migration as an in-place rewrite to preserve the old 'sticky-note' theme I had this site skinned with.
+
+I got [this BACKLOG file](https://github.com/funsaized/s11a.com/pull/281/changes#diff-7f701df4f6df68d27ece71f732a0866a2add4a78e4e0c3d42849780820f65530) back for the entire migration and treated it as syllabus of concepts to learn.
+
+### A note on using AI
+
+At this point, I could have handed the plan off to an agent and let it run. But the real goal was the journey: rewriting this site in TanStack Start patterns is the experience through which I'm actually learning.
+
+I ended up creating a throwaway TanStack spike app at `scratch/start-spike` to explore file routes, loaders for static metadata, and query parameters as state. This pattern is the backbone behind the [articles](https://blog.nzxt.dev.s11a.com/articles) page searh box.
+
+### Vite lifts. I configure
+
+It became clear to me Vite can do most of the heavy lifting that Gatsby and the extension ecosystem did. `mdx-js/rollup` can completely replace the GraphQL layer I was using to statically render and lazily-load my blog posts. With some extensions `mdx-js/rollup` can parse MDX into components, handle frontmatter and heading ID generation, and generate code highlighting and HTML transforms. I ended up writing a quick extension to parse the headings into a table of contents. Developing an understanding of `mdx-js/rollup` in tandem with `remark-mdx-frontmatter/remark-frontmatter`, `rehype-slug` allowed me to drop the GraphQL complexity from my stack.
+
+### Mapping Gatsby patterns to TanStack
+
+Mentally I found these parallels when thinking about Gatsby vs TanStack:
+
+| Gatsby                                  | TanStack Start                                           |
+| --------------------------------------- | -------------------------------------------------------- |
+| `gatsby-source-filesystem` + `allMdx`   | `import.meta.glob` + Zod in `article-metadata.ts`        |
+| `gatsby-node` `createPages`             | `src/routes/articles/$slug.tsx` + `prerender.crawlLinks` |
+| page / static queries                   | route `loader` + `staleTime: Infinity`                   |
+| `gatsby-plugin-mdx` v2                  | `@mdx-js/rollup` + MDX v3                                |
+| Prism + hand-maintained theme CSS       | `rehype-pretty-code` / Shiki (lotus / dragon)            |
+| `HeadFC` / SEO component                | route `head` + `seo.ts`                                  |
+| `gatsby-ssr` theme anti-flash           | `ScriptOnce` in `ThemeProvider`                          |
+| `gatsby-plugin-feed` / sitemap / robots | `rss[.]xml.ts`, `sitemap[.]xml.ts`                       |
+| webpack aliases in `gatsby-node`        | `tsconfig` paths + Vite `tsconfigPaths`                  |
+| 4× `useState` on `/articles`            | `validateSearch` (`q`, `category`)                       |
+| `Layout.tsx` wrap                       | `__root.tsx` `shellComponent`                            |
+| `gatsby-plugin-google-gtag`             | `analytics.ts` (simple gtag script)                      |
+| tweeets (none — static only)            | `createServerFn` + Query for views and tweets            |
+
+#### Less is more... or less can now handle more
+
+What a nice table! A plugin-based wild-west where I had to bounce between docs and APIs becomes Typescript + Vite with some TanStack syntactic sugar :).
+
+Before, I was using a hand-baked script in `gatsby-node.js` to enumerate slugs at build time and call `createPage` via Gatsby. This was exposed to the app via a GraphQL layer, which bought syntax but not power.
+
+With TanStack, filtering articles is a glob path, and `crawlLinks: true` in `fileRoutes` lets me serve static pages from the filesystem. Using loaders to return metadata only with proper caching allows Frontmatter to be cached indefinitely.
+
+A simple wrap of the MDX component behind one Suspense boundary makes article list and detail pages snappy.
+
+There are two details hidden in that mapping. First, a `$slug` route is only a template. Start does not enumerate its possible values for me. The articles index links every concrete slug, so `crawlLinks: true` discovers and prerenders them. If an article is not linked from a prerendered page, it does not get static HTML. Gatsby made that enumeration more explicit with `createPage`.
+
+Second, loaders only return serializable metadata. Frontmatter and the generated table of contents can be cached forever, but a compiled React component cannot travel in loader data. The separate lazy glob is what keeps that boundary clean. Query stays out of the content pipeline for the same reason: it belongs to changing server state, not immutable build input.
+
+## Don't rewrite in place
+
+The spike was only the first part of the migration method. I left the Gatsby SOURCE app at the repository root and built the TanStack TARGET app beside it in `scratch/s11a.com`. Each app had its own `package.json`, lockfile, and Node version. TARGET's `"type": "module"` could not accidentally break SOURCE's CommonJS `gatsby-node.js`, and the Gatsby site stayed deployable while I figured out Start.
+
+From there, each kind of state got one home. Static article metadata went into route loaders with `staleTime: Infinity`. Article bodies stayed in a separate lazy glob because compiled React components are not serializable loader data. Search and category went into the URL. View counts and tweets, the data that actually changes at runtime, went through `createServerFn` and TanStack Query.
+
+The content contract stayed the same. Frontmatter's `slug` is the URL; the filename is just a filename. That is why `building-a-personal-development-cloud.mdx` can serve `/articles/private-development-cloud-tailscale`. Canonical URLs and RSS GUIDs use that slug and keep their trailing slash.
+
+Once TARGET rendered the existing URLs, cutover became a delete. [Commit `39b5a40`](https://github.com/funsaized/s11a.com/commit/39b5a40) removed Gatsby and promoted TARGET to the repository root.
+
+## What the move bought
+
+The local development loop is the most immediate difference. `vite dev` gets out of the way compared with `gatsby develop`, and typed links make a broken internal route a type error instead of a 404 after deployment.
+
+The dependency cleanup was even better. The five security overrides disappeared with Gatsby. The project moved from Node 22 to 24, React 18 to 19, MDX 2 to 3, and Tailwind's old PostCSS setup to the v4 Vite plugin. Prettier and ESLint gave way to Oxfmt and Oxlint. Leaving Gatsby was the security patch.
+
+The blog is still static where that makes sense. Article routes prerender to HTML, while view counts and the latest tweet load through server functions without blocking the article. Gatsby would have needed another plugin or a client-only request without the same shared type boundary.
+
+The article filters improved too. The old page held search, category, selected tags, and pagination in four `useState` calls. The new page validates `q` and `category` as search parameters, so `/articles?q=batch&category=Backend` is shareable and survives a refresh.
+
+I own the MDX pipeline now. Frontmatter validation, heading IDs, Shiki themes, and table-of-contents depth are local choices.
+
+## The tradeoffs
+
+RSS and sitemap XML are string-built route responses. The table of contents is a custom rehype transform. There is no `gatsby-plugin-*` maintainer between me and the next spec change. Development of the XML producers was an exercise in agentic coding and reading the open specs.
+
+I also decided to take the time to move off Netlify to Vercel. The shipped site runs through Nitro and stores runtime data in Upstash Redis.
+
+This means hosting is no longer just static files on a CDN plus a TOML file. Server functions wanted a backend, so the operational surface is larger than the setup I praised in [my 2019 Netlify post](/articles/migrating-my-hosting-to-netlify).
+
+I skipped Gatsby's image pipeline as well. Article images remain in `public/images/articles` with no `gatsby-plugin-image` or build-time transforms. That is fine for now. If image weight becomes a problem, I can add a pipeline then.
+
+## What I'd repeat
+
+For another migration, I would follow the same order: spike the unknown conventions, keep SOURCE deployable, build TARGET beside it, lock decisions long enough to make progress, and make cutover a deletion.
+
+Gatsby was the right engine for this blog for years. Then it froze while the maintenance work kept growing. This wasn't a framework war. It was a way out that kept the working site until its replacement was ready.
