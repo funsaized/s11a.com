@@ -29,7 +29,7 @@ function NapkinFrame({ children }: { children: ReactNode }) {
 				alt=""
 				className="stain pointer-events-none absolute inset-0 size-full -rotate-12 object-cover"
 			/>
-			<div className="absolute inset-[64px_44px_68px_48px] flex flex-col items-center justify-center gap-1 overflow-hidden -rotate-2 text-center font-hand">
+			<div className="absolute inset-[10px_44px_68px_52px] flex flex-col items-center justify-center gap-1 overflow-hidden -rotate-2 text-center font-hand">
 				{children}
 			</div>
 		</>
