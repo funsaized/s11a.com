@@ -54,7 +54,7 @@ const desk: Definition[] = [
 
 function DefinitionList({ items }: { items: Definition[] }) {
 	return (
-		<dl>
+		<dl className="border-t border-dotted border-border">
 			{items.map((item) => (
 				<div
 					key={item.key}
@@ -75,22 +75,35 @@ function RouteComponent() {
 		<div className="mx-auto w-full max-w-prose px-[clamp(18px,4vw,24px)] pt-[clamp(44px,7vw,72px)] pb-12">
 			<section>
 				<div className="flex justify-center">
-					<div className="size-[140px] shrink-0 overflow-hidden rounded-full select-none">
-						<img
-							src="/images/me.jpg"
-							alt="Sai Nimmagadda"
-							className="pointer-events-none size-full object-cover"
+					<div className="relative size-[188px] select-none">
+						<div
+							className="absolute -inset-2.5 rounded-full [border:var(--rule-dotted)]"
+							aria-hidden
 						/>
+						<div className="size-full overflow-hidden rounded-full shadow-[0_12px_32px_var(--glow)]">
+							<img
+								src="/images/me.jpg"
+								alt="Sai Nimmagadda"
+								width={188}
+								height={188}
+								className="pointer-events-none size-full object-cover"
+							/>
+						</div>
 					</div>
 				</div>
-				<h1 className="mt-7 mb-2.5 text-center text-[40px]">About me</h1>
-				<p className="mx-auto max-w-[520px] text-center italic text-muted-foreground">
+				<div className="mt-7 text-center font-mono text-[13px] font-medium tracking-[0.14em] text-accent">
+					{"// behind the pour"}
+				</div>
+				<h1 className="mt-3 mb-2.5 text-center text-[clamp(34px,5vw,48px)] leading-[1.15]">
+					About me
+				</h1>
+				<p className="mx-auto max-w-[520px] text-center text-xl font-medium italic text-muted-foreground">
 					Full-stack, platform, and AI-minded engineer building systems that
 					scale from product UX to infrastructure
 				</p>
 				<div className="mt-10 mb-8 [border-top:var(--rule-dotted)]" />
 				<div className="space-y-[22px]">
-					<p>
+					<p className="text-[21px] leading-[1.55]">
 						I&apos;m a full-stack software engineer with a BSE in Electrical and
 						Computer Engineering and Biomedical Engineering from{" "}
 						<strong>Duke University</strong>. My work spans product-facing web
@@ -111,12 +124,16 @@ function RouteComponent() {
 			</section>
 
 			<section>
-				<h2 className="mt-12 mb-2 text-[26px]">Core expertise</h2>
+				<h2 className="mt-12 mb-1 text-[26px]">Core expertise</h2>
+				<p className="mb-4 font-mono text-[13px] text-faint">
+					what I reach for
+				</p>
 				<DefinitionList items={expertise} />
 			</section>
 
 			<section>
-				<h2 className="mt-12 mb-2 text-[26px]">The desk</h2>
+				<h2 className="mt-12 mb-1 text-[26px]">The desk</h2>
+				<p className="mb-4 font-mono text-[13px] text-faint">on the counter</p>
 				<DefinitionList items={desk} />
 			</section>
 
@@ -125,7 +142,7 @@ function RouteComponent() {
 					&ldquo;The best way to learn is through collaboration with
 					others.&rdquo;
 				</p>
-				<footer className="mt-3 font-mono text-xs text-faint">
+				<footer className="mt-3 font-hand text-lg text-faint">
 					sharing is caring — open source, knowledge, community
 				</footer>
 			</blockquote>
@@ -135,7 +152,7 @@ function RouteComponent() {
 					href="https://github.com/funsaized"
 					target="_blank"
 					rel="noreferrer"
-					className="text-faint no-underline"
+					className="text-faint no-underline hover:text-accent"
 				>
 					github
 				</a>
@@ -144,7 +161,7 @@ function RouteComponent() {
 					href="https://www.linkedin.com/in/sainimmagadda/"
 					target="_blank"
 					rel="noreferrer"
-					className="text-faint no-underline"
+					className="text-faint no-underline hover:text-accent"
 				>
 					linkedin
 				</a>
