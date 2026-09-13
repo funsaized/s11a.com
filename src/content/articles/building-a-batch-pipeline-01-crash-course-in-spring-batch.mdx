@@ -2,7 +2,7 @@
 title: 'Building a batch pipeline with Java #1: crash course in Spring Batch'
 slug: building-a-batch-pipeline-01-crash-course-in-spring-batch
 excerpt: >-
-  The last post took look at a Spring Batch project template to get off the
+  The last post took a look at a Spring Batch project template to get off the
   ground quickly. In this series we're going to take it a step further and use
   the...
 date: '2021-06-04'
@@ -17,7 +17,7 @@ author: Sai Nimmagadda
 
 ---
 
-The last post took look at a Spring Batch project template to get off the ground quickly. In this series we're going to take it a step further and use the starter to build out a batch job. We won't focus too much here on the implementation of the framework itself ([docs do a good job of that](https://docs.spring.io/spring-batch/docs/4.3.x/reference/html/domain.html#domainLanguageOfBatch)), but rather practical descriptions and use-cases to quickly enable yourself to build robust batch jobs for enterprise apps.
+The last post took a look at a Spring Batch project template to get off the ground quickly. In this series we're going to take it a step further and use the starter to build out a batch job. We won't focus too much here on the implementation of the framework itself ([docs do a good job of that](https://docs.spring.io/spring-batch/docs/4.3.x/reference/html/domain.html#domainLanguageOfBatch)), but rather practical descriptions and use-cases to quickly enable yourself to build robust batch jobs for enterprise apps.
 
 ## Prerequisites
 
@@ -99,12 +99,12 @@ You'll want to be familiar with the process of defining and fine tuning a step. 
 
 #### Chunky steps?
 
-**Understanding the *chunk-oriented* processing style Spring Batch uses is essential for efficient jobs.** In a nutshell, this means that many individual reads occur until the number reads is equal to the 'commit interval' (chunksize). At this point, the entire set of items (chunk) is written to the configured output. If you're familiar with database operations, this is effectively reading and writing within a transaction boundary. Because it is operationally expensive to start/stop a transaction, it is preferable to process as many items as possible within each transaction. This sequence diagram and pseudocode from Spring's docs illustrate this process:
+**Understanding the *chunk-oriented* processing style Spring Batch uses is essential for efficient jobs.** In a nutshell, this means that many individual reads occur until the number of reads is equal to the 'commit interval' (chunk size). At this point, the entire set of items (chunk) is written to the configured output. If you're familiar with database operations, this is effectively reading and writing within a transaction boundary. Because it is operationally expensive to start/stop a transaction, it is preferable to process as many items as possible within each transaction. This sequence diagram and pseudocode from Spring's docs illustrate this process:
 
 ![Spring batch chunk oriented processing sequence diagram](/images/articles/chunk_oriented_processing.png)
 
 ```java
-List items = new Arraylist();
+List items = new ArrayList();
 for(int i = 0; i < commitInterval; i++){
     Object item = itemReader.read();
     if (item != null) {
@@ -112,7 +112,7 @@ for(int i = 0; i < commitInterval; i++){
     }
 }
 
-List processedItems = new Arraylist();
+List processedItems = new ArrayList();
 for(Object item: items){
     Object processedItem = itemProcessor.process(item);
     if (processedItem != null) {
@@ -233,7 +233,7 @@ public Step step1() {
 }
 ```
 
-You simply define a class that implements the `Tasklet` interface. This interface has a single method that needs to be defined, `execute(...)`, that is called repeatedly until it returns `RepeatStatus.FINISHED`. A common pattern in the early/late steps of a job is to run some DDL to clear a schema before writing. This could be done by in a `Tasklet`:
+You simply define a class that implements the `Tasklet` interface. This interface has a single method that needs to be defined, `execute(...)`, that is called repeatedly until it returns `RepeatStatus.FINISHED`. A common pattern in the early/late steps of a job is to run some DDL to clear a schema before writing. This could be done in a `Tasklet`:
 
 ```java
 public class SetupTasklet implements Tasklet {
@@ -269,7 +269,7 @@ public interface ItemReader<T> {
 
 This simplicity allows for easy extensibility and reuse. Spring provides a number of readers for different datasources such as streams, SQL/NoSQL, flat files, and more that will fit the majority of use cases.
 
-### the `ItemProcessor` interface
+### The `ItemProcessor` interface
 
 Not all steps require processing or complex transformations of data. An [`ItemProcessor`](https://docs.spring.io/spring-batch/docs/current/api/org/springframework/batch/item/ItemProcessor.html) comes in handy when you need to perform some specific calculations, filtering, or apply business logic on the dataset. The processor interface definition is below:
 
@@ -280,7 +280,7 @@ public interface ItemProcessor<I, O> {
 }
 ```
 
-It operates on an input object of type `I` and and returns an object `O`. This allows for transformations if necessary. To illustrate how to define an `ItemProcessor`, let's return to the previous scenario of a CSV of names. In this scenario, we want to capitalize all the names. This is a perfect (simple) example of some business logic that could live in a processor!
+It operates on an input object of type `I` and returns an object `O`. This allows for transformations if necessary. To illustrate how to define an `ItemProcessor`, let's return to the previous scenario of a CSV of names. In this scenario, we want to capitalize all the names. This is a perfect (simple) example of some business logic that could live in a processor!
 
 ```java
 public class PersonItemProcessor implements ItemProcessor<Person, Person> {
@@ -315,4 +315,4 @@ public interface ItemWriter<T> {
 
 ## Summary
 
-We've touched on the basics of configuring jobs and the inner workings of a step in Spring Batch which should enable you to start writing some batch jobs. All-things-spring have a boatload of configuration options and tools to speed up implementation and reduce boilerplate code, so I encourage you to take advantage of the ecosystem. The official docs present some additional useful tools like listeners and parallel processing options that may improve the quality your job. In the next post we will take this basis to develop and run a full pipeline E2E.
+We've touched on the basics of configuring jobs and the inner workings of a step in Spring Batch which should enable you to start writing some batch jobs. All-things-spring have a boatload of configuration options and tools to speed up implementation and reduce boilerplate code, so I encourage you to take advantage of the ecosystem. The official docs present some additional useful tools like listeners and parallel processing options that may improve the quality of your job. In the next post we will take this basis to develop and run a full pipeline E2E.

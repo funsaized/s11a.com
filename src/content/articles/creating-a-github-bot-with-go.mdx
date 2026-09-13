@@ -1,5 +1,5 @@
 ---
-title: Building a github bot with Go
+title: Building a GitHub bot with Go
 slug: creating-a-github-bot-with-go
 excerpt: >-
   Recently I started digging around looking to automate some simple tasks that
@@ -16,7 +16,7 @@ author: Sai Nimmagadda
 
 ---
 
-Recently I started digging around looking to automate some simple tasks that were being repeated as part of a release management process for a bunch of microservices. [The Github API](https://docs.github.com/en/rest) offers a lot, so I was hoping to use it build something to respond to events. The last couple months have been **packed** with scheduled deployments. When it comes time for a release, release-XXX branches are cut in each repository. There are _a lot_ of services hosted in their own repos. If a change gets pushed to a release branch, it needs to be merged down into master. Normally doing this locally looks something like this:
+Recently I started digging around looking to automate some simple tasks that were being repeated as part of a release management process for a bunch of microservices. [The Github API](https://docs.github.com/en/rest) offers a lot, so I was hoping to use it to build something to respond to events. The last couple months have been **packed** with scheduled deployments. When it comes time for a release, release-XXX branches are cut in each repository. There are _a lot_ of services hosted in their own repos. If a change gets pushed to a release branch, it needs to be merged down into master. Normally doing this locally looks something like this:
 
 ```bash
 git pull
@@ -31,11 +31,11 @@ This is simple enough but becomes more of an issue when you have to do this for 
 
 We will cover:
 
-- How to setup a Github app
+- How to set up a Github app
 - How to authenticate and use the Github API
 - The basics of `http.Transport`
 - How to create a bot to respond to Github webhooks
-- How to package & deploy (on a kubernetes cluster)
+- How to package & deploy (on a Kubernetes cluster)
 
 The bot's full source can be [found here](https://github.com/funsaized/github-PR-automation). The scope of this post will go over some background and construction of the core functionality.
 
@@ -43,11 +43,11 @@ The bot's full source can be [found here](https://github.com/funsaized/github-PR
 
 #### A quick note about Github Actions
 
-It's worth mentioning Github Actions also has some capabilities to create pull requests and commits between branches without needing to write code. We operate on an older enterprise version of Github without actions available, so an app was the way to automate things in this case. This bot has very small footprint and we already had a k8s cluster so hosting this thing there was logical. The app-based approach also has the ability to be installed at an organization level to monitor many repos, whereas Github Actions need to be configured at a repository level. You might event want to think about hosting something similar to this as a serverless solution for an even lighter footprint..
+It's worth mentioning Github Actions also has some capabilities to create pull requests and commits between branches without needing to write code. We operate on an older enterprise version of Github without actions available, so an app was the way to automate things in this case. This bot has a very small footprint and we already had a k8s cluster so hosting this thing there was logical. The app-based approach also has the ability to be installed at an organization level to monitor many repos, whereas Github Actions need to be configured at a repository level. You might even want to think about hosting something similar to this as a serverless solution for an even lighter footprint.
 
 ## Github App setup essentials
 
-In order to automate, we'll need to build an application that can perform actions in response to something happening. Github publishes some handy [events](https://docs.github.com/en/developers/webhooks-and-events/events/github-event-types) that apps can subscribe to. At it's core, the bot we're going to build is a web server that will interpret and respond to these events to do something useful. The process of creating a Github app is relatively straightforward and outlined in depth [here](https://docs.github.com/en/developers/apps/building-github-apps/creating-a-github-app).
+In order to automate, we'll need to build an application that can perform actions in response to something happening. Github publishes some handy [events](https://docs.github.com/en/developers/webhooks-and-events/events/github-event-types) that apps can subscribe to. At its core, the bot we're going to build is a web server that will interpret and respond to these events to do something useful. The process of creating a Github app is relatively straightforward and outlined in depth [here](https://docs.github.com/en/developers/apps/building-github-apps/creating-a-github-app).
 
 Set the homepage & callback URL to anything (don't need them for our bot's purposes). However, make sure webhooks are set to active. For the webhook URL, I recommend heading over to [smee.io](https://smee.io) to generate a development webhook URL to start. Smee provides a handy node package we can run to receive forwarded events. During development, smee will act as the middleman to allow our localhost to receive Github event payloads. When the bot is ready to be deployed, we will change the webhook URL to our deployment's domain name. When it comes time to develop, a more detailed description to run your bot locally can be found [here](https://github.com/funsaized/github-PR-automation#usage).
 
@@ -57,7 +57,7 @@ On the permissions page request read/write access to Repository level _Contents_
 
 Go ahead and create the app. Make sure to generate and save a private key (.pem) since that will serve as the auth mechanism. With the app ID and private key in hand, that's it for registering the app!
 
-The bot will perform its "actions" via the API. Some of those actions will require authentication. So lets take a look at how to authenticate as a client of Github's services.
+The bot will perform its "actions" via the API. Some of those actions will require authentication. So let's take a look at how to authenticate as a client of Github's services.
 
 ## Authenticating
 
@@ -92,11 +92,11 @@ Notice the above request is to the `/app/installations` endpoint. This is import
 
 ### How to translate this to code
 
-Now, we could write our own methods to send the request for an access token and manage expiration. But why reinvent the wheel? There's an elegant open-source solution that I want to highlight. It's makes calling the API with minimal Go code simple and satisfying.
+Now, we could write our own methods to send the request for an access token and manage expiration. But why reinvent the wheel? There's an elegant open-source solution that I want to highlight. It makes calling the API with minimal Go code simple and satisfying.
 
-Bradley Falzon's [ghinstallation](https://github.com/bradleyfalzon/ghinstallation) is an awesome example of how powerful a robust `stdlib` like the one Go packs can be. The package provides "authentication as an installation" for [go-github](https://github.com/google/go-github). ghinstallation leverages the fact that the go-github library's backbone is built using the `http.Client`. That means we can give the `go-github` library a custom `http.Client`, say one that handle's authentication internally, and not have to worry about authenticating. This is exactly what ghinstallation gives us. Using these two libraries in tandem we get free authentication/refresh capability and methods for the majority of endpoints in Github's API.
+Bradley Falzon's [ghinstallation](https://github.com/bradleyfalzon/ghinstallation) is an awesome example of how powerful a robust `stdlib` like the one Go packs can be. The package provides "authentication as an installation" for [go-github](https://github.com/google/go-github). ghinstallation leverages the fact that the go-github library's backbone is built using the `http.Client`. That means we can give the `go-github` library a custom `http.Client`, say one that handles authentication internally, and not have to worry about authenticating. This is exactly what ghinstallation gives us. Using these two libraries in tandem we get free authentication/refresh capability and methods for the majority of endpoints in Github's API.
 
-**This is cool!** Internally ghinstallation provides an implementation of the [`http.RoundTripper`](https://golang.org/pkg/net/http/#Transport.RoundTrip) interface, named a `Transport`. I like to think of a `http.RoundTripper` as Go's somewhat equivalent of middleware for the `http.Client`. The `RoundTripper` runs the HTTP transaction and returns the response, meaning we can put logic in the `RoundTrip(*Request)` function and it wil execute before a response is obtained. Every request sent using the go-github library will use this `Transport` from ghinstallation. The `Transport` implements `RoundTrip` by stamping an access token on each request:
+**This is cool!** Internally ghinstallation provides an implementation of the [`http.RoundTripper`](https://golang.org/pkg/net/http/#Transport.RoundTrip) interface, named a `Transport`. I like to think of a `http.RoundTripper` as Go's somewhat equivalent of middleware for the `http.Client`. The `RoundTripper` runs the HTTP transaction and returns the response, meaning we can put logic in the `RoundTrip(*Request)` function and it will execute before a response is obtained. Every request sent using the go-github library will use this `Transport` from ghinstallation. The `Transport` implements `RoundTrip` by stamping an access token on each request:
 
 ```go
 type Transport struct {
@@ -129,7 +129,7 @@ ghinstallation also takes care of refreshing behind the scenes (the method `t.To
 
 Now that we have some background on the "how" of authentication with some Go code, the go code to do it can be broken down into two steps:
 
-1. Create a `Transport` (`ghinstallation.RoundTripper`) and a `http.Client` that uses that transport as it's `RoundTipper`
+1. Create a `Transport` (`ghinstallation.RoundTripper`) and a `http.Client` that uses that transport as its `RoundTripper`
 2. Create a go-github client
 
 Creating an authenticated github client with these two libraries looks something like this (shown for enterprise clients, see the full source for the slight variation to create a github.com client):
@@ -152,7 +152,7 @@ That's it! No fiddling with claims, reading files manually, parsing private keys
 
 ## Responding to webhook events
 
-At it's core our 'bot' is going to be a simple server that can respond to a HTTP request payload. To run a quick web server with Go you can just register a handler function on the default mux:
+At its core our 'bot' is going to be a simple server that can respond to an HTTP request payload. To run a quick web server with Go you can just register a handler function on the default mux:
 
 ```go
 http.HandleFunc("/", Handle)
@@ -196,7 +196,7 @@ func Handle(response http.ResponseWriter, request *http.Request) {
   go processEvent(&payload)
  default:
   log.Println("missing handler")
-  log.Printf("receieved release payload of type %v", payload)
+  log.Printf("received release payload of type %v", payload)
  }
 
  response.WriteHeader(http.StatusOK)
@@ -209,12 +209,12 @@ To make our release management easier, the `processEvent` function we write shou
 
 - Whenever a commit is made to the release branch we'll want to create a PR from that branch to master.
 - We should assign reviewers based on the recent committers to the branch.
-- I'm going to take an extra (optional) step and actually create a branhc of the release branch before creating the PR. This will make sure we don't accidentally merge master into release (sometimes Github's UI presents a "This branch is out of date..." message). All of this can be done via Github's API.
+- I'm going to take an extra (optional) step and actually create a branch of the release branch before creating the PR. This will make sure we don't accidentally merge master into release (sometimes Github's UI presents a "This branch is out of date..." message). All of this can be done via Github's API.
 
 For each action, here are the corresponding endpoint(s) needed:
 
 - **Create a pull request: [Create PR](https://docs.github.com/en/rest/reference/pulls#create-a-pull-request)**
-- **Assign reviewers:** I' chose to do this by getting authors who contributed to the branch with **[list commits](https://docs.github.com/en/rest/reference/repos#list-commits)** and followed by **[request reviewers](https://docs.github.com/en/rest/reference/pulls#review-requests)**
+- **Assign reviewers:** I chose to do this by getting authors who contributed to the branch with **[list commits](https://docs.github.com/en/rest/reference/repos#list-commits)** and followed by **[request reviewers](https://docs.github.com/en/rest/reference/pulls#review-requests)**
 - **Checkout a branch: [Create a reference](https://docs.github.com/en/rest/reference/git#create-a-reference)**
 
 Using libraries the actions above translate to writing minimal code. The `processEvent` method to run whenever a commit is made to the release is below with [full source here](https://github.com/funsaized/github-PR-automation/tree/master/pkg/client):
@@ -263,11 +263,11 @@ func processEvent(p *ghwebhooks.PushPayload) {
 }
 ```
 
-The last steps to create a running app is to start a HTTP server using the `Handle` function above.
+The last step to create a running app is to start an HTTP server using the `Handle` function above.
 
 ## Deploying and watching the automation 👀
 
-Docker and kubernetes makes deploying an app like this quick. The Dockerfile definition is below. Pretty standard:
+Docker and Kubernetes make deploying an app like this quick. The Dockerfile definition is below. Pretty standard:
 
 ```docker
 FROM golang
@@ -317,4 +317,4 @@ Executing the yaml will create a deployment and a service. Don't forget to creat
 
 ## Summary
 
-To keep this post digestible I've left out a decent bit of implementation. Hopefully it gives folks some direction on building similar apps. If you're looking for more detail around the implementation I encourage you to check out the [full source](https://github.com/funsaized/github-PR-automation) or reach out of you have any questions.
+To keep this post digestible I've left out a decent bit of implementation. Hopefully it gives folks some direction on building similar apps. If you're looking for more detail around the implementation I encourage you to check out the [full source](https://github.com/funsaized/github-PR-automation) or reach out if you have any questions.

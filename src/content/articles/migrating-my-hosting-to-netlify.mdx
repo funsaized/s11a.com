@@ -34,7 +34,7 @@ I chose to follow the `New site from Git` track to quickly get a version of my s
 
 Netlify then kicked off the build (since I had committed the file to master) and my site was live at http://s11a.netlify.com. CI/CD with no effort is the best kind!
 
-Peeking at Netlify's settings, I saw it had some Git integrations enabled by default. I immediately enabled them all and created a PR to test. Deploy comment's and checks! Ooh ahh CI/CD:
+Peeking at Netlify's settings, I saw it had some Git integrations enabled by default. I immediately enabled them all and created a PR to test. Deploy comments and checks! Ooh ahh CI/CD:
 
 ![](/images/articles/netlifyPR.png)
 
@@ -44,7 +44,7 @@ Next I wanted to have Netlify host my site at my custom domain. After taking dow
 ## Route53 -> Netlify DNS
 I think parts of Netlify's docs are a perfect example of when minimal is too minimal, but their [migration docs](https://docs.netlify.com/domains-https/netlify-dns/) do a decent enough job explaining the process for a number of migration methods. In my case, I wanted to keep AWS as my registrar but use Netlify's DNS service. From reading  some of their suggested migration strategies, this seemed the easiest way to get started hosting.
 
-I started with [Netlify DNS](https://www.netlify.com/blog/2017/12/19/an-easier-way-to-manage-domains-and-dns-on-netlify/) (still in beta), so there was really only a few steps to get the site up at a custom domain:
+I started with [Netlify DNS](https://www.netlify.com/blog/2017/12/19/an-easier-way-to-manage-domains-and-dns-on-netlify/) (still in beta), so there were really only a few steps to get the site up at a custom domain:
 
 1. Add the domain to Netlify
 2. Update AWS Route53 hosted zone (NS, SOA)

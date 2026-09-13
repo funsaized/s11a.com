@@ -17,18 +17,18 @@ author: Sai Nimmagadda
 ---
 
 I recently started poking at the developer experience of the Node.js world. As a Java dev by day, I wanted to learn the JS community patterns on a lower level. I went through the exercise of standing up an Express.js + Passport.js server for a project
-and surprisingly didn't find a consensus pattern to test an app using Oauth 2.0 for authorization. Many docs were helpful, but dated.
-Therefore, approach here outlines the path I took: a Passport.js strategy to functionally test protected routes without making HTTP requests to the authentication provider.
+and surprisingly didn't find a consensus pattern to test an app using OAuth 2.0 for authorization. Many docs were helpful, but dated.
+Therefore, the approach here outlines the path I took: a Passport.js strategy to functionally test protected routes without making HTTP requests to the authentication provider.
 
 ## Prerequisites
 
 - Node.js/Express application
-- Passport.js + an Oauth 2.0 authentication strategy (here we use Github)
+- Passport.js + an OAuth 2.0 authentication strategy (here we use Github)
 - Bun (used here for ease of running & testing)
 
 ## The problem
 
-I wrote a little app with an option to sign-up using Github, and wanted to write functional tests. Testing protected routes using a [delegated sign-in](https://web.archive.org/web/20160322014955/http://hueniverse.com/2009/04/16/introducing-sign-in-with-twitter-oauth-style-connect/) generally requires making HTTP requests to the authentication provider. If you recall, the OAuth 2.0 authorization code flow[^1]:
+I wrote a little app with an option to sign up using Github, and wanted to write functional tests. Testing protected routes using a [delegated sign-in](https://web.archive.org/web/20160322014955/http://hueniverse.com/2009/04/16/introducing-sign-in-with-twitter-oauth-style-connect/) generally requires making HTTP requests to the authentication provider. If you recall, the OAuth 2.0 authorization code flow[^1]:
 
 ![Oauth 2.0 authorization code flow](/images/articles/oauth2-authorization-code-flow.png)
 
@@ -57,7 +57,7 @@ app.post(
 );
 ```
 
-## Recapping the Oauth2 setup
+## Recapping the OAuth 2.0 setup
 
 I'll skip the majority of the Express setup & configuration to focus on the testing approach.
 For reference, the full application and quick start can be found [here](https://github.com/funsaized/express-passport-github-oauth2-functional-testing).
@@ -197,7 +197,7 @@ const environmentStrategy = (store: any): passport.Strategy => {
 };
 ```
 
-That's really all there is to it. You can now write tests for your protected routes. Endpoints will be still be protected by the passport middleware, but the strategy will be mocked, making authenticating before each test case a simple procedure.
+That's really all there is to it. You can now write tests for your protected routes. Endpoints will still be protected by the passport middleware, but the strategy will be mocked, making authenticating before each test case a simple procedure.
 [For example, using the `supertest` library](https://github.com/funsaized/express-passport-github-oauth2-functional-testing/blob/main/test/users.test.ts):
 
 ```typescript

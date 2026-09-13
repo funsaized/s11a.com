@@ -1,5 +1,5 @@
 ---
-title: Making garlic bot more random with a self scheduling serverless function
+title: Making garlic bot more random with a self-scheduling serverless function
 slug: making-garlic-bot-more-random-with-a-self-scheduling-serverless-function
 excerpt: >-
   On a snowy day a while back I threw together a project to explore serverless
@@ -22,7 +22,7 @@ On a snowy day a while back I threw together a project to explore serverless fun
 
 ![Garlic bot twitter profile](/images/articles/garlic_bot_twitter.png)
 
-It has a problem though: *it isn't totally random*. The tweet selection is random enough - it uses the [search tweets](https://developer.twitter.com/en/docs/twitter-api/search-overview) API using the keyword `garlic` to pick an arbitrary tweet in the result set. The function to search & retweet runs once every 90 minutes. This is orchestrated via a [CloudWatch](https://docs.aws.amazon.com/AmazonCloudWatch/latest/events/WhatIsCloudWatchEvents.html) rule that triggers in a fixed rate of 90 minutes. Indeed, this is the part that bugs me: the trigger is deterministic (isn't random at all).
+It has a problem though: *it isn't totally random*. The tweet selection is random enough - it uses the [search tweets](https://developer.twitter.com/en/docs/twitter-api/search-overview) API using the keyword `garlic` to pick an arbitrary tweet in the result set. The function to search & retweet runs once every 90 minutes. This is orchestrated via a [CloudWatch](https://docs.aws.amazon.com/AmazonCloudWatch/latest/events/WhatIsCloudWatchEvents.html) rule that triggers at a fixed rate of 90 minutes. Indeed, this is the part that bugs me: the trigger is deterministic (isn't random at all).
 
 In a stroke of luck I stumbled on [this article](https://blog.bitsrc.io/aws-lambda-function-that-dynamically-schedules-its-next-runtime-e971fca6b6f6) demonstrating a lambda function that triggers itself. The solution centers around using a lambda function to create its own CloudWatch rule & attach itself as the target. When the rule is triggered, the lambda is triggered, and the process repeats. Using this premise I realized I could make Garlic bot truly tweet when it feels like it because each invocation schedules the next!
 
@@ -142,7 +142,7 @@ module.exports = {
 
 For brevity I'm only showing the scheduling logic that runs within the lambda. Full [handler code can be found here](https://github.com/funsaized/garlic-bot) but that's really it!
 
-As mentioned, it adds an element of randomness to the schedule by using the `Math.Random()` function to get the number of minutes to add to the current time:
+As mentioned, it adds an element of randomness to the schedule by using the `Math.random()` function to get the number of minutes to add to the current time:
 
 ```javascript
 function between(min, max) {

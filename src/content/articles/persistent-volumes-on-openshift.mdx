@@ -28,7 +28,7 @@ In today’s day and age there are countless ways to deploy and serve files on t
 ## The Tools
 #### Openshift
 
-The tutorial here assumes you have an instance of Openshift deployed and a project running on your infrastructure of choice. If you don’t currently have a running cluster, I would recommend checking out Redhat’s developer preview [here](https://try.openshift.com/) which can be easily set up on AWS or setting up a [minishift cluster](https://github.com/minishift/minishift). At the time of writing this images were deployed on an instance of Openshift running openshift v3.9.
+The tutorial here assumes you have an instance of Openshift deployed and a project running on your infrastructure of choice. If you don’t currently have a running cluster, I would recommend checking out Red Hat’s developer preview [here](https://try.openshift.com/) which can be easily set up on AWS or setting up a [minishift cluster](https://github.com/minishift/minishift). At the time of writing this images were deployed on an instance of Openshift running openshift v3.9.
 
 #### NGINX
 
@@ -52,10 +52,10 @@ ADD index.html /var/www/static/index.html
 
 WORKDIR /usr/src
 
-# support running as arbitrary user which belogs to the root group
+# support running as arbitrary user which belongs to the root group
 RUN chmod -R g+rwx /var/cache/nginx /var/run /var/log/nginx /usr/share/nginx/html /var/www/static
 
-# users are not allowed to listen on priviliged ports
+# users are not allowed to listen on privileged ports
 RUN sed -i.bak 's/listen\(.*\)80;/listen 8081;/' /etc/nginx/conf.d/default.conf
 EXPOSE 8081
 
@@ -167,7 +167,7 @@ Note: Running oc get pvc will also verify that the volume has been successfully 
 
 
 ## Uploading and accessing static content
-At this point we have a running NGINX web server attached to a persistent volume and its time to finally add the content we would like to serve. To do this we are going to use the oc rsh command combined with tar. First we get the name of the pod mounted to the volume using the oc get pods command. In this example our pod is named `nginx-static-5c89688f44-nkrxj` so we’ll package the contents of the pdf directory and copy the files to the volume using the command
+At this point we have a running NGINX web server attached to a persistent volume and it's time to finally add the content we would like to serve. To do this we are going to use the oc rsh command combined with tar. First we get the name of the pod mounted to the volume using the oc get pods command. In this example our pod is named `nginx-static-5c89688f44-nkrxj` so we’ll package the contents of the pdf directory and copy the files to the volume using the command
 
 ```
 tar cf - . | oc rsh nginx-static-5c89688f44-nkrxj tar xofC - /var/www/static --no-overwrite-dir
@@ -191,4 +191,4 @@ As a review, we’ve successfully:
 * Uploaded documents to the created PV
 * Served the documents over the web via the custom NGINX image
 
-I encourage you to use this walk through as a starter for implementing something similar within your own use case. What I’ve touched on here barely scratches the surface of what is possible with NGINX.
+I encourage you to use this walkthrough as a starter for implementing something similar within your own use case. What I’ve touched on here barely scratches the surface of what is possible with NGINX.

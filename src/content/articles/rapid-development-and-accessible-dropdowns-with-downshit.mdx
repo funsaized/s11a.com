@@ -19,7 +19,7 @@ author: Sai Nimmagadda
 
 ## Flexible and fast development
 
-Admittedly I'm probably a bit late to the game on this one, but I stumbled on downshift and have been impressed! Developing with it feels _fast_. It offers so many features out of the box and uses render props. Render props are great because they decouple implementation details with the content being rendered, and after using this for a couple hours I am thrilled with the low-level control this puts in a developer's hands. Lets take this example, building a dropdown that searches a backend onChange:
+Admittedly I'm probably a bit late to the game on this one, but I stumbled on downshift and have been impressed! Developing with it feels _fast_. It offers so many features out of the box and uses render props. Render props are great because they decouple implementation details from the content being rendered, and after using this for a couple hours I am thrilled with the low-level control this puts in a developer's hands. Let's take this example, building a dropdown that searches a backend onChange:
 
 ```jsx
   render() {
@@ -100,6 +100,6 @@ Some high-level things to note:
 
 -   We are using the optional props `isOpen`, `inputValue` and `highlightedIndex` to enhance the user experience of our dropdown component
 
--   We have ommitted `getRootProps`. This is an important prop and recommended to provide a fully accessible experience with screen readers.
+-   We have omitted `getRootProps`. This is an important prop and recommended to provide a fully accessible experience with screen readers.
 
-That's really all there is to it. Downshift is a primitive that fits into any component or existing implementation because of how flexibile the API is. Easy WAI-ARIA compliance win with alot of power.
+That's really all there is to it. Downshift is a primitive that fits into any component or existing implementation because of how flexible the API is. Easy WAI-ARIA compliance win with a lot of power.

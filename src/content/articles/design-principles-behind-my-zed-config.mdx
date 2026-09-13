@@ -17,7 +17,7 @@ author: Sai Nimmagadda
 ---
 
 I've been a VSCode user for years. I even [wrote about my setup](/articles/my-custom-operator-mono-vscode-setup) — Operator Mono, sidebar on the right, the whole thing. But Zed has been pulling me in. 
-It's native, it's genuinely fast in a way that Electron apps just aren't, and the configuration surface is surprisingly deep. Its also completely open - if you want a feature just hack away.
+It's native, it's genuinely fast in a way that Electron apps just aren't, and the configuration surface is surprisingly deep. It's also completely open - if you want a feature, just hack away.
 
 
 After a few months of daily driving it, my `settings.json` has grown into something intentional enough to document.
@@ -110,7 +110,7 @@ If you stare at something 8+ hours a day, the font matters. Long live Operator M
 
 The split between UI font and buffer font is intentional. [Zed Sans](https://zed.dev/blog/zed-decoded-the-design) was designed specifically for editor chrome — it's legible at small sizes for panels, tabs, and status bars. [Operator Mono](https://typography.com/blog/introducing-operator) is where I want to spend my reading time, in the actual code buffer. The `SSm Lig` variant adds font ligatures using [kiliman's project](https://github.com/kiliman/operator-mono-lig).
 
-The `"comfortable"` line height gives breathing room between lines without feeling wasteful.Operator Mono's italics do the heavy lifting for visual distinction (more on that below).
+The `"comfortable"` line height gives breathing room between lines without feeling wasteful. Operator Mono's italics do the heavy lifting for visual distinction (more on that below).
 
 The terminal gets its own font config too:
 
@@ -296,7 +296,7 @@ Prettier runs on save globally. For JavaScript, TypeScript, and TSX, I also run 
 }
 ```
 
-For JSON, CSS, SCSS, HTML, and Markdown, Prettier is configured as an external formatter since these don't need ESLint. The per-language `tab_size: 2` override is importat, as the JS/TS ecosystem has standardized on 2.
+For JSON, CSS, SCSS, HTML, and Markdown, Prettier is configured as an external formatter since these don't need ESLint. The per-language `tab_size: 2` override is important, as the JS/TS ecosystem has standardized on 2.
 
 ### TypeScript LSP
 

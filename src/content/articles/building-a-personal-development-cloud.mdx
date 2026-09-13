@@ -26,7 +26,7 @@ Of course, why not "just SSH and port-forward"? You're right, it works. But it f
 
 So I networked my machines together, gave their apps real names and trusted HTTPS, and made the whole setup easy for both me and my agents to reach.
 
-And of utmost importance, was doing all of that without any of it being exposed to the public internet.
+And of utmost importance was doing all of that without any of it being exposed to the public internet.
 
 <div style={{ display: "flex", justifyContent: "center" }}>
   ![A tinfoil hat man with a thumbs up](/images/articles/tin-foil-hat.gif)
@@ -68,7 +68,7 @@ The approach hinges on understanding the roles of the three layers that work tog
 | What is this app called?                | Public DNS pointing at a Tailscale address      |
 | How does a browser reach it?            | Caddy on the Tailscale IP, proxying to loopback |
 
-#### Tailscale is identity not just "the VPN"
+#### Tailscale is identity, not just "the VPN"
 
 A traditional VPN is a tunnel into a network: you connect to a gateway and gain access to the machines behind it. Tailscale adds a control plane on top: it builds a [WireGuard-based mesh](https://tailscale.com/docs/concepts/wireguard) in which each enrolled device:
 
@@ -118,9 +118,9 @@ app.dev.example.com {
 }
 ```
 
-Those two binds are the boundary. If the app listens on `0.0.0.0`, it may be reachable from networks I did not intend. If Caddy listens on the LAN address, the proxy has escaped the tailnet. I dont need either.
+Those two binds are the boundary. If the app listens on `0.0.0.0`, it may be reachable from networks I did not intend. If Caddy listens on the LAN address, the proxy has escaped the tailnet. I don't need either.
 
-HTTPS is important to consider. Tailscale answers whether two devices may communicate. TLS proves to the browser that the process at the other end is allowed to call itself `app.dev.example.com`. Cookies, service workers, WebAuthn, and the the web at large care about HTTPS.
+HTTPS is important to consider. Tailscale answers whether two devices may communicate. TLS proves to the browser that the process at the other end is allowed to call itself `app.dev.example.com`. Cookies, service workers, WebAuthn, and the web at large care about HTTPS.
 
 Since public ingress is a no-go, HTTP-01 certificate validation was out. DNS-01 lets Caddy request a certificate, publish the CA's TXT challenge through my DNS provider's API, and complete validation without opening port 80. The Caddy binary on each system needed a module for my DNS provider so it can manage certs.
 
@@ -128,7 +128,7 @@ The exact Caddy build, service definitions, and DNS records live in the [referen
 
 ## Machines have roles
 
-Now that everythign is connected, my laptop became a a gateway to so much more. I ended up with four roles spread across the hardware I already owned:
+Now that everything is connected, my laptop became a gateway to so much more. I ended up with four roles spread across the hardware I already owned:
 
 ```text
 Client laptop    | editor, browser, Mosh; sleeps and changes networks
@@ -143,7 +143,7 @@ The GPU workstation is a bounded compute tier. It can run quantized local models
 
 The Linux laptop exists because sometimes the kernel is the feature. Making it a native Tailscale peer was less work than virtualizing Linux on the mini. It gets its own keypair, address, firewall, and application boundary like every other machine.
 
-And for fun I've got my phone and ipad loaded with Tailscale. No, I have not connected a terminal or agents to them intentionally. I'd be checking things way too often. But I've got access to my files in the meantime ;).
+And for fun I've got my phone and iPad loaded with Tailscale. No, I have not connected a terminal or agents to them intentionally. I'd be checking things way too often. But I've got access to my files in the meantime ;).
 
 ## Persistent work, not persistent SSH
 
@@ -158,11 +158,11 @@ In the spirit of layers, I treat remote work as four separate ones in my daily w
 | Herdr         | Keeps agents, servers, tests, and logs running after the connection vanishes |
 | Remote editor | Keeps files and builds on the remote while the interface stays on my laptop  |
 
-[Mosh](https://mosh.org/) handles the unreliable pipe. It uses UDP, so the host firewall must allow its port range on the Tailscale interface. [Herdr](https://github.com/herdrdev/herdr) handles the durable workspace. When the laptop wakes up on another network, I reconnect to the same work instead of reconstructing it from shell history. Its a slick TUI.
+[Mosh](https://mosh.org/) handles the unreliable pipe. It uses UDP, so the host firewall must allow its port range on the Tailscale interface. [Herdr](https://github.com/herdrdev/herdr) handles the durable workspace. When the laptop wakes up on another network, I reconnect to the same work instead of reconstructing it from shell history. It's a slick TUI.
 
 Tailscale membership does not automatically grant shell access. Overlay identity and SSH identity remain separate. I still distribute keys deliberately and use key-only SSH.
 
-Layers of reponsibilities: SSH knows who opened the workspace. Mosh keeps a path to it. Herdr keeps it alive. The editor makes it comfortable. No one layer pretends to do all four jobs.
+Layers of responsibilities: SSH knows who opened the workspace. Mosh keeps a path to it. Herdr keeps it alive. The editor makes it comfortable. No one layer pretends to do all four jobs.
 
 ## Growing the cloud
 
@@ -174,7 +174,7 @@ A new app on the network takes three steps:
 
 The wildcards do the legwork, so I do not add a DNS record for every dev server. The app receives a readable URL and a trusted certificate without becoming a new network listener.
 
-Hosts with their own ingress gets a nested wildcard instead of competing for the hub's flat namespace:
+Hosts with their own ingress get a nested wildcard instead of competing for the hub's flat namespace:
 
 ```text
 *.dev.example.com         -> mini
@@ -182,7 +182,7 @@ Hosts with their own ingress gets a nested wildcard instead of competing for the
 *.linux.dev.example.com   -> Linux laptop
 ```
 
-Each host runs its own Caddy process, binds to its own Tailscale address, and enforces its own firewall. This lets me do things like run graphana on the gpu station specific to my Ollama setup at `grafana.gpu.dev.example.com`.
+Each host runs its own Caddy process, binds to its own Tailscale address, and enforces its own firewall. This lets me do things like run Grafana on the GPU station specific to my Ollama setup at `grafana.gpu.dev.example.com`.
 
 Loopback comes first on the GPU host too. Ollama, Open WebUI, Grafana, Prometheus, and Dozzle do not become safe merely because they sit on a tailnet. A raw model API stays on loopback. A dashboard gets application authentication before it gets a vanity URL.
 
@@ -190,7 +190,7 @@ As the number of apps grew, I split Caddy sites into `conf.d/*.caddy` and passed
 
 ## Private by routing is not private by policy
 
-This architecture is private by routing, not private by host policy. A device outside the tailnet has no path to the service. A device inside it can still reach whatever Tailscale ACLs, the host firewall, SSH, Caddy, and the application permit. I could take it as step further and implement an ACL, but that would be overkill for my single-user needs.
+This architecture is private by routing, not private by host policy. A device outside the tailnet has no path to the service. A device inside it can still reach whatever Tailscale ACLs, the host firewall, SSH, Caddy, and the application permit. I could take it a step further and implement an ACL, but that would be overkill for my single-user needs.
 
 I treat the boring controls as part of the setup rather than a hardening project for later:
 
@@ -199,7 +199,7 @@ I treat the boring controls as part of the setup rather than a hardening project
 3. Anything leaving loopback gets its own authentication. Open WebUI gets an admin account, Grafana loses anonymous admin, and raw Ollama remains private to the host.
 4. Recovery has a documented procedure. For example, a stolen laptop means disabling its Tailscale node and rotating its SSH keys... a leaked DNS token gets revoked and replaced.
 
-Public metadata and secrets also distinction and careful handling. DNS names, certificate logs, and the existence of this architecture are public. DNS API tokens, tailnet names, usernames, real addresses, and unresolved security gaps are not.
+Public metadata and secrets also need distinction and careful handling. DNS names, certificate logs, and the existence of this architecture are public. DNS API tokens, tailnet names, usernames, real addresses, and unresolved security gaps are not.
 
 ## What I prioritized
 

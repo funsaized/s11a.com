@@ -31,7 +31,7 @@ The full, completed source code can be [found here](https://github.com/funsaized
 
 I'm sure you're aware of Stack Exchange, but did you know the people over at Stack Exchange, Inc publish all content as scheduled [data dumps](https://archive.org/details/stackexchange)? We're going to take these public records and ingest them into a relational database to demonstrate development with Spring Batch.
 
-The job will ingest everything in a site on StackExchange (posts, comments, users, etc) into a MySQL database. Using Spring Batch we can create a maintainable and extensible Job usign a minimal amount of code.
+The job will ingest everything in a site on StackExchange (posts, comments, users, etc) into a MySQL database. Using Spring Batch we can create a maintainable and extensible Job using a minimal amount of code.
 
 ![Batch job dataflow](/images/articles/batch-job.png)
 
@@ -83,7 +83,7 @@ spring:
     password: "pass"
 ```
 
-Out of the box there are some sample readers and writes in the package `com.batch.config.readers` for testing that aren't needed, so clear those out. With a blank project, let's work on reading and printing the data we've downloaded.
+Out of the box there are some sample readers and writers in the package `com.batch.config.readers` for testing that aren't needed, so clear those out. With a blank project, let's work on reading and printing the data we've downloaded.
 
 ### Adding POJOs for the domain objects
 
@@ -151,7 +151,7 @@ Specifying this information using fluent builder syntax looks like this:
 
 Above we create a `StaxEventItemReader` named `postReader` that operates on elements named `row` using the `Jaxb2Marshaller` (a generic marshaller/unmarshaller using the Java Architecture for XML Binding a.k.a JAXB spec). We're also binding the `Post` class defined above to the unmarshaller instance `unmarsh`.
 
-We need to do one more thing before reading XML, and that is annotate the POJO entities we defined with some metadata required for deserialization. You'll notice the addition of a few annotations. `XmlRootElement` specifies the name of individual elements in a document and `XmlAttribute` specifies how to map to fields in the class. Lastly, `XmlAccessorType` is used to determine how to marshal to/from XML, and we specify that `XmlAccessType.FIELD` to signify that each field should be found to XML:
+We need to do one more thing before reading XML, and that is annotate the POJO entities we defined with some metadata required for deserialization. You'll notice the addition of a few annotations. `XmlRootElement` specifies the name of individual elements in a document and `XmlAttribute` specifies how to map to fields in the class. Lastly, `XmlAccessorType` is used to determine how to marshal to/from XML, and we specify that `XmlAccessType.FIELD` to signify that each field should be bound to XML:
 
 ```java
 import javax.persistence.Entity;
@@ -369,13 +369,13 @@ Simply define a Bean of type `StaxEventItemReader` that is bound to the POJO rep
 
 If you recall, a chunk-oriented step must read from at least one input and write to at least one output. So far we've constructed wiring to read our target data from XML and write to the console. Now let's close the loop and write to a relational database.
 
-Before defining the `ItemWriter`s for the job, let's get an instance of MySQL up and running. This can be done many ways. The simplest for local development nowadays is via a container. Using docker we can start an instance of MySQL as follows:
+Before defining the `ItemWriter`s for the job, let's get an instance of MySQL up and running. This can be done many ways. The simplest for local development nowadays is via a container. Using Docker we can start an instance of MySQL as follows:
 
 ```bash
 docker run --name test-mysql -e MYSQL_ROOT_PASSWORD=password -e MYSQL_ROOT_USER=root -e MYSQL_PASSWORD=password -d -p 3306:3306 mysql:5.7.26
 ```
 
->I happen to be running apple silicon and the typical mysql image doesn't work. As a workaround I ended up using this [mysql-server image](https://hub.docker.com/r/mysql/mysql-server) without issue.
+>I happen to be running Apple silicon and the typical mysql image doesn't work. As a workaround I ended up using this [mysql-server image](https://hub.docker.com/r/mysql/mysql-server) without issue.
 
 Once your instance of MySQL is running, the last setup step is to create the target database and execute the schema. I created a database `stacke` and executed [the full schema here](https://github.com/funsaized/stack-exchange-dump-to-mysql/blob/master/src/main/resources/schema-base.sql) to get a set of empty tables to populate via the batch job.
 
@@ -391,7 +391,7 @@ app:
     password: ${MYSQL_PWD:password}
 ```
 
-You may also notice the rapid-starter & package `com.batch.config.db` sets up spring-data-jpa. This will come in handy shortly... To verify succesful configuration, go ahead and start up the application. You should see some new output this time similar to below if everything worked:
+You may also notice the rapid-starter & package `com.batch.config.db` sets up spring-data-jpa. This will come in handy shortly... To verify successful configuration, go ahead and start up the application. You should see some new output this time similar to below if everything worked:
 
 ```bash
 2022-03-06  INFO 50201 --- [main] o.hibernate.jpa.internal.util.LogHelper: HHH000204: Processing PersistenceUnitInfo [name: appPersU]
@@ -410,7 +410,7 @@ You may also notice the rapid-starter & package `com.batch.config.db` sets up sp
 2022-03-06  INFO 50201 --- [main] com.snimma1.Application: Started Application in 2.004 seconds (JVM running for 2.229)
 ```
 
-To write batches to MySQL, we need to define `ItemWriter`s using the `Datasource` we just configured. There are a number of valid ways to do this. For example, we could write a custom `ItemWriter` by injecting the MySQl `DataSource` into our implementation. However, we can save some time by leveraging the the `JpaItemWriter` [implementation](https://docs.spring.io/spring-batch/docs/current/api/org/springframework/batch/item/database/JpaItemWriter.html) that comes with Spring Batch. We can create a single instance of a `JpaItemWriter` with the persistance context for the `app.datasource` and use it to write each entity (i.e post, comment, etc) to MySQL. Since the rapid-starter has already setup spring-data-jpa, we just need to inject the `EntityManager` associated with `app.datasource` to create a working writer. Our complete `WritersConfig` looks like this:
+To write batches to MySQL, we need to define `ItemWriter`s using the `Datasource` we just configured. There are a number of valid ways to do this. For example, we could write a custom `ItemWriter` by injecting the MySQL `DataSource` into our implementation. However, we can save some time by leveraging the `JpaItemWriter` [implementation](https://docs.spring.io/spring-batch/docs/current/api/org/springframework/batch/item/database/JpaItemWriter.html) that comes with Spring Batch. We can create a single instance of a `JpaItemWriter` with the persistence context for the `app.datasource` and use it to write each entity (i.e post, comment, etc) to MySQL. Since the rapid-starter has already setup spring-data-jpa, we just need to inject the `EntityManager` associated with `app.datasource` to create a working writer. Our complete `WritersConfig` looks like this:
 
 ```java
 @Configuration
@@ -523,7 +523,7 @@ This one confused me initially because everything above looks like it should wri
   }
 ```
 
-Re-running with these changes and observe the step will write Posts to MySQL!
+Re-run with these changes and observe that the step will write Posts to MySQL!
 
 ```bash
 2022-03-07  INFO 8182 --- [main] com.snimma1.Application: Started Application in 1.855 seconds (JVM running for 2.057)
@@ -634,7 +634,7 @@ public Step step1(
 
 ## Executing parallel writes
 
-Each of the other `Step`s in job follows the same pattern outlined above (save for the processing step). You can find the full set of `Step` [definitions here](https://github.com/funsaized/stack-exchange-dump-to-mysql/blob/master/src/main/java/com/snimma1/config/batch/BatchConfig.java#L107). What I want to focus on before recapping is the concept of parallel processing within Spring Batch.
+Each of the other `Step`s in the job follows the same pattern outlined above (save for the processing step). You can find the full set of `Step` [definitions here](https://github.com/funsaized/stack-exchange-dump-to-mysql/blob/master/src/main/java/com/snimma1/config/batch/BatchConfig.java#L107). What I want to focus on before recapping is the concept of parallel processing within Spring Batch.
 
 The framework offers two modes of parallel processing:
 
@@ -684,7 +684,7 @@ public Job importStackDumpToSql(Flow jobFlow) {
 }
 ```
 
-Now we can sit back and executing the job to get an import of an entire Stack Exchange site into MySQL!
+Now we can sit back and execute the job to get an import of an entire Stack Exchange site into MySQL!
 
 ## Summary
 

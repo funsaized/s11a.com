@@ -16,7 +16,7 @@ author: Sai Nimmagadda
 ---
 
 ## The "Problem"
-When developing a production ready data pipeline, there are a number of aspects to consider aside from simply developing functional code. For example, a strong workflow may include dependency management, checkpoints, parameterization, visualization, and failure recovery. Suddenly, the traditional python data (shown below) pipeline becomes much more complex:
+When developing a production ready data pipeline, there are a number of aspects to consider aside from simply developing functional code. For example, a strong workflow may include dependency management, checkpoints, parameterization, visualization, and failure recovery. Suddenly, the traditional Python data pipeline (shown below) becomes much more complex:
 
 ```python
 if __name__ == ‘__main__’:
@@ -35,12 +35,12 @@ Simply put, the Target class maps to an output of many different types. An outpu
 A task, on the other hand, is a method designed by extending the class `luigi.Task`. The output of a task is a target. This infrastructure of tasks and targets creates a key feature of the Luigi workflow: atomicity. Because a task requires a successful target to have complete status, we can ensure tasks have been run to completion in time for subsequent tasks while simultaneously pinpointing errors in the flow. To get an idea of what we’re talking about, take a look at the example task provided using our old friends ‘foo’ and ‘bar’ here.
 
 ## The Example 
-Here’s a brief pipeline that mirrors some of the imports we do on a daily basis in my work developing healthcare software. In this scenario, raw provider data from a hospital was given as a dropped excel file on a corporate shared drive. The information was to be cleaned, formatted, and uploaded into an application’s MySQL database in order to be visible within the app. For the most part, the pipeline presented here is synonymous with the one pushed into production; however, protected information has been removed, as well as some complexity simplified for ease of presentation. One thing to note – if you’ve started to peek at the codebase and are confused by the filepaths, the code reviewed here was deployed in an Alpine Linux docker image.
+Here’s a brief pipeline that mirrors some of the imports we do on a daily basis in my work developing healthcare software. In this scenario, raw provider data from a hospital was given as a dropped Excel file on a corporate shared drive. The information was to be cleaned, formatted, and uploaded into an application’s MySQL database in order to be visible within the app. For the most part, the pipeline presented here is synonymous with the one pushed into production; however, protected information has been removed, as well as some complexity simplified for ease of presentation. One thing to note – if you’ve started to peek at the codebase and are confused by the filepaths, the code reviewed here was deployed in an Alpine Linux docker image.
 
 For our example, the dataset and codebase can be found here. A quick peek at the spreadsheet would reveal that for this exercise we are actually loading Disney characters in the form of healthcare providers! We can see that the dataset has headers *NP*, *NpFirstName*, *NpLastName*, *NPI*, and *Type*. (note: NPI is the unique 10 digit identification number required to recognize healthcare providers in the US).  Our deliverable is correctly formatted data in our application’s MySQL server (see here with output column names). And, with anything new, I feel the best way to learn is by jumping right into it…
 
 ## The Implementation
-The first part of 99% of data pipelines is the **E** in ETL: extract. In order to do that, we’re going to take advantage of one of my favorite python libraries, pandas, and make a simple python function that will later be fed into a Luigi.task object:
+The first part of 99% of data pipelines is the **E** in ETL: extract. In order to do that, we’re going to take advantage of one of my favorite Python libraries, pandas, and make a simple Python function that will later be fed into a Luigi.task object:
 
 ```python
 def stage_data(filename):
@@ -56,11 +56,11 @@ def stage_data(filename):
 
 The next step in the pipeline is the **T** or transform. Here the transformation is relatively straightforward and is an exercise of mapping input columns to our output columns; however, during this step we must also prune the data for any invalid or bad entries. In the context of this example, bad data is classified as a row of raw data in which there exists a duplicate NPI (provider already loaded into application) or the provider’s full name was null. A quick peek at the raw data reveals that we have both a duplicate NPI entry in two rows (see Minnie Mouse) and a provider with an empty full name (see Buzz Lightyear). Therefore, our flow should include tasks for cleaning and logging these changes to the data.
 
-To do this, let’s create a task that will kick off our workflow, called CreateLogFiles. Looking at the repository reveals that the class follows the task structure of **Requires**, **Output**, and **Run** . Specifically, this tasks has no requirements, and during runtime produces three log files prefixed with the filename that is being imported and the current date. Upon completion, the task looks for the last of the three log files created to inform the central scheduler that its execution is complete.
+To do this, let’s create a task that will kick off our workflow, called CreateLogFiles. Looking at the repository reveals that the class follows the task structure of **Requires**, **Output**, and **Run** . Specifically, this task has no requirements, and during runtime produces three log files prefixed with the filename that is being imported and the current date. Upon completion, the task looks for the last of the three log files created to inform the central scheduler that its execution is complete.
 
-Next, we create the tasks to actually transform and log the transformations of the data. Specifically, these tasks are the `LogErrors` and `LogDuplicates` tasks. These two tasks are very similar, differing only in what they are logging. The logic to do so is pure python, and relatively straightforward to follow. In the `LogErrors` task, the row for Buzz Lightyear will be identified whereas in the LogDuplicates tasks the row for Minnie Mouse will be identified. Once logged, these rows are removed from the target containing clean data that will be passed to subsequent tasks. Both tasks return `luigi.LocalTarget('/root/etc/mnt/Import/' + os.path.splitext(self.filename)[0] + '_' + timestr + '_Filtered.xlsx')`. The key here is atomicity. By using targets stamped with the current date and suffixed with an identifying tag, we simultaneously maintain logs and cleaned versions of our new data to pass to downstream jobs.
+Next, we create the tasks to actually transform and log the transformations of the data. Specifically, these tasks are the `LogErrors` and `LogDuplicates` tasks. These two tasks are very similar, differing only in what they are logging. The logic to do so is pure python, and relatively straightforward to follow. In the `LogErrors` task, the row for Buzz Lightyear will be identified whereas in the `LogDuplicates` task the row for Minnie Mouse will be identified. Once logged, these rows are removed from the target containing clean data that will be passed to subsequent tasks. Both tasks return `luigi.LocalTarget('/root/etc/mnt/Import/' + os.path.splitext(self.filename)[0] + '_' + timestr + '_Filtered.xlsx')`. The key here is atomicity. By using targets stamped with the current date and suffixed with an identifying tag, we simultaneously maintain logs and cleaned versions of our new data to pass to downstream jobs.
 
-With our cleaned data we’re finally ready populate the database. We first write a couple functions to connect to our MySQL server using PyMySQL and load the data into desired tables:
+With our cleaned data we’re finally ready to populate the database. We first write a couple functions to connect to our MySQL server using PyMySQL and load the data into desired tables:
 
 ```python
 def get_connection(hostname, username, password):
@@ -143,7 +143,7 @@ class ImportFlow(luigi.WrapperTask):
         return
 ```
 
-To run this locally, we navigate to simply call our wrapper task using the syntax outlined in Luigi’s docs and pass in our parameters. The final flag tells Luigi not to connect to a scheduled server:
+To run this locally, we simply call our wrapper task using the syntax outlined in Luigi’s docs and pass in our parameters. The final flag tells Luigi not to connect to a scheduled server:
 
 `luigi --module provider_import ImportFlow --filename test_provider_import_A.xlsx --dbName MyDB --username usr --password pwd --local-scheduler`
 

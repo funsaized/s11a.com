@@ -28,7 +28,7 @@ We will explore one of the essential features of Cosmos DB - pagination and cont
 
 ## Setting up a workspace
 
-The code here has been hacked together from the [quick start for java example](https://github.com/Azure-Samples/azure-cosmos-java-getting-started/blob/main/src/main/java/com/azure/cosmos/sample/sync/SyncMain.java). To create a workspace, simply use the portal to create a Cosmos DB [free tier](https://learn.microsoft.com/en-us/azure/cosmos-db/free-tier).
+The code here has been hacked together from the [quick start for Java example](https://github.com/Azure-Samples/azure-cosmos-java-getting-started/blob/main/src/main/java/com/azure/cosmos/sample/sync/SyncMain.java). To create a workspace, simply use the portal to create a Cosmos DB [free tier](https://learn.microsoft.com/en-us/azure/cosmos-db/free-tier).
 
 Once you have a Cosmos instance, set the primary key and connection strings that the program will use to create a client.
 
@@ -49,7 +49,7 @@ You can then run the example code. [It can be found here](https://github.com/fun
 
 Cosmos DB stored procedures are written in JavaScript. This allows for a wide range of syntax. The `chain` command allows for extremely concise scripting. The syntax is modeled after lodash and ECMAScript5 array functions. [This cheat sheet](https://learn.microsoft.com/en-us/azure/cosmos-db/nosql/javascript-query-api#sql-to-javascript-cheat-sheet) should give you the tools to get started writing with it.
 
-Within a partition the stored procedure be doing the equivalent SQL query (with pagination):
+Within a partition the stored procedure will be doing the equivalent SQL query (with pagination):
 
 ```sql
 SELECT i.address FROM items i;
@@ -79,7 +79,7 @@ function getItems(continuation) {
 }
 ```
 
-Within the chain's terminating `value()` we are setting the `FeedOptions` to the default `pageSize` of 100 wiring in the `continuation` token from procedure input. In the callback we set the response body to include the resulting documents in `result` field and the associated continuation token, it it exists, in the `continuation` field.
+Within the chain's terminating `value()` we are setting the `FeedOptions` to the default `pageSize` of 100 wiring in the `continuation` token from procedure input. In the callback we set the response body to include the resulting documents in the `result` field and the associated continuation token, if it exists, in the `continuation` field.
 
 The full server-side JS API can be found [here](http://azure.github.io/azure-cosmosdb-js-server/index.html).
 

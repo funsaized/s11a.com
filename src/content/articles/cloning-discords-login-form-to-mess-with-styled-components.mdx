@@ -18,7 +18,7 @@ author: Sai Nimmagadda
 
 ## [styled-components](https://styled-components.com/)
 
-I've been eyeing [styled-components](https://styled-components.com/) for a while now, so I decided to throw together a clone of the Discord login form to get a feel for developing with the library. Here's my current progresss - it's responsive, but missing some key elements like the cool SVG animation of the background:
+I've been eyeing [styled-components](https://styled-components.com/) for a while now, so I decided to throw together a clone of the Discord login form to get a feel for developing with the library. Here's my current progress - it's responsive, but missing some key elements like the cool SVG animation of the background:
 
 ![](/images/articles/discordClone.png)
 <div style={{textAlign: "center", fontWeight: 800, fontStyle: "italic"}}>
@@ -26,7 +26,7 @@ I've been eyeing [styled-components](https://styled-components.com/) for a while
 </div>
 
 
-After throwing this together, I gotta say I enjoyed flow of using styled-components. I know it's just CSS in JS, but it *feels* slick. Using it completely removed any worry of conflicting class names / styles and I also really enjoyed the way props work. I personally find coding logic to determine styles in render methods tedious. But with styled-components the coupling of logic and styles is closer than ever. Take this simple usage of props. By passing in the prop `primary` to the `GamerForm` we are able to influence its style:
+After throwing this together, I gotta say I enjoyed the flow of using styled-components. I know it's just CSS in JS, but it *feels* slick. Using it completely removed any worry of conflicting class names / styles and I also really enjoyed the way props work. I personally find coding logic to determine styles in render methods tedious. But with styled-components the coupling of logic and styles is closer than ever. Take this simple usage of props. By passing in the prop `primary` to the `GamerForm` we are able to influence its style:
 
 ```css
 /* GamerForm.js */
@@ -72,7 +72,7 @@ class DiscordForm extends React.Component {
           ....
 ```
 
-Theming is another neat tool that comes in styled components that has parallels in things like SASS. By wrapping styled-components in  a `<ThemeProvider>` component and passing in an object like the following you can build re-usable and dynamically themed sites:
+Theming is another neat tool that comes in styled components that has parallels in things like SASS. By wrapping styled-components in a `<ThemeProvider>` component and passing in an object like the following you can build re-usable and dynamically themed sites:
 
 ```css
 const theme = {
