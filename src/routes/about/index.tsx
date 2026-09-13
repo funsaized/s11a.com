@@ -117,8 +117,7 @@ function RouteComponent() {
 						workflows, and turning ambiguous ideas into shipped software.
 					</p>
 					<p>
-						The throughline is leverage — products users value, and engineering
-						systems that let teams move faster.
+            This site is my space for self-expression. It is my digital garden, a space to share what I've learned with the world. It will always be organic content, free from AI writing and sponsored posts.
 					</p>
 				</div>
 			</section>
