@@ -44,6 +44,10 @@ const desk: Definition[] = [
 	{ key: "terminal", value: "Ghostty" },
 	{ key: "laptop", value: 'MacBook Air 13" M4, 24GB RAM' },
 	{ key: "home server", value: "Mac Mini M1 (2020), 16GB RAM" },
+	{
+		key: "home server 2",
+		value: "Omarchy, Ryzen 9 5900XT, RTX 3080 Ti, 32GB RAM",
+	},
 	{ key: "keyboard", value: "Keychron K2 HE Wireless" },
 	{ key: "this site", value: "TanStack Start + Tailwind, hosted on Vercel" },
 ];
