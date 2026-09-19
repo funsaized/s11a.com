@@ -1,0 +1,185 @@
+---
+title: "Porting my VS Code debug workflow to LazyVim"
+slug: porting-vscode-debugging-to-lazyvim
+excerpt: >-
+  After a week with LazyVim, it was time to figure out a key tool in my 
+  day-to-day development workflow: the TypeScript debugger. Turns out I 
+  enabled LazyVim's DAP extras already and basically just had to internalize the keys.
+date: "2026-09-19"
+category: Productivity
+tags:
+  - Neovim
+  - LazyVim
+  - TypeScript
+  - VSCode
+  - Tools
+  - Omarchy
+  - Linux
+readingTime: 6 min read
+author: Sai Nimmagadda
+---
+
+I've been a VS Code user for years. I even [wrote about that setup](/articles/my-custom-operator-mono-vscode-setup). Then [Zed pulled me in](/articles/design-principles-behind-my-zed-config) for a while. Lately, with all the agentic coding, I wanted to _feel something_ again. In an effort to stay sharp, I've been much more intentional about going 'lower-level' and building without AI in recent months. Taking my editor one level lower into the Vim space seemed like a fun little challenge.
+
+For the past week, I've been on an Omarchy Linux distro rocking LazyVim (the default editor out of the box), and I gotta say, the ecosystem makes you feel like a true master-of-the-machines. You can't beat this workflow:
+
+```bash
+- Super + Enter -> Launch terminal
+- z <my-project-glob> -> zoxide smart cd
+- nvim . -> launch neovim
+- <leader>fr -> open recents via snacks.picker
+```
+
+After a week, I've gotten the basic navigation and editing experience down. The last part missing from my day-to-day workflow was the ability to debug. When I started googling, it became apparent there was a relatively simple path forward... once I taught myself how the LazyVim ecosystem works.
+
+## Where things live
+
+I'm going to be honest. I should've read the [LazyVim](https://www.lazyvim.org/) docs more closely. The first sentence makes it clear that `LazyVim != lazy.nvim`. In lieu of reading the docs with proper attention, my escapades through Google searches gave me this mental model:
+
+1. Neovim is the actual editor. It provides buffers, windows, commands, keymaps, etc.
+2. [`lazy.nvim` is a plugin package manager](https://github.com/folke/lazy.nvim). It is roughly the Neovim equivalent to `npm`, `cargo`, or `pip`, but for Neovim plugins. It allows for downloading Lua plugins, which Neovim interprets. Vimscript bad, Lua good 👍.
+3. [LazyVim is a configured Neovim distro](https://github.com/LazyVim/LazyVim). Yes, it's an amazing naming choice, considering the package manager. It is a carefully designed config built on top of `lazy.nvim`.
+4. Mason is an installer for external developer tools. It handles the mess of manually finding, downloading, and updating packages and compatibility with other Neovim plugins. Think app store for language tools. Without it, I'd have to source and wire up tools for every language I use. 
+
+My model for managing my editor is now:
+
+```bash
+Neovim
+   ↓
+lazy.nvim
+   ↓
+LazyVim
+   ↓
+your config
+```
+
+
+| Tool           | What it installs                                                         | Where it lives                                                                   |
+| -------------- | ------------------------------------------------------------------------ | -------------------------------------------------------------------------------- |
+| lazy.nvim      | Neovim plugins (`nvim-dap`, `nvim-dap-ui`, …)                            | `~/.local/share/nvim/lazy/`                                                      |
+| LazyVim extras | Feature packs: plugins plus the Lua that wires them                      | Declared in `~/.config/nvim/lazyvim.json`; implemented under LazyVim's `extras/` |
+| Mason          | Language servers, formatters, debug adapters (the binaries DAP talks to) | `~/.local/share/nvim/mason/packages/`                                            |
+
+
+Functionally, a LazyVim extra is a recipe. You put a string in `lazyvim.json`, and LazyVim tells lazy.nvim which plugins to fetch _and_ drops in the Lua that binds keys, adapters, and default configurations. 
+
+Mason is a different layer: it installs the lower-level tooling (CLIs) those plugins talk to. `js-debug-adapter` is a Mason package. `nvim-dap` is a lazy.nvim plugin.
+
+## What I already had on
+
+The relevant extras in `lazyvim.json`:
+
+```json
+"lazyvim.plugins.extras.dap.core",
+"lazyvim.plugins.extras.dap.nlua",
+"lazyvim.plugins.extras.lang.typescript",
+"lazyvim.plugins.extras.lang.typescript.oxc",
+"lazyvim.plugins.extras.lang.typescript.vtsls"
+```
+
+`dap.core` pulls `nvim-dap`, the DAP UI, virtual text, and `mason-nvim-dap`. It also binds the `<leader>d*` keys, and I found out it reads `.vscode/launch.json` on demand.
+
+`lang.typescript` is doing more than LSP. It really is two extras glued together: an LSP and optional debug wiring. Because `dap.core` is also enabled, bringing with it `nvim-dap`, other extras wake up. Mason then installs `js-debug-adapter`, and LazyVim registers `pwa-node` / `pwa-chrome` adapters plus Launch file and Attach configs for `typescript` and `javascript`.
+
+I also have `lang.java`, so Mason pulled `java-debug-adapter` too. As you can see, LazyExtras pulled the plugins. Mason pulled the adapter binary.
+
+## Mapping VS Code debugging to Neovim's keymap
+
+| VS Code               | LazyVim                             |
+| --------------------- | ----------------------------------- |
+| F9                    | `<leader>db`                        |
+| F5                    | `<leader>dc`                        |
+| F10 / F11 / Shift+F11 | `<leader>dO` / `di` / `do`          |
+| Stop                  | `<leader>dt`                        |
+| Debug console / watch | DAP UI auto-opens (`<leader>du`)    |
+| Hover a value         | virtual text, or `<leader>de`       |
+| `.vscode/launch.json` | loaded on demand (`dap.ext.vscode`) |
+
+`:DapContinue` still works. The keys are the port.
+
+## What's talking to what
+
+This is the same protocol that VS Code uses. The adapter is the debug server, and its configuration out of the box is either _launch_ (DAP starts the process) or _attach_ (you started it, DAP connects). Behind the scenes, DAP talks to the adapter, which talks to Node.
+
+## Launch file
+
+At this point, I figured I was ready to launch a file. I was working on a script to pull an open dataset and write the raw data file. I used `<leader>db` to place my first breakpoint after parsing args as a sanity check. The system pooped out:
+
+```
+[dap] Error: Spawn 'tsx' ENOENT or Failed to launch target: spawn tsx ENOENT
+```
+
+On my new Omarchy install, neither `tsx` nor `ts-node` was on PATH. The launch file runs whatever LazyVim stuffed in `runtimeExecutable`, which is controlled by LazyVim's `lang.typescript` extra:
+
+```
+runtimeExecutable = vim.fn.executable("tsx") == 1 and "tsx" or "ts-node"
+```
+
+`nvim-dap` sends this config to the adapter, which is Mason's `js-debug-adapter`, and that spawns `tsx script.ts` or `ts-node script.ts`. In my case, no `tsx` in my PATH meant attach would erroneously choose ts-node. A global install fixed this immediately, and I was able to attach my script:
+
+```bash
+npm i -g tsx
+```
+
+<video
+  autoPlay
+  controls
+  muted
+  playsInline
+  preload="metadata"
+  aria-label="TypeScript debugging in LazyVim"
+  src="/videos/articles/vim-debug.mp4"
+/>
+
+## Attach
+
+Attaching to existing processes is also something I do regularly. This can be done by starting Node with the desired inspector flags. `--inspect-brk` breaks before any user code runs, which is what you want for a script. `--inspect` listens without pausing, which is what you want for a server that other things are waiting on.
+
+```bash
+node --inspect-brk ./dist/main.js
+# or
+NODE_OPTIONS=--inspect npm run dev
+```
+
+Then `<leader>dc` -> **Attach** and I pick the process. 
+
+
+## `launch.json`
+
+I can also drop the same `.vscode/launch.json` in the repo to drive config. LazyVim aliases `node` / `chrome` to `pwa-node` / `pwa-chrome`, so the `type` values VS Code wrote still resolve.
+
+```json
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Attach to Node",
+      "type": "node",
+      "request": "attach",
+      "port": 9229,
+      "cwd": "${workspaceFolder}",
+      "skipFiles": ["<node_internals>/**"]
+    },
+    {
+      "name": "Launch current file (tsx)",
+      "type": "node",
+      "request": "launch",
+      "runtimeExecutable": "tsx",
+      "args": ["${file}"],
+      "cwd": "${workspaceFolder}",
+      "sourceMaps": true,
+      "skipFiles": ["<node_internals>/**", "node_modules/**"]
+    }
+  ]
+}
+```
+
+## Debugging Neovim itself
+
+I've yet to do this, but I brought along `dap.nlua`, which brings in `one-small-step-for-vimkind`. This allows me to debug Lua scripts, which LazyVim is built on. If an extra ever misbehaves, this could be useful for debugging my config.
+
+## Developing comfort in the Neovim debugger
+
+I've been fiddling in the debugger for a bit. While it is nice to zip around panes with the keyboard, I do find the user experience less desirable than VS Code or Zed. Things like large objects or long names overflow certain panes. This is probably expected for a TUI-based editor. 
+
+I'll give it some time and learn some tricks. I'm willing to sacrifice a bit of UX for an all-in-one editor. 
