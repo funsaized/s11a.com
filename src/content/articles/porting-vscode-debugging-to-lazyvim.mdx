@@ -115,7 +115,7 @@ On my new Omarchy install, neither `tsx` nor `ts-node` was on PATH. The launch f
 runtimeExecutable = vim.fn.executable("tsx") == 1 and "tsx" or "ts-node"
 ```
 
-`nvim-dap` sends this config to the adapter, which is Mason's `js-debug-adapter`, and that spawns `tsx script.ts` or `ts-node script.ts`. In my case, no `tsx` in my PATH meant attach would erroneously choose ts-node. A global install fixed this immediately, and I was able to attach my script:
+`nvim-dap` sends this config to the adapter, which is Mason's `js-debug-adapter`, and that spawns `tsx script.ts` or `ts-node script.ts`. In my case, no `tsx` in my PATH meant attach would erroneously choose ts-node. A global install fixed this immediately, and I was able to launch my script:
 
 ```bash
 npm i -g tsx
