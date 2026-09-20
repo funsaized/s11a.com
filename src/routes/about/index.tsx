@@ -40,7 +40,7 @@ const expertise: Definition[] = [
 ];
 
 const desk: Definition[] = [
-	{ key: "editor", value: "Zed" },
+	{ key: "editor", value: "Zed + aspiring NeoVim" },
 	{ key: "terminal", value: "Ghostty" },
 	{ key: "laptop", value: 'MacBook Air 13" M4, 24GB RAM' },
 	{ key: "home server", value: "Mac Mini M1 (2020), 16GB RAM" },
