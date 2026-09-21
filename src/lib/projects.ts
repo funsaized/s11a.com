@@ -28,8 +28,8 @@ export const projects: Project[] = [
 		badge: "building",
 	},
 	{
-		icon: "🐸 ribbet",
-		title: "ribbet",
+		icon: "🐸 ribbit",
+		title: "ribbit",
 		path: "https://funsaized.github.io/ribbit/",
 		source: "htttps://github.com/funsaized/ribbit",
 		description:
