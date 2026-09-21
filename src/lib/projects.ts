@@ -30,8 +30,8 @@ export const projects: Project[] = [
 	{
 		icon: "🐸 ribbet",
 		title: "ribbet",
-		path: "https://funsaized.github.io/ribbet/",
-		source: "htttps://github.com/funsaized/ribbet",
+		path: "https://funsaized.github.io/ribbit/",
+		source: "htttps://github.com/funsaized/ribbit",
 		description:
 			"LLM-supercharged universal command line utility. A performance-first, local-first semantic shell toolkit.",
 		status: "active",
