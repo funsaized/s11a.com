@@ -28,6 +28,20 @@ export const projects: Project[] = [
 		badge: "building",
 	},
 	{
+		icon: "🐸 ribbet",
+		title: "ribbet",
+		path: "https://funsaized.github.io/ribbet/",
+		source: "htttps://github.com/funsaized/ribbet",
+		description:
+			"LLM-supercharged universal command line utility. A performance-first, local-first semantic shell toolkit.",
+		status: "active",
+		year: 2026,
+		category: "Developer tools",
+		badge: "building",
+		stars: 1,
+		forks: 0,
+	},
+	{
 		icon: "🧑‍🍳",
 		title: "herdr-mise",
 		path: "https://github.com/funsaized/herdr-mise",
