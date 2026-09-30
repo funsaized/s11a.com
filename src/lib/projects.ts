@@ -26,6 +26,7 @@ export const projects: Project[] = [
 		year: 2026,
 		category: "UI library",
 		badge: "building",
+		stars: 1,
 	},
 	{
 		icon: "🐸 ribbit",
@@ -38,7 +39,7 @@ export const projects: Project[] = [
 		year: 2026,
 		category: "Developer tools",
 		badge: "building",
-		stars: 1,
+		stars: 0,
 		forks: 0,
 	},
 	{
@@ -52,7 +53,7 @@ export const projects: Project[] = [
 		year: 2026,
 		category: "Developer tools",
 		badge: "new",
-		stars: 3,
+		stars: 4,
 		forks: 0,
 	},
 	{
@@ -66,7 +67,7 @@ export const projects: Project[] = [
 		year: 2026,
 		category: "Homelab",
 		badge: "building",
-		stars: 0,
+		stars: 2,
 		forks: 0,
 	},
 	{
@@ -79,7 +80,7 @@ export const projects: Project[] = [
 		year: 2026,
 		category: "Desktop app",
 		badge: "new",
-		stars: 0,
+		stars: 1,
 		forks: 0,
 	},
 	{
@@ -93,6 +94,7 @@ export const projects: Project[] = [
 		year: 2026,
 		category: "Image generation",
 		badge: "new",
+		stars: 2,
 	},
 	{
 		icon: "🌊",
@@ -104,6 +106,7 @@ export const projects: Project[] = [
 		status: "active",
 		year: 2026,
 		category: "Zed extension",
+		stars: 3,
 	},
 	{
 		icon: "🌅",
@@ -115,6 +118,7 @@ export const projects: Project[] = [
 		status: "archived",
 		year: 2025,
 		category: "Developer tools",
+		stars: 0,
 	},
 	{
 		icon: "📆",
@@ -126,7 +130,7 @@ export const projects: Project[] = [
 		status: "archived",
 		year: 2025,
 		category: "Utility",
-		stars: 0,
+		stars: 1,
 		forks: 0,
 	},
 	{
@@ -202,6 +206,7 @@ export const projects: Project[] = [
 		status: "active",
 		year: 2024,
 		category: "Open source",
+		stars: 0,
 	},
 	{
 		icon: "🏥",
@@ -213,5 +218,6 @@ export const projects: Project[] = [
 		status: "archived",
 		year: 2017,
 		category: "Open source",
+		stars: 6,
 	},
 ];
