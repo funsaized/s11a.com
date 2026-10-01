@@ -16,6 +16,7 @@ export const Route = createFileRoute("/about/")({
 interface Definition {
 	key: string;
 	value: string;
+	link?: string;
 }
 
 const expertise: Definition[] = [
@@ -42,6 +43,11 @@ const expertise: Definition[] = [
 const desk: Definition[] = [
 	{ key: "editor", value: "Zed + aspiring NeoVim" },
 	{ key: "terminal", value: "Ghostty" },
+	{
+		key: "dotfiles",
+		value: "DotBento",
+		link: "https://github.com/funsaized/dotbento",
+	},
 	{ key: "laptop", value: 'MacBook Air 13" M4, 24GB RAM' },
 	{ key: "home server", value: "Mac Mini M1 (2020), 16GB RAM" },
 	{
@@ -63,7 +69,20 @@ function DefinitionList({ items }: { items: Definition[] }) {
 					<dt className="self-baseline pt-1 font-mono text-[12.5px] tracking-[0.05em] text-accent">
 						{item.key}
 					</dt>
-					<dd className="text-[17px] text-muted-foreground">{item.value}</dd>
+					<dd className="text-[17px] text-muted-foreground">
+						{item.link ? (
+							<a
+								href={item.link}
+								target="_blank"
+								rel="noreferrer"
+								className="text-faint no-underline hover:text-accent"
+							>
+								{item.value}
+							</a>
+						) : (
+							item.value
+						)}
+					</dd>
 				</div>
 			))}
 		</dl>
