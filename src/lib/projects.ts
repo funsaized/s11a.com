@@ -16,6 +16,18 @@ export interface Project {
 
 export const projects: Project[] = [
 	{
+		icon: "🕷️",
+		title: "cr4wler",
+		path: "https://cr4wler.s11a.com",
+		source: "https://github.com/funsaized/cr4wler",
+		description: "It lives in chrome. Eight legs and questionable intentions.",
+		status: "active",
+		year: 2026,
+		category: "Chrome Extensions",
+		badge: "new",
+		stars: 1,
+	},
+	{
 		icon: "✏️",
 		title: "stet",
 		path: "https://stetkit.com",
