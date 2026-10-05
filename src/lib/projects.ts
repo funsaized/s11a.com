@@ -18,7 +18,7 @@ export const projects: Project[] = [
 	{
 		icon: "🕷️",
 		title: "cr4wler",
-		path: "https://cr4wler.s11a.com",
+		path: "https://chromewebstore.google.com/detail/cr4wler-%E2%80%94-a-little-web-mi/bnocpddjakljegjfehmjcpjbbilonmnf",
 		source: "https://github.com/funsaized/cr4wler",
 		description: "It lives in chrome. Eight legs and questionable intentions.",
 		status: "active",
