@@ -41,20 +41,6 @@ export const projects: Project[] = [
 		stars: 1,
 	},
 	{
-		icon: "🐸 ribbit",
-		title: "ribbit",
-		path: "https://funsaized.github.io/ribbit/",
-		source: "https://github.com/funsaized/ribbit",
-		description:
-			"LLM-supercharged universal command line utility. A performance-first, local-first semantic shell toolkit.",
-		status: "active",
-		year: 2026,
-		category: "Developer tools",
-		badge: "building",
-		stars: 0,
-		forks: 0,
-	},
-	{
 		icon: "🧑‍🍳",
 		title: "herdr-mise",
 		path: "https://github.com/funsaized/herdr-mise",
