@@ -60,8 +60,8 @@ export const projects: Project[] = [
 		path: "https://github.com/funsaized/hoardarr",
 		source: "https://github.com/funsaized/hoardarr",
 		description:
-			"A self-hosted movie automation workflow built on Swamp. Control your data, control your pipelines.",
-		status: "active",
+			"Self-hosted movie and TV library automation, with Swamp workflows and an agent at the controls.",
+		status: "in-progress",
 		year: 2026,
 		category: "Homelab",
 		badge: "building",
