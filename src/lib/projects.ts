@@ -16,6 +16,19 @@ export interface Project {
 
 export const projects: Project[] = [
 	{
+		icon: "🎊",
+		title: "piñata",
+		path: "https://pi.dev/packages/pi-pinata?name=pinata",
+		source: "https://github.com/funsaized/pinata",
+		description:
+			"Orchestrated subagents for Pi prioritizing developer experience and sppeed",
+		status: "in-progress",
+		year: 2026,
+		category: "Developer tools",
+		badge: "building",
+		stars: 2,
+	},
+	{
 		icon: "🕷️",
 		title: "cr4wler",
 		path: "https://chromewebstore.google.com/detail/cr4wler-%E2%80%94-a-little-web-mi/bnocpddjakljegjfehmjcpjbbilonmnf",
@@ -25,19 +38,6 @@ export const projects: Project[] = [
 		year: 2026,
 		category: "Chrome Extensions",
 		badge: "new",
-		stars: 1,
-	},
-	{
-		icon: "✏️",
-		title: "stet",
-		path: "https://stetkit.com",
-		source: "https://github.com/funsaized/stet",
-		description:
-			"Hand-sketched margin marks on live UI. Add circles, highlights, arrows, notes, and proofreader marks without replacing your controls or layout",
-		status: "active",
-		year: 2026,
-		category: "UI library",
-		badge: "building",
 		stars: 1,
 	},
 	{
