@@ -21,7 +21,7 @@ export const projects: Project[] = [
 		path: "https://pi.dev/packages/pi-pinata?name=pinata",
 		source: "https://github.com/funsaized/pinata",
 		description:
-			"Orchestrated subagents for Pi prioritizing developer experience and sppeed",
+			"Orchestrated subagents for Pi prioritizing developer experience and speed",
 		status: "in-progress",
 		year: 2026,
 		category: "Developer tools",
